@@ -188,3 +188,142 @@ document.addEventListener('DOMContentLoaded', function() {
     initSwiper();
     updateContent(0);
 });
+//-------------------------------------------
+// Случайные цвета для иконок при наведении
+//-------------------------------------------
+
+document.addEventListener('DOMContentLoaded', function() {
+    const navItems = document.querySelectorAll('.nav-item a');
+    
+    // Расширенный массив ярких и насыщенных цветов
+    const colors = [
+        // Красные и розовые
+        '#FF6B6B', // ярко-красный
+        '#FF4757', // алый
+        '#FF3838', // огненно-красный
+        '#FF6B81', // розово-красный
+        '#FD79A8', // розовый
+        '#F368E0', // ярко-розовый
+        '#E84393', // малиновый
+        '#D63384', // пурпурный
+        
+        // Оранжевые и желтые
+        '#FF8A5C', // оранжевый
+        '#FF6348', // красно-оранжевый
+        '#FF9F43', // мандариновый
+        '#FECA57', // золотой
+        '#FFD93D', // желтый
+        '#FDCB6E', // янтарный
+        '#F39C12', // охристый
+        
+        // Зеленые
+        '#00B894', // изумрудный
+        '#00CEC9', // темно-бирюзовый
+        '#55EFC4', // мятный
+        '#A3CB38', // салатовый
+        '#6AB04C', // зеленый
+        '#2ED573', // ярко-зеленый
+        '#27AE60', // изумрудно-зеленый
+        
+        // Синие и голубые
+        '#0984E3', // синий
+        '#45B7D1', // голубой
+        '#74B9FF', // светло-голубой
+        '#4ECDC4', // бирюзовый
+        '#00D2D3', // ярко-бирюзовый
+        '#1B9CFC', // королевский синий
+        '#4834D4', // темно-синий
+        
+        // Фиолетовые
+        '#6C5CE7', // фиолетовый
+        '#A29BFE', // светло-фиолетовый
+        '#9B59B6', // пурпурный
+        '#BE2EDD', // ярко-фиолетовый
+        '#8E44AD', // темно-фиолетовый
+        '#DDA0DD', // сливовый
+        '#CD84F1', // лавандовый
+        
+        // Неоновые
+        '#7BED9F', // неоново-зеленый
+        '#70A1FF', // неоново-синий
+        '#FFAF40', // неоново-оранжевый
+        '#FF4D4D', // неоново-красный
+        '#D980FA', // неоново-фиолетовый
+        '#F8A5C2', // неоново-розовый
+        
+        // Пастельные
+        '#FFB3B3', // пастельно-красный
+        '#FFD3B3', // пастельно-оранжевый
+        '#FFFFB3', // пастельно-желтый
+        '#B3FFB3', // пастельно-зеленый
+        '#B3D4FF', // пастельно-голубой
+        '#E6B3FF', // пастельно-фиолетовый
+        '#FFB3E6', // пастельно-розовый
+        
+        // Яркие и насыщенные
+        '#FF0000', // красный
+        '#FF7700', // оранжевый
+        '#FFDD00', // желтый
+        '#00FF00', // зеленый
+        '#00DDFF', // голубой
+        '#0066FF', // синий
+        '#9900FF', // фиолетовый
+        '#FF00FF', // маджента
+    ];
+    
+    // Функция для получения случайного цвета
+    function getRandomColor() {
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    // Функция для получения случайного цвета, отличного от предыдущего
+    let lastColor = null;
+    let lastColor2 = null; // Запоминаем два последних цвета для разнообразия
+    
+    function getUniqueRandomColor() {
+        let newColor;
+        let attempts = 0;
+        do {
+            newColor = getRandomColor();
+            attempts++;
+            // Если слишком много попыток, просто берем случайный
+            if (attempts > 50) break;
+        } while (newColor === lastColor || newColor === lastColor2);
+        
+        lastColor2 = lastColor;
+        lastColor = newColor;
+        return newColor;
+    }
+    
+    // Добавляем обработчики для каждой иконки
+    navItems.forEach(item => {
+        const icon = item.querySelector('.nav-icon');
+        const text = item.querySelector('.nav-text');
+        
+        // При наведении меняем цвет на случайный
+        item.addEventListener('mouseenter', function() {
+            const color = getUniqueRandomColor();
+            if (icon) {
+                icon.style.color = color;
+                icon.style.transition = 'color 0.3s ease, transform 0.3s ease';
+            }
+            if (text) {
+                text.style.color = color;
+                text.style.transition = 'color 0.3s ease';
+            }
+        });
+        
+        // При уходе мыши возвращаем цвет (если не активный)
+        item.addEventListener('mouseleave', function() {
+            const isActive = this.closest('.nav-item').classList.contains('active');
+            if (!isActive) {
+                if (icon) {
+                    icon.style.color = '';
+                }
+                if (text) {
+                    text.style.color = '';
+                }
+            }
+        });
+    });
+});
