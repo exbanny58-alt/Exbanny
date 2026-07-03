@@ -1,6 +1,11 @@
 from flask import Flask, render_template, send_from_directory, request, jsonify
 import os
 import json
+import subprocess
+import platform
+import tkinter as tk
+from tkinter import filedialog
+import threading
 
 app = Flask(__name__)
 
@@ -26,6 +31,46 @@ def save_settings(settings):
     except Exception as e:
         print(f'❌ Ошибка сохранения: {e}')
         return False
+
+def select_folder_dialog():
+    """Открыть диалог выбора папки через tkinter"""
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes('-topmost', True)
+        
+        folder_path = filedialog.askdirectory(
+            title="Выберите папку",
+            initialdir=os.path.expanduser("~")
+        )
+        
+        root.destroy()
+        return folder_path
+    except Exception as e:
+        print(f'❌ Ошибка tkinter: {e}')
+        return None
+
+def select_file_dialog():
+    """Открыть диалог выбора файла через tkinter"""
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        root.attributes('-topmost', True)
+        
+        file_path = filedialog.askopenfilename(
+            title="Выберите файл",
+            initialdir=os.path.expanduser("~"),
+            filetypes=[
+                ("Исполняемые файлы", "*.exe"),
+                ("Все файлы", "*.*")
+            ]
+        )
+        
+        root.destroy()
+        return file_path
+    except Exception as e:
+        print(f'❌ Ошибка tkinter: {e}')
+        return None
 
 @app.route('/')
 def landing():
@@ -61,7 +106,6 @@ def save_settings_api():
         if data is None:
             return jsonify({'success': False, 'message': 'Нет данных'}), 400
         
-        # Сохраняем как есть, даже пустые значения
         if save_settings(data):
             return jsonify({'success': True, 'message': 'Настройки сохранены'})
         return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
@@ -73,12 +117,135 @@ def reset_setting(field):
     """Сбросить конкретную настройку (установить пустую строку)"""
     try:
         settings = load_settings()
-        # Устанавливаем пустую строку вместо удаления
         settings[field] = ""
         save_settings(settings)
         return jsonify({'success': True, 'message': f'Поле {field} сброшено'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+# ============================================
+# API ДЛЯ ОТКРЫТИЯ ПРОВОДНИКА
+# ============================================
+
+@app.route('/api/browse/file', methods=['POST'])
+def browse_file():
+    """Открыть диалог выбора файла через tkinter"""
+    try:
+        data = request.get_json()
+        field = data.get('field')
+        input_id = data.get('inputId')
+        
+        # Запускаем в отдельном потоке, чтобы не блокировать Flask
+        result = [None]
+        
+        def thread_func():
+            result[0] = select_file_dialog()
+        
+        thread = threading.Thread(target=thread_func)
+        thread.start()
+        thread.join(timeout=60)  # Ждём до 60 секунд
+        
+        file_path = result[0]
+        
+        if file_path and file_path.strip():
+            return jsonify({
+                'success': True,
+                'path': file_path,
+                'field': field,
+                'inputId': input_id,
+                'message': 'Файл выбран'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Файл не выбран'
+            })
+    
+    except Exception as e:
+        print(f'❌ Ошибка: {e}')
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/browse/folder', methods=['POST'])
+def browse_folder():
+    """Открыть диалог выбора папки через tkinter"""
+    try:
+        data = request.get_json()
+        field = data.get('field')
+        input_id = data.get('inputId')
+        
+        # Запускаем в отдельном потоке, чтобы не блокировать Flask
+        result = [None]
+        
+        def thread_func():
+            result[0] = select_folder_dialog()
+        
+        thread = threading.Thread(target=thread_func)
+        thread.start()
+        thread.join(timeout=60)  # Ждём до 60 секунд
+        
+        folder_path = result[0]
+        
+        if folder_path and folder_path.strip():
+            return jsonify({
+                'success': True,
+                'path': folder_path,
+                'field': field,
+                'inputId': input_id,
+                'message': 'Папка выбрана'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Папка не выбрана'
+            })
+    
+    except Exception as e:
+        print(f'❌ Ошибка: {e}')
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/open/explorer', methods=['POST'])
+def open_explorer():
+    """Открыть проводник по указанному пути"""
+    try:
+        data = request.get_json()
+        path = data.get('path', '').strip()
+        
+        if not path:
+            return jsonify({'success': False, 'message': 'Путь не указан'}), 400
+        
+        if not os.path.exists(path):
+            return jsonify({'success': False, 'message': f'Путь не существует'}), 404
+        
+        if not os.path.isdir(path):
+            return jsonify({'success': False, 'message': f'Указанный путь не является папкой'}), 400
+        
+        # Открываем проводник в зависимости от ОС
+        if platform.system() == 'Windows':
+            subprocess.Popen(['explorer', path])
+        elif platform.system() == 'Darwin':  # macOS
+            subprocess.Popen(['open', path])
+        elif platform.system() == 'Linux':
+            subprocess.Popen(['xdg-open', path])
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Неподдерживаемая ОС: {platform.system()}'
+            }), 400
+        
+        return jsonify({'success': True, 'message': f'Проводник открыт: {path}'})
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Ошибка: {str(e)}'
+        }), 500
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print("🚀 Сервер запущен: http://127.0.0.1:5000")
+    app.run(debug=True, host='127.0.0.1', port=5000)

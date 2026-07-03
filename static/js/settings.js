@@ -33,14 +33,11 @@ async function saveField(field, inputId, statusId) {
     }
     
     try {
-        // Сначала загружаем все настройки
         const response = await fetch('/api/settings');
         const settings = await response.json();
         
-        // Обновляем одно поле
         settings[field] = value;
         
-        // Сохраняем все настройки
         const saveResponse = await fetch('/api/settings', {
             method: 'POST',
             headers: {
@@ -73,10 +70,9 @@ async function saveField(field, inputId, statusId) {
     }
 }
 
-// Сброс одного поля (устанавливаем пустую строку)
+// Сброс одного поля
 async function resetField(field, inputId, statusId) {
     try {
-        // Отправляем POST запрос на сервер для сброса
         const response = await fetch(`/api/settings/reset/${field}`, {
             method: 'POST',
         });
@@ -107,14 +103,132 @@ async function resetField(field, inputId, statusId) {
     }
 }
 
-// Открытие проводника (заглушка)
-function browseFile(inputId) {
+// Открытие проводника через сервер
+async function browseFile(inputId, type = 'file') {
+    const btn = document.querySelector(`[data-target="${inputId}"]`);
+    const field = btn?.dataset.field;
+    if (!field) {
+        console.error('Не найден field для inputId:', inputId);
+        return;
+    }
+    
+    // Показываем, что процесс начался
+    const statusId = `status-${field}`;
+    const statusEl = document.getElementById(statusId);
+    statusEl.textContent = '⏳ Открывается диалог...';
+    statusEl.style.color = '#60a5fa';
+    
+    try {
+        const endpoint = type === 'folder' ? '/api/browse/folder' : '/api/browse/file';
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                field: field,
+                inputId: inputId
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.path) {
+            const input = document.getElementById(inputId);
+            input.value = result.path;
+            
+            // Автоматически сохраняем после выбора
+            await saveField(field, inputId, statusId);
+            
+            showNotification('✅ Путь выбран и сохранён');
+        } else if (!result.success) {
+            statusEl.textContent = '❌ ' + (result.message || 'Ошибка выбора');
+            statusEl.style.color = '#f87171';
+            setTimeout(() => {
+                statusEl.textContent = '';
+            }, 3000);
+            showNotification('❌ ' + (result.message || 'Ошибка выбора'));
+        }
+    } catch (e) {
+        console.error('Ошибка открытия проводника:', e);
+        statusEl.textContent = '❌ Ошибка: ' + e.message;
+        statusEl.style.color = '#f87171';
+        setTimeout(() => {
+            statusEl.textContent = '';
+        }, 3000);
+        showNotification('❌ Ошибка: ' + e.message);
+    }
+}
+
+// Открыть выбранную папку в проводнике
+async function openInExplorer(inputId) {
     const input = document.getElementById(inputId);
-    input.removeAttribute('readonly');
-    input.focus();
-    input.addEventListener('blur', function() {
-        input.setAttribute('readonly', true);
-    }, { once: true });
+    const path = input.value.trim();
+    
+    if (!path) {
+        showNotification('⚠️ Сначала выберите путь');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/open/explorer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ path: path })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showNotification('✅ ' + result.message);
+        } else {
+            showNotification('❌ ' + result.message);
+        }
+    } catch (e) {
+        showNotification('❌ Ошибка: ' + e.message);
+    }
+}
+
+// Уведомления
+function showNotification(message) {
+    let notification = document.querySelector('.settings-notification');
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.className = 'settings-notification';
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(16, 21, 61, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 24px;
+            color: #fff;
+            font-family: "Nunito", sans-serif;
+            font-size: 0.9rem;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        `;
+        document.body.appendChild(notification);
+    }
+    
+    notification.textContent = message;
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateX(-50%) translateY(0)';
+    
+    clearTimeout(notification._hideTimeout);
+    notification._hideTimeout = setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 3000);
 }
 
 function openSettings() {
@@ -149,7 +263,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.browse-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const target = this.dataset.target;
-            browseFile(target);
+            const type = this.dataset.type || 'file';
+            browseFile(target, type);
+        });
+    });
+    
+    // Добавляем кнопки "Открыть в проводнике"
+    document.querySelectorAll('.open-explorer-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const target = this.dataset.target;
+            openInExplorer(target);
         });
     });
 });

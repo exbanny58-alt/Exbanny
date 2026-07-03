@@ -2,13 +2,16 @@
     <div class="settings-container">
         <div class="settings-header">
             <h1>⚙️ Настройки</h1>
+            <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
             <button onclick="closeSettings()" class="close-btn">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
         <div class="settings-content">
-            <!-- Сервер -->
+            <!-- ============================================ -->
+            <!-- 1. ИСПОЛНЯЕМЫЙ ФАЙЛ СЕРВЕРА -->
+            <!-- ============================================ -->
             <div class="settings-card">
                 <div class="settings-card-header">
                     <span class="settings-icon">
@@ -26,18 +29,29 @@
                 <div class="settings-card-body">
                     <div class="input-group">
                         <input type="text" id="server-exe-path" class="settings-input" placeholder="C:\DayZServer\DayZServer_x64.exe" readonly>
-                        <button type="button" class="btn btn-secondary browse-btn" data-target="server-exe-path">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/></svg>
+                        <button type="button" class="btn btn-secondary browse-btn" data-target="server-exe-path" data-field="server_exe" data-type="file">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                            </svg>
                             Обзор
                         </button>
                     </div>
                     <div class="input-actions">
                         <button type="button" class="btn btn-save-row save-single-btn" data-target="server-exe-path" data-field="server_exe">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
                             Сохранить
                         </button>
                         <button type="button" class="btn btn-reset-row reset-single-btn" data-target="server-exe-path" data-field="server_exe">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4 1,10 7,10"/><path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/><polyline points="23,20 23,14 17,14"/><path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1,4 1,10 7,10"/>
+                                <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                <polyline points="23,20 23,14 17,14"/>
+                                <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                            </svg>
                             Сбросить
                         </button>
                     </div>
@@ -45,7 +59,9 @@
                 </div>
             </div>
 
-            <!-- Игра -->
+            <!-- ============================================ -->
+            <!-- 2. ИСПОЛНЯЕМЫЙ ФАЙЛ ИГРЫ -->
+            <!-- ============================================ -->
             <div class="settings-card">
                 <div class="settings-card-header">
                     <span class="settings-icon">
@@ -61,18 +77,29 @@
                 <div class="settings-card-body">
                     <div class="input-group">
                         <input type="text" id="game-exe-path" class="settings-input" placeholder="C:\Program Files (x86)\Steam\steamapps\common\DayZ\DayZ_x64.exe" readonly>
-                        <button type="button" class="btn btn-secondary browse-btn" data-target="game-exe-path">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/></svg>
+                        <button type="button" class="btn btn-secondary browse-btn" data-target="game-exe-path" data-field="game_exe" data-type="file">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                            </svg>
                             Обзор
                         </button>
                     </div>
                     <div class="input-actions">
                         <button type="button" class="btn btn-save-row save-single-btn" data-target="game-exe-path" data-field="game_exe">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
                             Сохранить
                         </button>
                         <button type="button" class="btn btn-reset-row reset-single-btn" data-target="game-exe-path" data-field="game_exe">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4 1,10 7,10"/><path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/><polyline points="23,20 23,14 17,14"/><path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1,4 1,10 7,10"/>
+                                <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                <polyline points="23,20 23,14 17,14"/>
+                                <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                            </svg>
                             Сбросить
                         </button>
                     </div>
@@ -80,7 +107,9 @@
                 </div>
             </div>
 
-            <!-- Workshop -->
+            <!-- ============================================ -->
+            <!-- 3. ПАПКА WORKSHOP -->
+            <!-- ============================================ -->
             <div class="settings-card">
                 <div class="settings-card-header">
                     <span class="settings-icon">
@@ -96,18 +125,29 @@
                 <div class="settings-card-body">
                     <div class="input-group">
                         <input type="text" id="workshop-path" class="settings-input" placeholder="C:\DayZServer\!Workshop" readonly>
-                        <button type="button" class="btn btn-secondary browse-btn" data-target="workshop-path">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/></svg>
+                        <button type="button" class="btn btn-secondary browse-btn" data-target="workshop-path" data-field="workshop" data-type="folder">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                            </svg>
                             Обзор
                         </button>
                     </div>
                     <div class="input-actions">
                         <button type="button" class="btn btn-save-row save-single-btn" data-target="workshop-path" data-field="workshop">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
                             Сохранить
                         </button>
                         <button type="button" class="btn btn-reset-row reset-single-btn" data-target="workshop-path" data-field="workshop">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4 1,10 7,10"/><path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/><polyline points="23,20 23,14 17,14"/><path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1,4 1,10 7,10"/>
+                                <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                <polyline points="23,20 23,14 17,14"/>
+                                <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                            </svg>
                             Сбросить
                         </button>
                     </div>
@@ -115,7 +155,9 @@
                 </div>
             </div>
 
-            <!-- Свои моды -->
+            <!-- ============================================ -->
+            <!-- 4. ПАПКА СВОИХ МОДОВ -->
+            <!-- ============================================ -->
             <div class="settings-card">
                 <div class="settings-card-header">
                     <span class="settings-icon">
@@ -131,18 +173,29 @@
                 <div class="settings-card-body">
                     <div class="input-group">
                         <input type="text" id="custom-mods-path" class="settings-input" placeholder="C:\DayZServer\@MyMods" readonly>
-                        <button type="button" class="btn btn-secondary browse-btn" data-target="custom-mods-path">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/></svg>
+                        <button type="button" class="btn btn-secondary browse-btn" data-target="custom-mods-path" data-field="custom_mods" data-type="folder">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                            </svg>
                             Обзор
                         </button>
                     </div>
                     <div class="input-actions">
                         <button type="button" class="btn btn-save-row save-single-btn" data-target="custom-mods-path" data-field="custom_mods">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                <polyline points="7,3 7,8 15,8"/>
+                            </svg>
                             Сохранить
                         </button>
                         <button type="button" class="btn btn-reset-row reset-single-btn" data-target="custom-mods-path" data-field="custom_mods">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1,4 1,10 7,10"/><path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/><polyline points="23,20 23,14 17,14"/><path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/></svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="1,4 1,10 7,10"/>
+                                <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                <polyline points="23,20 23,14 17,14"/>
+                                <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                            </svg>
                             Сбросить
                         </button>
                     </div>
