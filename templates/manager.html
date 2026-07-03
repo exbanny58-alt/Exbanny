@@ -1,0 +1,92 @@
+<main id="managerPage" style="display: none;">
+    <nav class="main-menu">
+        <div>
+            <ul>
+                <li class="nav-item active">
+                    <a href="#" onclick="navigateTo('server')">
+                        <i class="fa fa-server nav-icon"></i>
+                        <span class="nav-text">Менеджер</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="navigateTo('stats')">
+                        <i class="fa fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Статистика</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="navigateTo('players')">
+                        <i class="fa fa-users nav-icon"></i>
+                        <span class="nav-text">Игроки</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="navigateTo('config')">
+                        <i class="fa fa-gear nav-icon"></i>
+                        <span class="nav-text">Настройки</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="navigateTo('mods')">
+                        <i class="fa fa-folder nav-icon"></i>
+                        <span class="nav-text">Моды</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <ul>
+            <li class="nav-item">
+                <a href="#" onclick="navigateTo('profile')">
+                    <i class="fa fa-user nav-icon"></i>
+                    <span class="nav-text">Профиль</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="openSettings()">
+                    <i class="fa fa-gear nav-icon"></i>
+                    <span class="nav-text">Система</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" onclick="showLanding()">
+                    <i class="fa fa-right-from-bracket nav-icon"></i>
+                    <span class="nav-text">Выход</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <section class="content">
+        <div class="left-content">
+            <div class="slider-container">
+                <div class="swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide" data-slide="server">
+                            {% include 'slides/server.html' %}
+                        </div>
+                        <div class="swiper-slide" data-slide="game">
+                            {% include 'slides/game.html' %}
+                        </div>
+                        <div class="swiper-slide" data-slide="mods">
+                            {% include 'slides/mods.html' %}
+                        </div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+
+            <div class="content-placeholder" id="dynamicContent">
+                <h1>Управление сервером</h1>
+                <p>Здесь будет панель управления сервером DayZ</p>
+            </div>
+        </div>
+
+        <div class="right-content">
+            <div class="right-placeholder" id="rightPanel">
+                <h1>Информация</h1>
+                <p>Выберите раздел</p>
+            </div>
+        </div>
+    </section>
+</main>
