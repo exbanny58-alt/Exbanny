@@ -511,3 +511,26 @@ input[type="range"]::-moz-range-thumb {
         border-radius: 10px;
     }
 }
+
+/* Уведомления */
+.editor-notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(16, 21, 61, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 12px 24px;
+    color: #fff;
+    font-family: "Nunito", sans-serif;
+    font-size: 0.9rem;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+

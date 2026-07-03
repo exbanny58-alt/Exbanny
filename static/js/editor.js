@@ -3,13 +3,174 @@
 // ============================================
 
 // ============================================
+// ЗАГРУЗКА/СОХРАНЕНИЕ НАСТРОЕК С СЕРВЕРА
+// ============================================
+
+async function loadEditorSettingsFromServer() {
+    try {
+        const response = await fetch('/api/editor/settings');
+        const data = await response.json();
+        
+        if (data && Object.keys(data).length > 0) {
+            applySettingsToControls(data);
+            applyAllStyles(false);
+            return true;
+        } else {
+            const defaults = {
+                mainBg: '#10153d',
+                mainOpacity: 50,
+                mainBlur: 10,
+                mainRadius: 20,
+                mainPadding: 0,
+                mainGap: 0,
+                menuActiveBg: '#6a6d9b',
+                menuOpacity: 50,
+                textColor: '#ffffff',
+                contentGap: 0,
+                leftPadding: 30,
+                rightPadding: 25,
+                slideOverlayColor: '#261595',
+                slideOverlayOpacity: 80,
+                gradientColor1: '#4a3f8a',
+                gradientColor2: '#1a1145',
+                gradientDirection: '135',
+                useGradient: false,
+                playerBg: '#bcb8c6',
+                playerOpacity: 20,
+                playerBlur: 10,
+                playerPadding: 20,
+                playerRadius: 16,
+                editorBg: '#10153d',
+                editorOpacity: 95,
+                editorBlur: 0,
+                editorRadius: 20,
+                editorPadding: 30,
+                editorBorder: 1,
+                overlayBg: '#000000',
+                overlayOpacity: 70,
+                overlayBlur: 8,
+                isTransparent: false,
+                isBlur: true
+            };
+            applySettingsToControls(defaults);
+            applyAllStyles(false);
+            return false;
+        }
+    } catch (e) {
+        return false;
+    }
+}
+
+async function saveEditorSettingsToServer(showNotification = true) {
+    const settings = getCurrentSettings();
+    
+    try {
+        const response = await fetch('/api/editor/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(settings)
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+            if (showNotification) {
+                showNotification('✅ Настройки сохранены');
+            }
+            return true;
+        } else {
+            if (showNotification) {
+                showNotification('❌ Ошибка сохранения');
+            }
+            return false;
+        }
+    } catch (e) {
+        if (showNotification) {
+            showNotification('❌ Ошибка сохранения');
+        }
+        return false;
+    }
+}
+
+// ============================================
+// ПОЛУЧЕНИЕ/ПРИМЕНЕНИЕ НАСТРОЕК
+// ============================================
+
+function getCurrentSettings() {
+    return {
+        mainBg: document.getElementById('mainBg').value,
+        mainOpacity: parseInt(document.getElementById('mainOpacity').value),
+        mainBlur: parseInt(document.getElementById('mainBlur').value),
+        mainRadius: parseInt(document.getElementById('mainRadius').value),
+        mainPadding: parseInt(document.getElementById('mainPadding').value),
+        mainGap: parseInt(document.getElementById('mainGap').value),
+        menuActiveBg: document.getElementById('menuActiveBg').value,
+        menuOpacity: parseInt(document.getElementById('menuOpacity').value),
+        textColor: document.getElementById('textColor').value,
+        contentGap: parseInt(document.getElementById('contentGap').value),
+        leftPadding: parseInt(document.getElementById('leftPadding').value),
+        rightPadding: parseInt(document.getElementById('rightPadding').value),
+        slideOverlayColor: document.getElementById('slideOverlayColor').value,
+        slideOverlayOpacity: parseInt(document.getElementById('slideOverlayOpacity').value),
+        gradientColor1: document.getElementById('gradientColor1').value,
+        gradientColor2: document.getElementById('gradientColor2').value,
+        gradientDirection: document.getElementById('gradientDirection').value,
+        useGradient: document.getElementById('useGradient').checked,
+        playerBg: document.getElementById('playerBg').value,
+        playerOpacity: parseInt(document.getElementById('playerOpacity').value),
+        playerBlur: parseInt(document.getElementById('playerBlur').value),
+        playerPadding: parseInt(document.getElementById('playerPadding').value),
+        playerRadius: parseInt(document.getElementById('playerRadius').value),
+        editorBg: document.getElementById('editorBg').value,
+        editorOpacity: parseInt(document.getElementById('editorOpacity').value),
+        editorBlur: parseInt(document.getElementById('editorBlur').value),
+        editorRadius: parseInt(document.getElementById('editorRadius').value),
+        editorPadding: parseInt(document.getElementById('editorPadding').value),
+        editorBorder: parseInt(document.getElementById('editorBorder').value),
+        overlayBg: document.getElementById('overlayBg').value,
+        overlayOpacity: parseInt(document.getElementById('overlayOpacity').value),
+        overlayBlur: parseInt(document.getElementById('overlayBlur').value),
+        isTransparent: document.getElementById('isTransparent').checked,
+        isBlur: document.getElementById('isBlur').checked
+    };
+}
+
+function applySettingsToControls(settings) {
+    Object.keys(settings).forEach(key => {
+        const el = document.getElementById(key);
+        if (!el) return;
+        
+        const value = settings[key];
+        
+        if (el.type === 'checkbox') {
+            el.checked = value;
+        } else if (el.type === 'color') {
+            el.value = value;
+        } else if (el.type === 'range') {
+            el.value = value;
+            const valEl = document.getElementById(key + 'Val');
+            if (valEl) {
+                valEl.textContent = value;
+            }
+        } else {
+            el.value = value;
+        }
+    });
+    
+    updateGradientDirection();
+}
+
+// ============================================
 // ОТКРЫТИЕ / ЗАКРЫТИЕ
 // ============================================
-function openEditor() {
+
+async function openEditor() {
     const overlay = document.getElementById('cssEditorOverlay');
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
-    loadCurrentStyles();
+    
+    await loadEditorSettingsFromServer();
     updatePreview();
 }
 
@@ -20,102 +181,12 @@ function closeEditor() {
 }
 
 // ============================================
-// ЗАГРУЗКА ТЕКУЩИХ СТИЛЕЙ
-// ============================================
-function loadCurrentStyles() {
-    const main = document.querySelector('main');
-    const body = document.body;
-    const navActive = document.querySelector('.nav-item.active a');
-    const slideOverlay = document.querySelector('.slide-overlay');
-    const musicPlayer = document.querySelector('.music-player');
-    const content = document.querySelector('.content');
-    const leftContent = document.querySelector('.left-content');
-    const rightContent = document.querySelector('.right-content');
-    const editorContainer = document.querySelector('.editor-container');
-    
-    // Основной контейнер
-    if (main) {
-        const bg = window.getComputedStyle(main).background || 'rgba(16, 21, 61, 0.5)';
-        const blur = parseInt(window.getComputedStyle(main).backdropFilter.replace('blur(', '')) || 10;
-        const radius = parseInt(window.getComputedStyle(main).borderRadius) || 20;
-        const padding = parseInt(window.getComputedStyle(main).padding) || 0;
-        const gap = parseInt(window.getComputedStyle(main).gap) || 0;
-        
-        document.getElementById('mainBg').value = extractColor(bg) || '#10153d';
-        document.getElementById('mainBlur').value = blur;
-        document.getElementById('mainBlurVal').textContent = blur;
-        document.getElementById('mainRadius').value = radius;
-        document.getElementById('mainRadiusVal').textContent = radius;
-        document.getElementById('mainPadding').value = padding;
-        document.getElementById('mainPaddingVal').textContent = padding;
-        document.getElementById('mainGap').value = gap;
-        document.getElementById('mainGapVal').textContent = gap;
-    }
-    
-    // Меню актив
-    if (navActive) {
-        const bg = window.getComputedStyle(navActive).background;
-        document.getElementById('menuActiveBg').value = extractColor(bg) || '#6a6d9b';
-    }
-    
-    // Контент
-    if (content) {
-        const gap = parseInt(window.getComputedStyle(content).gap) || 0;
-        document.getElementById('contentGap').value = gap;
-        document.getElementById('contentGapVal').textContent = gap;
-    }
-    
-    // Левая колонка
-    if (leftContent) {
-        const padding = parseInt(window.getComputedStyle(leftContent).padding) || 30;
-        document.getElementById('leftPadding').value = padding;
-        document.getElementById('leftPaddingVal').textContent = padding;
-    }
-    
-    // Правая колонка
-    if (rightContent) {
-        const padding = parseInt(window.getComputedStyle(rightContent).padding) || 25;
-        document.getElementById('rightPadding').value = padding;
-        document.getElementById('rightPaddingVal').textContent = padding;
-    }
-}
-
-// ============================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ============================================
-function extractColor(bg) {
-    const rgba = bg.match(/rgba?\([^)]+\)/);
-    if (rgba) return rgba[0];
-    const hex = bg.match(/#[a-fA-F0-9]{6}/);
-    if (hex) return hex[0];
-    return null;
-}
-
-function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function rgbToRgba(rgb, alpha) {
-    if (!rgb) return `rgba(0,0,0,${alpha})`;
-    const match = rgb.match(/(\d+)/g);
-    if (match && match.length >= 3) {
-        return `rgba(${match[0]}, ${match[1]}, ${match[2]}, ${alpha})`;
-    }
-    return `rgba(0,0,0,${alpha})`;
-}
-
-// ============================================
 // ПРИМЕНЕНИЕ ВСЕХ СТИЛЕЙ
 // ============================================
-function applyAllStyles() {
+
+function applyAllStyles(save = false) {
     const main = document.querySelector('main');
     const navActive = document.querySelector('.nav-item.active a');
-    const slideOverlay = document.querySelector('.slide-overlay');
     const musicPlayer = document.querySelector('.music-player');
     const overlay = document.getElementById('cssEditorOverlay');
     const content = document.querySelector('.content');
@@ -123,7 +194,7 @@ function applyAllStyles() {
     const rightContent = document.querySelector('.right-content');
     const editorContainer = document.querySelector('.editor-container');
     
-    // === ОСНОВНОЙ КОНТЕЙНЕР ===
+    // === ОСНОВНОЙ КОНТЕЙНЕР (main) ===
     if (main) {
         const bgColor = document.getElementById('mainBg').value;
         const blur = document.getElementById('mainBlur').value;
@@ -142,7 +213,7 @@ function applyAllStyles() {
         main.style.gap = `${gap}px`;
     }
     
-    // === МЕНЮ АКТИВ ===
+    // === МЕНЮ АКТИВНЫЙ ПУНКТ ===
     if (navActive) {
         const color = document.getElementById('menuActiveBg').value;
         const opacity = document.getElementById('menuOpacity').value / 100;
@@ -152,7 +223,7 @@ function applyAllStyles() {
         }
     }
     
-    // === КОНТЕНТ ===
+    // === КОНТЕНТ (расстояние между колонками) ===
     if (content) {
         const gap = document.getElementById('contentGap').value;
         content.style.gap = `${gap}px`;
@@ -176,26 +247,7 @@ function applyAllStyles() {
         if (el) el.style.color = textColor;
     });
     
-    // === СЛАЙДЕР ОВЕРЛЕЙ ===
-    if (slideOverlay) {
-        const color1 = document.getElementById('gradientColor1').value;
-        const color2 = document.getElementById('gradientColor2').value;
-        const direction = document.getElementById('gradientDirection').value;
-        const useGradient = document.getElementById('useGradient').checked;
-        const overlayColor = document.getElementById('slideOverlayColor').value;
-        const opacity = document.getElementById('slideOverlayOpacity').value / 100;
-        
-        if (useGradient) {
-            slideOverlay.style.background = `linear-gradient(${direction}deg, ${color1}, ${color2})`;
-        } else {
-            const rgb = hexToRgb(overlayColor);
-            if (rgb) {
-                slideOverlay.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
-            }
-        }
-    }
-    
-    // === ПЛЕЕР ===
+    // === МУЗЫКАЛЬНЫЙ ПЛЕЕР - С ЗАЩИТОЙ ===
     if (musicPlayer) {
         const color = document.getElementById('playerBg').value;
         const blur = document.getElementById('playerBlur').value;
@@ -210,6 +262,21 @@ function applyAllStyles() {
         musicPlayer.style.backdropFilter = `blur(${blur}px)`;
         musicPlayer.style.padding = `${padding}px`;
         musicPlayer.style.borderRadius = `${radius}px`;
+        
+        // === ЗАЩИТА ЭЛЕМЕНТОВ ПЛЕЕРА ===
+        // Прогресс-бар
+        const progress = document.getElementById('progress');
+        if (progress) {
+            progress.style.width = '100%';
+            progress.style.maxWidth = '300px';
+            progress.style.flex = '0 0 auto';
+        }
+        
+        // Кнопки управления
+        const controls = musicPlayer.querySelectorAll('.controls button');
+        controls.forEach(btn => {
+            btn.style.flexShrink = '0';
+        });
     }
     
     // === ОКНО РЕДАКТОРА ===
@@ -256,13 +323,31 @@ function applyAllStyles() {
         overlay.classList.remove('no-blur');
     }
     
-    // === ПРЕДПРОСМОТР ===
+    // === СОХРАНЕНИЕ НА СЕРВЕР ===
+    if (save) {
+        saveEditorSettingsToServer(true);
+    }
+    
+    // === ОБНОВЛЕНИЕ ПРЕВЬЮ ===
     updatePreview();
+}
+// ============================================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ============================================
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
 }
 
 // ============================================
 // ОБНОВЛЕНИЕ ПРЕВЬЮ
 // ============================================
+
 function updatePreview() {
     const previewBox = document.querySelector('.preview-box');
     const previewText = document.querySelector('.preview-text');
@@ -305,73 +390,32 @@ function updatePreview() {
 // ============================================
 // СБРОС
 // ============================================
-function resetEditorStyles() {
+
+async function resetEditorStyles() {
     if (!confirm('Сбросить все изменения CSS?')) return;
     
-    const defaults = {
-        mainBg: '#10153d',
-        mainBlur: 10,
-        mainRadius: 20,
-        mainOpacity: 50,
-        mainPadding: 0,
-        mainGap: 0,
-        menuActiveBg: '#6a6d9b',
-        menuOpacity: 50,
-        textColor: '#ffffff',
-        contentGap: 0,
-        leftPadding: 30,
-        rightPadding: 25,
-        slideOverlayColor: '#261595',
-        slideOverlayOpacity: 80,
-        gradientColor1: '#4a3f8a',
-        gradientColor2: '#1a1145',
-        gradientDirection: '135',
-        useGradient: false,
-        playerBg: '#bcb8c6',
-        playerBlur: 10,
-        playerOpacity: 20,
-        playerPadding: 20,
-        playerRadius: 16,
-        editorBg: '#10153d',
-        editorBlur: 0,
-        editorRadius: 20,
-        editorPadding: 30,
-        editorOpacity: 95,
-        editorBorder: 1,
-        overlayBg: '#000000',
-        overlayOpacity: 70,
-        overlayBlur: 8,
-        isTransparent: false,
-        isBlur: true
-    };
-    
-    // Применяем значения
-    Object.keys(defaults).forEach(key => {
-        const el = document.getElementById(key);
-        if (el) {
-            if (el.type === 'checkbox') {
-                el.checked = defaults[key];
-            } else if (el.type === 'color') {
-                el.value = defaults[key];
-            } else {
-                el.value = defaults[key];
-                const valEl = document.getElementById(key + 'Val');
-                if (valEl) valEl.textContent = defaults[key];
-            }
+    try {
+        const response = await fetch('/api/editor/settings/defaults', {
+            method: 'POST',
+        });
+        const result = await response.json();
+        
+        if (result.success && result.defaults) {
+            applySettingsToControls(result.defaults);
+            applyAllStyles(true);
+            showNotification('🔄 Сброшено до стандартных настроек');
+        } else {
+            showNotification('❌ Ошибка сброса');
         }
-    });
-    
-    // Обновить направление градиента
-    updateGradientDirection();
-    
-    // Применить
-    applyAllStyles();
-    showNotification('🔄 CSS сброшен до значений по умолчанию');
+    } catch (e) {
+        showNotification('❌ Ошибка сброса');
+    }
 }
 
 // ============================================
 // НАПРАВЛЕНИЕ ГРАДИЕНТА
 // ============================================
+
 function updateGradientDirection() {
     const buttons = document.querySelectorAll('.gradient-direction button');
     const value = document.getElementById('gradientDirection').value;
@@ -384,21 +428,13 @@ function updateGradientDirection() {
 function setGradientDirection(dir) {
     document.getElementById('gradientDirection').value = dir;
     updateGradientDirection();
-    applyAllStyles();
-}
-
-// ============================================
-// ОБНОВЛЕНИЕ ЗНАЧЕНИЙ ПОЛЗУНКОВ
-// ============================================
-function updateRangeValue(id, displayId) {
-    const value = document.getElementById(id).value;
-    const display = document.getElementById(displayId);
-    if (display) display.textContent = value;
+    applyAllStyles(false);
 }
 
 // ============================================
 // ЭКСПОРТ CSS
 // ============================================
+
 function exportCSS() {
     const css = `/* Сгенерировано визуальным редактором */
 /* Основной контейнер */
@@ -441,7 +477,6 @@ main {
     border-radius: ${document.querySelector('.music-player')?.style.borderRadius || '16px'};
 }`;
     
-    // Скачиваем файл
     const blob = new Blob([css], { type: 'text/css' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -449,13 +484,13 @@ main {
     a.download = 'custom-style.css';
     a.click();
     URL.revokeObjectURL(url);
-    
     showNotification('✅ CSS экспортирован!');
 }
 
 // ============================================
 // УВЕДОМЛЕНИЯ
 // ============================================
+
 function showNotification(message) {
     let notification = document.querySelector('.editor-notification');
     if (!notification) {
@@ -498,30 +533,41 @@ function showNotification(message) {
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Обновление значений ползунков
     document.querySelectorAll('input[type="range"]').forEach(range => {
         const displayId = range.id + 'Val';
         const display = document.getElementById(displayId);
         if (display) {
             range.addEventListener('input', function() {
                 display.textContent = this.value;
-                applyAllStyles();
+                applyAllStyles(false);
             });
         }
     });
     
-    // Автоприменение при изменении
     document.querySelectorAll('.editor-controls input, .editor-controls select').forEach(input => {
         if (input.type !== 'range') {
-            input.addEventListener('input', applyAllStyles);
-            input.addEventListener('change', applyAllStyles);
+            input.addEventListener('input', function() {
+                applyAllStyles(false);
+            });
+            input.addEventListener('change', function() {
+                applyAllStyles(false);
+            });
         }
     });
     
-    // Направление градиента
+    const applyBtn = document.querySelector('.editor-btn-success');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', function() {
+            applyAllStyles(true);
+            showNotification('✅ Настройки применены и сохранены');
+        });
+    }
+    
     updateGradientDirection();
     
-    // Применить стили при открытии
-    setTimeout(applyAllStyles, 100);
+    setTimeout(async function() {
+        await loadEditorSettingsFromServer();
+    }, 200);
 });
