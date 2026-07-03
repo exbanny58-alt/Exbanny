@@ -1,18 +1,24 @@
-// Загрузка сохранённых путей из localStorage
-function loadSettings() {
-    const fields = ['server_exe', 'game_exe', 'workshop', 'custom_mods'];
-    const inputIds = ['server-exe-path', 'game-exe-path', 'workshop-path', 'custom-mods-path'];
-    
-    fields.forEach((field, i) => {
-        const saved = localStorage.getItem(`dayz_${field}`);
-        if (saved) {
-            document.getElementById(inputIds[i]).value = saved;
-        }
-    });
+// Загрузка сохранённых путей из сервера
+async function loadSettings() {
+    try {
+        const response = await fetch('/api/settings');
+        const data = await response.json();
+        
+        const fields = ['server_exe', 'game_exe', 'workshop', 'custom_mods'];
+        const inputIds = ['server-exe-path', 'game-exe-path', 'workshop-path', 'custom-mods-path'];
+        
+        fields.forEach((field, i) => {
+            if (data[field]) {
+                document.getElementById(inputIds[i]).value = data[field];
+            }
+        });
+    } catch (e) {
+        console.error('Ошибка загрузки настроек:', e);
+    }
 }
 
-// Сохранение одного поля
-function saveField(field, inputId, statusId) {
+// Сохранение одного поля на сервер
+async function saveField(field, inputId, statusId) {
     const value = document.getElementById(inputId).value.trim();
     if (!value) {
         document.getElementById(statusId).textContent = 'Укажите путь';
@@ -20,20 +26,73 @@ function saveField(field, inputId, statusId) {
         return;
     }
     
-    localStorage.setItem(`dayz_${field}`, value);
-    document.getElementById(statusId).textContent = '✓ Сохранено';
-    document.getElementById(statusId).style.color = '#4ade80';
+    try {
+        // Сначала загружаем все настройки
+        const response = await fetch('/api/settings');
+        const settings = await response.json();
+        
+        // Обновляем одно поле
+        settings[field] = value;
+        
+        // Сохраняем все настройки
+        const saveResponse = await fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(settings)
+        });
+        
+        const result = await saveResponse.json();
+        
+        if (result.success) {
+            document.getElementById(statusId).textContent = '✓ Сохранено';
+            document.getElementById(statusId).style.color = '#4ade80';
+        } else {
+            document.getElementById(statusId).textContent = '❌ Ошибка';
+            document.getElementById(statusId).style.color = '#f87171';
+        }
+    } catch (e) {
+        document.getElementById(statusId).textContent = '❌ Ошибка';
+        document.getElementById(statusId).style.color = '#f87171';
+    }
+    
     setTimeout(() => {
         document.getElementById(statusId).textContent = '';
     }, 2000);
 }
 
 // Сброс одного поля
-function resetField(field, inputId, statusId) {
-    localStorage.removeItem(`dayz_${field}`);
-    document.getElementById(inputId).value = '';
-    document.getElementById(statusId).textContent = 'Сброшено';
-    document.getElementById(statusId).style.color = '#94a3b8';
+async function resetField(field, inputId, statusId) {
+    try {
+        const response = await fetch('/api/settings');
+        const settings = await response.json();
+        
+        delete settings[field];
+        
+        const saveResponse = await fetch('/api/settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(settings)
+        });
+        
+        const result = await saveResponse.json();
+        
+        if (result.success) {
+            document.getElementById(inputId).value = '';
+            document.getElementById(statusId).textContent = 'Сброшено';
+            document.getElementById(statusId).style.color = '#94a3b8';
+        } else {
+            document.getElementById(statusId).textContent = '❌ Ошибка';
+            document.getElementById(statusId).style.color = '#f87171';
+        }
+    } catch (e) {
+        document.getElementById(statusId).textContent = '❌ Ошибка';
+        document.getElementById(statusId).style.color = '#f87171';
+    }
+    
     setTimeout(() => {
         document.getElementById(statusId).textContent = '';
     }, 2000);
@@ -41,7 +100,6 @@ function resetField(field, inputId, statusId) {
 
 // Открытие проводника (заглушка — в вебе нельзя открыть проводник)
 function browseFile(inputId) {
-    // Для веб-версии просто разблокируем поле для ручного ввода
     const input = document.getElementById(inputId);
     input.removeAttribute('readonly');
     input.focus();
@@ -61,7 +119,6 @@ function closeSettings() {
 
 // Вешаем обработчики после загрузки DOM
 document.addEventListener('DOMContentLoaded', function() {
-    // Кнопки Сохранить
     document.querySelectorAll('.save-single-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const field = this.dataset.field;
@@ -71,7 +128,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Кнопки Сбросить
     document.querySelectorAll('.reset-single-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const field = this.dataset.field;
@@ -81,7 +137,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Кнопки Обзор
     document.querySelectorAll('.browse-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const target = this.dataset.target;
