@@ -20,6 +20,11 @@
         rel="stylesheet"
         href="{{ url_for('static', filename='css/style.css') }}"
     />
+    <!-- Подключаем редактор CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/editor.css') }}"
+    />
 </head>
 <body>
     <!-- Страница приветствия -->
@@ -31,63 +36,64 @@
     <!-- Основной контент (скрыт изначально) -->
     <main id="managerPage" style="display: none;">
         <!-- Боковое меню -->
-		<nav class="main-menu">
-			<div>
-				<ul>
-					<li class="nav-item active">
-						<a href="#" onclick="showManager()">
-							<i class="fa fa-server nav-icon"></i>
-							<span class="nav-text">Менеджер</span>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a href="#">
-							<i class="fa fa-chart-line nav-icon"></i>
-							<span class="nav-text">Статистика</span>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a href="#">
-							<i class="fa fa-users nav-icon"></i>
-							<span class="nav-text">Игроки</span>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a href="#">
-							<i class="fa fa-gear nav-icon"></i>
-							<span class="nav-text">Настройки</span>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a href="#">
-							<i class="fa fa-folder nav-icon"></i>
-							<span class="nav-text">Моды</span>
-						</a>
-					</li>
-				</ul>
-			</div>
+        <nav class="main-menu">
+            <div>
+                <ul>
+                    <li class="nav-item active">
+                        <a href="#" onclick="navigateTo('server')">
+                            <i class="fa fa-server nav-icon"></i>
+                            <span class="nav-text">Менеджер</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" onclick="navigateTo('stats')">
+                            <i class="fa fa-chart-line nav-icon"></i>
+                            <span class="nav-text">Статистика</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" onclick="navigateTo('players')">
+                            <i class="fa fa-users nav-icon"></i>
+                            <span class="nav-text">Игроки</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" onclick="openEditor()">
+                            <i class="fa fa-code nav-icon"></i>
+                            <span class="nav-text">CSS</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" onclick="navigateTo('mods')">
+                            <i class="fa fa-folder nav-icon"></i>
+                            <span class="nav-text">Моды</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-			<ul>
-				<li class="nav-item">
-					<a href="#">
-						<i class="fa fa-user nav-icon"></i>
-						<span class="nav-text">Профиль</span>
-					</a>
-				</li>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" onclick="navigateTo('profile')">
+                        <i class="fa fa-user nav-icon"></i>
+                        <span class="nav-text">Профиль</span>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="#" onclick="openSettings()">
                         <i class="fa fa-gear nav-icon"></i>
                         <span class="nav-text">Система</span>
                     </a>
                 </li>
-				<li class="nav-item">
-					<a href="#" onclick="showLanding()">
-						<i class="fa fa-right-from-bracket nav-icon"></i>
-						<span class="nav-text">Выход</span>
-					</a>
-				</li>
-			</ul>
-		</nav>
+                <li class="nav-item">
+                    <a href="#" onclick="showLanding()">
+                        <i class="fa fa-right-from-bracket nav-icon"></i>
+                        <span class="nav-text">Выход</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
         <!-- Основной контент -->
         <section class="content">
             <div class="left-content">
@@ -95,18 +101,24 @@
                 <div class="slider-container">
                     <div class="swiper">
                         <div class="swiper-wrapper">
-                            <div class="swiper-slide">
-								<img src="{{ url_for('static', filename='images/server.png') }}" />                                <div class="slide-overlay">
+                            <!-- Слайд 1: Сервер -->
+                            <div class="swiper-slide" data-slide="server">
+                                <img src="{{ url_for('static', filename='images/server.png') }}" />
+                                <div class="slide-overlay">
                                     <h2>Управление сервером</h2>
                                 </div>
                             </div>
-                            <div class="swiper-slide">
-								<img src="{{ url_for('static', filename='images/game.png') }}" />                                <div class="slide-overlay">
+                            <!-- Слайд 2: Игра -->
+                            <div class="swiper-slide" data-slide="game">
+                                <img src="{{ url_for('static', filename='images/game.png') }}" />
+                                <div class="slide-overlay">
                                     <h2>Управление игрой</h2>
                                 </div>
                             </div>
-                            <div class="swiper-slide">
-								<img src="{{ url_for('static', filename='images/mods.png') }}" />                                <div class="slide-overlay">
+                            <!-- Слайд 3: Моды -->
+                            <div class="swiper-slide" data-slide="mods">
+                                <img src="{{ url_for('static', filename='images/mods.png') }}" />
+                                <div class="slide-overlay">
                                     <h2>Управление модами</h2>
                                 </div>
                             </div>
@@ -115,17 +127,17 @@
                     </div>
                 </div>
 
-                <!-- Место для контента -->
-                <div class="content-placeholder">
-                    <h1>Your Content Here</h1>
-                    <p>Добавь свои карточки, списки или что угодно</p>
+                <!-- Динамический контент -->
+                <div class="content-placeholder" id="dynamicContent">
+                    <h1>Управление сервером</h1>
+                    <p>Здесь будет панель управления сервером DayZ</p>
                 </div>
             </div>
 
             <div class="right-content">
-                <div class="right-placeholder">
-                    <h1>Right Panel</h1>
-                    <p>Тут может быть твой контент</p>
+                <div class="right-placeholder" id="rightPanel">
+                    <h1>Информация</h1>
+                    <p>Выберите раздел</p>
                 </div>
 
                 <!-- Музыкальный плеер -->
@@ -154,25 +166,303 @@
                 </div>
             </div>
         </section>
-        <!-- Страница настроек системы (скрыта) -->
-        <div id="settingsPage" class="settings-overlay" style="display: none;">
-            <div class="settings-container">
-                <div class="settings-header">
-                    <h1>Настройки системы</h1>
-                    <button onclick="closeSettings()" class="close-btn">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+
+        <!-- Страница настроек системы (подгружается из settings.html) -->
+        {% include 'settings.html' %}
+    </main>
+
+        <!-- ============================================
+            ВИЗУАЛЬНЫЙ CSS РЕДАКТОР
+            ============================================ -->
+        <div id="cssEditorOverlay" class="editor-overlay">
+            <div class="editor-container">
+                <!-- Заголовок -->
+                <div class="editor-header">
+                    <h1>
+                        <i class="fa-solid fa-paintbrush"></i>
+                        Визуальный CSS Редактор
+                    </h1>
+                    <div class="editor-header-actions">
+                        <button class="editor-btn editor-btn-success" onclick="applyAllStyles()">
+                            <i class="fa-solid fa-check"></i> Применить
+                        </button>
+                        <button class="editor-btn editor-btn-danger" onclick="resetEditorStyles()">
+                            <i class="fa-solid fa-rotate-left"></i> Сброс
+                        </button>
+                        <button class="editor-btn editor-btn-primary" onclick="exportCSS()">
+                            <i class="fa-solid fa-download"></i> Экспорт
+                        </button>
+                        <button class="editor-btn editor-btn-close" onclick="closeEditor()">
+                            <i class="fa-solid fa-xmark"></i> Закрыть
+                        </button>
+                    </div>
                 </div>
-                <div class="settings-content">
-                    <p>Здесь будут настройки системы</p>
+                
+                <!-- Тело -->
+                <div class="editor-body">
+                    <!-- ЛЕВАЯ ПАНЕЛЬ - НАСТРОЙКИ -->
+                    <div class="editor-controls">
+                        
+                        <!-- Основной контейнер -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Главный контейнер (main)</div>
+                            
+                            <div class="control-row">
+                                <label>Фон</label>
+                                <input type="color" id="mainBg" value="#10153d">
+                            </div>
+                            <div class="control-row">
+                                <label>Прозрачность</label>
+                                <input type="range" id="mainOpacity" min="0" max="100" value="50">
+                                <span class="control-value" id="mainOpacityVal">50</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Размытие</label>
+                                <input type="range" id="mainBlur" min="0" max="30" value="10">
+                                <span class="control-value" id="mainBlurVal">10</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Скругление</label>
+                                <input type="range" id="mainRadius" min="0" max="50" value="20">
+                                <span class="control-value" id="mainRadiusVal">20</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Отступы</label>
+                                <input type="range" id="mainPadding" min="0" max="50" value="0">
+                                <span class="control-value" id="mainPaddingVal">0</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Расстояние</label>
+                                <input type="range" id="mainGap" min="0" max="30" value="0">
+                                <span class="control-value" id="mainGapVal">0</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Меню -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Меню</div>
+                            
+                            <div class="control-row">
+                                <label>Активный пункт</label>
+                                <input type="color" id="menuActiveBg" value="#6a6d9b">
+                            </div>
+                            <div class="control-row">
+                                <label>Прозрачность</label>
+                                <input type="range" id="menuOpacity" min="0" max="100" value="50">
+                                <span class="control-value" id="menuOpacityVal">50</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Контент -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Контент</div>
+                            
+                            <div class="control-row">
+                                <label>Расстояние между колонками</label>
+                                <input type="range" id="contentGap" min="0" max="30" value="0">
+                                <span class="control-value" id="contentGapVal">0</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Отступы левой колонки</label>
+                                <input type="range" id="leftPadding" min="0" max="60" value="30">
+                                <span class="control-value" id="leftPaddingVal">30</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Отступы правой колонки</label>
+                                <input type="range" id="rightPadding" min="0" max="60" value="25">
+                                <span class="control-value" id="rightPaddingVal">25</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Цвет текста -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Текст</div>
+                            <div class="control-row">
+                                <label>Основной цвет</label>
+                                <input type="color" id="textColor" value="#ffffff">
+                            </div>
+                        </div>
+                        
+                        <!-- Слайдер -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Слайдер</div>
+                            
+                            <div class="control-row">
+                                <label>Градиент</label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="useGradient">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="control-row">
+                                <label>Цвет 1</label>
+                                <input type="color" id="gradientColor1" value="#4a3f8a">
+                            </div>
+                            <div class="control-row">
+                                <label>Цвет 2</label>
+                                <input type="color" id="gradientColor2" value="#1a1145">
+                            </div>
+                            
+                            <div class="control-row">
+                                <label>Направление</label>
+                                <div class="gradient-direction">
+                                    <button data-value="0" onclick="setGradientDirection('0')">↑</button>
+                                    <button data-value="45" onclick="setGradientDirection('45')">↗</button>
+                                    <button data-value="90" onclick="setGradientDirection('90')">→</button>
+                                    <button data-value="135" onclick="setGradientDirection('135')">↘</button>
+                                    <button data-value="180" onclick="setGradientDirection('180')">↓</button>
+                                    <button data-value="225" onclick="setGradientDirection('225')">↙</button>
+                                    <button data-value="270" onclick="setGradientDirection('270')">←</button>
+                                    <button data-value="315" onclick="setGradientDirection('315')">↖</button>
+                                </div>
+                                <input type="hidden" id="gradientDirection" value="135">
+                            </div>
+                            
+                            <div class="control-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px; margin-top: 4px;">
+                                <label>Оверлей цвет</label>
+                                <input type="color" id="slideOverlayColor" value="#261595">
+                            </div>
+                            <div class="control-row">
+                                <label>Прозрачность</label>
+                                <input type="range" id="slideOverlayOpacity" min="0" max="100" value="80">
+                                <span class="control-value" id="slideOverlayOpacityVal">80</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Плеер -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Музыкальный плеер</div>
+                            
+                            <div class="control-row">
+                                <label>Фон</label>
+                                <input type="color" id="playerBg" value="#bcb8c6">
+                            </div>
+                            <div class="control-row">
+                                <label>Прозрачность</label>
+                                <input type="range" id="playerOpacity" min="0" max="100" value="20">
+                                <span class="control-value" id="playerOpacityVal">20</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Размытие</label>
+                                <input type="range" id="playerBlur" min="0" max="30" value="10">
+                                <span class="control-value" id="playerBlurVal">10</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Отступы</label>
+                                <input type="range" id="playerPadding" min="0" max="50" value="20">
+                                <span class="control-value" id="playerPaddingVal">20</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Скругление</label>
+                                <input type="range" id="playerRadius" min="0" max="30" value="16">
+                                <span class="control-value" id="playerRadiusVal">16</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Окно редактора -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Окно редактора</div>
+                            
+                            <div class="control-row">
+                                <label>Фон</label>
+                                <input type="color" id="editorBg" value="#10153d">
+                            </div>
+                            <div class="control-row">
+                                <label>Прозрачность</label>
+                                <input type="range" id="editorOpacity" min="0" max="100" value="95">
+                                <span class="control-value" id="editorOpacityVal">95</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Размытие</label>
+                                <input type="range" id="editorBlur" min="0" max="30" value="0">
+                                <span class="control-value" id="editorBlurVal">0</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Скругление</label>
+                                <input type="range" id="editorRadius" min="0" max="40" value="20">
+                                <span class="control-value" id="editorRadiusVal">20</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Отступы</label>
+                                <input type="range" id="editorPadding" min="0" max="60" value="30">
+                                <span class="control-value" id="editorPaddingVal">30</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Толщина рамки</label>
+                                <input type="range" id="editorBorder" min="0" max="10" value="1">
+                                <span class="control-value" id="editorBorderVal">1</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Оверлей редактора -->
+                        <div class="editor-group">
+                            <div class="editor-group-title">Фон редактора</div>
+                            
+                            <div class="control-row">
+                                <label>Прозрачный</label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="isTransparent">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="control-row">
+                                <label>Блюр</label>
+                                <label class="toggle">
+                                    <input type="checkbox" id="isBlur" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="control-row">
+                                <label>Цвет фона</label>
+                                <input type="color" id="overlayBg" value="#000000">
+                            </div>
+                            <div class="control-row">
+                                <label>Прозрачность</label>
+                                <input type="range" id="overlayOpacity" min="0" max="100" value="70">
+                                <span class="control-value" id="overlayOpacityVal">70</span>
+                            </div>
+                            <div class="control-row">
+                                <label>Размытие</label>
+                                <input type="range" id="overlayBlur" min="0" max="20" value="8">
+                                <span class="control-value" id="overlayBlurVal">8</span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- ПРАВАЯ ПАНЕЛЬ - ПРЕВЬЮ -->
+                    <div class="editor-preview-panel">
+                        <label><i class="fa-solid fa-eye"></i> Предпросмотр</label>
+                        <div id="cssPreview" class="editor-preview">
+                            <div class="preview-box">
+                                <span>main</span>
+                            </div>
+                            <div class="preview-text">Пример текста</div>
+                            <div class="preview-card">
+                                <h4>Карточка</h4>
+                                <p>Стили применяются в реальном времени</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </main>
+        <!-- Подключаем редактор -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
 
     <!-- Swiper JS (локально) -->
     <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
-    <!-- Подключаем JS -->
+    
+    <!-- Основной JS -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <!-- Настройки -->
+    <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+    
+    <!-- Редактор CSS -->
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+
 </body>
 </html>
