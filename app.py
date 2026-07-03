@@ -44,7 +44,7 @@ def serve_images(filename):
     return send_from_directory('static/images', filename)
 
 # ============================================
-# API ДЛЯ НАСТРОЕК (пути к папкам)
+# API ДЛЯ НАСТРОЕК
 # ============================================
 
 @app.route('/api/settings', methods=['GET'])
@@ -58,11 +58,25 @@ def save_settings_api():
     """Сохранить настройки"""
     try:
         data = request.get_json()
-        if data:
-            if save_settings(data):
-                return jsonify({'success': True, 'message': 'Настройки сохранены'})
-            return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
-        return jsonify({'success': False, 'message': 'Нет данных'}), 400
+        if data is None:
+            return jsonify({'success': False, 'message': 'Нет данных'}), 400
+        
+        # Сохраняем как есть, даже пустые значения
+        if save_settings(data):
+            return jsonify({'success': True, 'message': 'Настройки сохранены'})
+        return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/settings/reset/<field>', methods=['POST'])
+def reset_setting(field):
+    """Сбросить конкретную настройку (установить пустую строку)"""
+    try:
+        settings = load_settings()
+        # Устанавливаем пустую строку вместо удаления
+        settings[field] = ""
+        save_settings(settings)
+        return jsonify({'success': True, 'message': f'Поле {field} сброшено'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 

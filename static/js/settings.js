@@ -8,8 +8,11 @@ async function loadSettings() {
         const inputIds = ['server-exe-path', 'game-exe-path', 'workshop-path', 'custom-mods-path'];
         
         fields.forEach((field, i) => {
-            if (data[field]) {
-                document.getElementById(inputIds[i]).value = data[field];
+            const input = document.getElementById(inputIds[i]);
+            if (data[field] && data[field].trim()) {
+                input.value = data[field];
+            } else {
+                input.value = '';
             }
         });
     } catch (e) {
@@ -23,6 +26,9 @@ async function saveField(field, inputId, statusId) {
     if (!value) {
         document.getElementById(statusId).textContent = 'Укажите путь';
         document.getElementById(statusId).style.color = '#f87171';
+        setTimeout(() => {
+            document.getElementById(statusId).textContent = '';
+        }, 2000);
         return;
     }
     
@@ -45,60 +51,63 @@ async function saveField(field, inputId, statusId) {
         
         const result = await saveResponse.json();
         
+        const statusEl = document.getElementById(statusId);
         if (result.success) {
-            document.getElementById(statusId).textContent = '✓ Сохранено';
-            document.getElementById(statusId).style.color = '#4ade80';
+            statusEl.textContent = '✓ Сохранено';
+            statusEl.style.color = '#4ade80';
         } else {
-            document.getElementById(statusId).textContent = '❌ Ошибка';
-            document.getElementById(statusId).style.color = '#f87171';
+            statusEl.textContent = '❌ Ошибка';
+            statusEl.style.color = '#f87171';
         }
+        
+        setTimeout(() => {
+            statusEl.textContent = '';
+        }, 2000);
     } catch (e) {
-        document.getElementById(statusId).textContent = '❌ Ошибка';
-        document.getElementById(statusId).style.color = '#f87171';
+        const statusEl = document.getElementById(statusId);
+        statusEl.textContent = '❌ Ошибка';
+        statusEl.style.color = '#f87171';
+        setTimeout(() => {
+            statusEl.textContent = '';
+        }, 2000);
     }
-    
-    setTimeout(() => {
-        document.getElementById(statusId).textContent = '';
-    }, 2000);
 }
 
-// Сброс одного поля
+// Сброс одного поля (устанавливаем пустую строку)
 async function resetField(field, inputId, statusId) {
     try {
-        const response = await fetch('/api/settings');
-        const settings = await response.json();
-        
-        delete settings[field];
-        
-        const saveResponse = await fetch('/api/settings', {
+        // Отправляем POST запрос на сервер для сброса
+        const response = await fetch(`/api/settings/reset/${field}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(settings)
         });
         
-        const result = await saveResponse.json();
+        const result = await response.json();
+        const statusEl = document.getElementById(statusId);
+        const input = document.getElementById(inputId);
         
         if (result.success) {
-            document.getElementById(inputId).value = '';
-            document.getElementById(statusId).textContent = 'Сброшено';
-            document.getElementById(statusId).style.color = '#94a3b8';
+            input.value = '';
+            statusEl.textContent = '✓ Сброшено';
+            statusEl.style.color = '#4ade80';
         } else {
-            document.getElementById(statusId).textContent = '❌ Ошибка';
-            document.getElementById(statusId).style.color = '#f87171';
+            statusEl.textContent = '❌ Ошибка';
+            statusEl.style.color = '#f87171';
         }
+        
+        setTimeout(() => {
+            statusEl.textContent = '';
+        }, 2000);
     } catch (e) {
-        document.getElementById(statusId).textContent = '❌ Ошибка';
-        document.getElementById(statusId).style.color = '#f87171';
+        const statusEl = document.getElementById(statusId);
+        statusEl.textContent = '❌ Ошибка';
+        statusEl.style.color = '#f87171';
+        setTimeout(() => {
+            statusEl.textContent = '';
+        }, 2000);
     }
-    
-    setTimeout(() => {
-        document.getElementById(statusId).textContent = '';
-    }, 2000);
 }
 
-// Открытие проводника (заглушка — в вебе нельзя открыть проводник)
+// Открытие проводника (заглушка)
 function browseFile(inputId) {
     const input = document.getElementById(inputId);
     input.removeAttribute('readonly');
