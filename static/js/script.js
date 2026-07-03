@@ -4,26 +4,24 @@ let swiper = null;
 function showManager() {
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('managerPage').style.display = 'grid';
-    
-    // Инициализируем слайдер после показа
     initSwiper();
+    updateContent(0); // Показываем контент первого слайда по умолчанию
 }
 
 // Функция показа лендинга
 function showLanding() {
     document.getElementById('managerPage').style.display = 'none';
     document.getElementById('landingPage').style.display = 'flex';
-    
-    // Уничтожаем слайдер при скрытии
     if (swiper) {
         swiper.destroy(true, true);
         swiper = null;
     }
 }
 
+// Инициализация слайдера
 function initSwiper() {
     if (swiper) return;
-    
+
     swiper = new Swiper(".swiper", {
         effect: "coverflow",
         grabCursor: true,
@@ -41,6 +39,10 @@ function initSwiper() {
         on: {
             click(event) {
                 swiper.slideTo(this.clickedIndex);
+                updateContent(this.clickedIndex);
+            },
+            slideChange() {
+                updateContent(this.realIndex);
             },
         },
         pagination: {
@@ -48,18 +50,44 @@ function initSwiper() {
         },
     });
 
-    // Прокрутка колёсиком мыши (без задержки)
+    // Прокрутка колёсиком мыши
     const swiperContainer = document.querySelector(".swiper");
-    
+
     swiperContainer.addEventListener("wheel", function(e) {
         e.preventDefault();
-        
         if (e.deltaY > 0) {
             swiper.slideNext();
         } else {
             swiper.slidePrev();
         }
     }, { passive: false });
+}
+
+// Обновление контента под слайдером
+function updateContent(index) {
+    const contentPlaceholder = document.querySelector('.content-placeholder');
+    
+    const pages = [
+        {
+            title: 'Управление сервером',
+            text: 'Здесь будет панель управления сервером DayZ: запуск, остановка, мониторинг, логи.'
+        },
+        {
+            title: 'Управление игрой',
+            text: 'Здесь будут настройки игры: конфиги, параметры мира, расписание рестартов.'
+        },
+        {
+            title: 'Управление модами',
+            text: 'Здесь будет управление модами: установка, обновление, порядок загрузки.'
+        }
+    ];
+    
+    if (pages[index]) {
+        contentPlaceholder.innerHTML = `
+            <h1>${pages[index].title}</h1>
+            <p>${pages[index].text}</p>
+        `;
+    }
 }
 
 // Навигация
