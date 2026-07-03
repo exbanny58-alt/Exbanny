@@ -160,3 +160,11 @@ backwardButton.addEventListener("click", function() {
 progress.addEventListener("input", function() {
     console.log("Progress:", this.value);
 });
+
+function openSettings() {
+    document.getElementById('settingsPage').style.display = 'flex';
+}
+
+function closeSettings() {
+    document.getElementById('settingsPage').style.display = 'none';
+}

@@ -74,12 +74,12 @@
 						<span class="nav-text">Профиль</span>
 					</a>
 				</li>
-				<li class="nav-item">
-					<a href="#">
-						<i class="fa fa-gear nav-icon"></i>
-						<span class="nav-text">Система</span>
-					</a>
-				</li>
+                <li class="nav-item">
+                    <a href="#" onclick="openSettings()">
+                        <i class="fa fa-gear nav-icon"></i>
+                        <span class="nav-text">Система</span>
+                    </a>
+                </li>
 				<li class="nav-item">
 					<a href="#" onclick="showLanding()">
 						<i class="fa fa-right-from-bracket nav-icon"></i>
@@ -154,6 +154,20 @@
                 </div>
             </div>
         </section>
+        <!-- Страница настроек системы (скрыта) -->
+        <div id="settingsPage" class="settings-overlay" style="display: none;">
+            <div class="settings-container">
+                <div class="settings-header">
+                    <h1>Настройки системы</h1>
+                    <button onclick="closeSettings()" class="close-btn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="settings-content">
+                    <p>Здесь будут настройки системы</p>
+                </div>
+            </div>
+        </div>
     </main>
 
     <!-- Swiper JS (локально) -->
