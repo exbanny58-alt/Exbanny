@@ -46,24 +46,6 @@ function navigateTo(page) {
     }
 }
 
-// Переключение между лендингом и менеджером
-function showManager() {
-    document.getElementById('landingPage').style.display = 'none';
-    document.getElementById('managerPage').style.display = 'grid';
-    initSwiper();
-    // Показываем контент первого слайда по умолчанию
-    updateContent(0);
-}
-
-function showLanding() {
-    document.getElementById('managerPage').style.display = 'none';
-    document.getElementById('landingPage').style.display = 'flex';
-    if (swiper) {
-        swiper.destroy(true, true);
-        swiper = null;
-    }
-}
-
 // Инициализация слайдера
 function initSwiper() {
     if (swiper) return;
@@ -191,13 +173,18 @@ if (progress) {
 // Навигация по клику на пункты меню
 document.querySelectorAll('.nav-item a').forEach(link => {
     link.addEventListener('click', function(e) {
-        // Если это не специальные кнопки (settings, выход)
         const onclick = this.getAttribute('onclick') || '';
-        if (onclick.includes('openSettings') || onclick.includes('showLanding')) {
+        if (onclick.includes('openSettings')) {
             return;
         }
         
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         this.closest('.nav-item').classList.add('active');
     });
+});
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', function() {
+    initSwiper();
+    updateContent(0);
 });

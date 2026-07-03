@@ -13,14 +13,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-    <!-- Страница приветствия -->
-    <div id="landingPage" class="welcome-overlay">
-        <h1>DayZ Менеджер</h1>
-        <button onclick="showManager()" class="enter-btn">Войти</button>
-    </div>
-
     <!-- Основной контент -->
-    <main id="managerPage" style="display: none;">
+    <main id="managerPage">
         <!-- Боковое меню -->
         <nav class="main-menu">
             <div>
@@ -63,12 +57,6 @@
                     <a href="#" onclick="openSettings()">
                         <i class="fa fa-gear nav-icon"></i>
                         <span class="nav-text">Система</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" onclick="showLanding()">
-                        <i class="fa fa-right-from-bracket nav-icon"></i>
-                        <span class="nav-text">Выход</span>
                     </a>
                 </li>
             </ul>

@@ -72,12 +72,12 @@ def select_file_dialog():
         print(f'❌ Ошибка tkinter: {e}')
         return None
 
+# ============================================
+# ГЛАВНАЯ СТРАНИЦА - СРАЗУ МЕНЕДЖЕР
+# ============================================
 @app.route('/')
-def landing():
-    return render_template('landing.html')
-
-@app.route('/manager')
 def index():
+    """Главная страница - сразу менеджер"""
     return render_template('index.html')
 
 @app.route('/static/webfonts/<path:filename>')
@@ -135,7 +135,6 @@ def browse_file():
         field = data.get('field')
         input_id = data.get('inputId')
         
-        # Запускаем в отдельном потоке, чтобы не блокировать Flask
         result = [None]
         
         def thread_func():
@@ -143,7 +142,7 @@ def browse_file():
         
         thread = threading.Thread(target=thread_func)
         thread.start()
-        thread.join(timeout=60)  # Ждём до 60 секунд
+        thread.join(timeout=60)
         
         file_path = result[0]
         
@@ -176,7 +175,6 @@ def browse_folder():
         field = data.get('field')
         input_id = data.get('inputId')
         
-        # Запускаем в отдельном потоке, чтобы не блокировать Flask
         result = [None]
         
         def thread_func():
@@ -184,7 +182,7 @@ def browse_folder():
         
         thread = threading.Thread(target=thread_func)
         thread.start()
-        thread.join(timeout=60)  # Ждём до 60 секунд
+        thread.join(timeout=60)
         
         folder_path = result[0]
         
@@ -207,43 +205,6 @@ def browse_folder():
         return jsonify({
             'success': False,
             'message': str(e)
-        }), 500
-
-@app.route('/api/open/explorer', methods=['POST'])
-def open_explorer():
-    """Открыть проводник по указанному пути"""
-    try:
-        data = request.get_json()
-        path = data.get('path', '').strip()
-        
-        if not path:
-            return jsonify({'success': False, 'message': 'Путь не указан'}), 400
-        
-        if not os.path.exists(path):
-            return jsonify({'success': False, 'message': f'Путь не существует'}), 404
-        
-        if not os.path.isdir(path):
-            return jsonify({'success': False, 'message': f'Указанный путь не является папкой'}), 400
-        
-        # Открываем проводник в зависимости от ОС
-        if platform.system() == 'Windows':
-            subprocess.Popen(['explorer', path])
-        elif platform.system() == 'Darwin':  # macOS
-            subprocess.Popen(['open', path])
-        elif platform.system() == 'Linux':
-            subprocess.Popen(['xdg-open', path])
-        else:
-            return jsonify({
-                'success': False,
-                'message': f'Неподдерживаемая ОС: {platform.system()}'
-            }), 400
-        
-        return jsonify({'success': True, 'message': f'Проводник открыт: {path}'})
-    
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Ошибка: {str(e)}'
         }), 500
 
 if __name__ == '__main__':
