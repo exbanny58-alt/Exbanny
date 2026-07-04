@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DayZ Менеджер</title>
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}" />
     <!-- Подключаем CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
@@ -16,37 +14,61 @@
         <!-- Боковое меню -->
         <nav class="main-menu">
             <div class="menu-top">
-                <ul>
-                    <li class="nav-item">
-                        <a href="#" onclick="showContent('server')">
-                            <i class="fa fa-server nav-icon"></i>
-                            <span class="nav-text">Управление сервером</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" onclick="showContent('game')">
-                            <i class="fa fa-gamepad nav-icon"></i>
-                            <span class="nav-text">Управление игрой</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" onclick="showContent('mods')">
-                            <i class="fa fa-folder nav-icon"></i>
-                            <span class="nav-text">Управление модами</span>
-                        </a>
-                    </li>
-                </ul>
+                <!-- Блок с основными пунктами меню (с обводкой) -->
+                <div class="menu-block">
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#" onclick="showContent('server')">
+                                <!-- Иконка сервера -->
+                                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span class="nav-text">Управление сервером</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showContent('game')">
+                                <!-- Иконка игры (геймпад) -->
+                                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="5,3 19,12 5,21"/>
+                                </svg>
+                                <span class="nav-text">Управление игрой</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" onclick="showContent('mods')">
+                                <!-- Иконка папки -->
+                                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                                </svg>
+                                <span class="nav-text">Управление модами</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
 
             <div class="menu-bottom">
-                <ul>
-                    <li class="nav-item">
-                        <a href="#" onclick="showSettings()">
-                            <i class="fa fa-gear nav-icon"></i>
-                            <span class="nav-text">Настройки</span>
-                        </a>
-                    </li>
-                </ul>
+                <!-- Декоративный разделитель -->
+                <div class="menu-divider"></div>
+                
+                <!-- Блок с настройками -->
+                <div class="menu-block-settings">
+                    <ul>
+                        <li class="nav-item">
+                            <a href="#" onclick="showSettings()">
+                                <!-- Иконка настроек (шестеренка) -->
+                                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <span class="nav-text">Настройки</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
 
@@ -57,7 +79,10 @@
                 <div id="startPage" class="start-page">
                     <div class="start-content">
                         <div class="start-logo">
-                            <i class="fa fa-shield-halved"></i>
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                <polyline points="9 12 11 14 15 10"/>
+                            </svg>
                         </div>
                         <h1>DayZ Менеджер</h1>
                         <p>Выберите раздел в меню слева</p>

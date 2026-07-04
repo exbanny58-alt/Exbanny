@@ -62,7 +62,7 @@ body {
    ============================================ */
 main {
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 255px 1fr;
     
     width: 96vw;
     height: 92vh;
@@ -102,9 +102,56 @@ main {
     flex-shrink: 0;
 }
 
+/* ============================================
+   БЛОК МЕНЮ С ОБВОДКОЙ
+   ============================================ */
+.menu-block {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    margin: 0 12px 8px 12px;
+    padding: 6px 0;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+/* Свечение блока при наведении */
+.menu-block:hover {
+    border-color: rgba(167, 139, 250, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.05);
+}
+
+/* Блок с настройками (нижний) */
+.menu-block-settings {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    margin: 0 12px;
+    padding: 6px 0;
+    transition: all 0.4s ease;
+}
+
+.menu-block-settings:hover {
+    border-color: rgba(167, 139, 250, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Декоративная линия между блоками */
+.menu-divider {
+    height: 1px;
+    margin: 8px 20px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255, 255, 255, 0.08),
+        transparent
+    );
+}
+
 .nav-item {
     display: block;
-    margin: 4px 0;
+    margin: 2px 0;
 }
 
 .nav-item a {
@@ -113,8 +160,8 @@ main {
     gap: 14px;
     color: #fff;
     font-size: 0.95rem;
-    padding: 12px 18px;
-    margin: 0 12px;
+    padding: 10px 16px;
+    margin: 0 8px;
     border-radius: 10px;
     transition: all 0.3s ease;
     position: relative;
@@ -124,20 +171,20 @@ main {
 
 .nav-item a:hover {
     background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(167, 139, 250, 0.3);
-    transform: translateX(4px);
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    transform: translateX(3px);
 }
 
 .nav-item a:hover .nav-icon {
-    transform: scale(1.15) rotate(5deg);
+    transform: scale(1.12) rotate(5deg);
     transition: all 0.3s ease;
 }
 
 /* Активный пункт меню */
 .nav-item.active a {
-    background: rgba(106, 109, 155, 0.3);
-    border: 1px solid rgba(167, 139, 250, 0.4);
-    box-shadow: 0 0 20px rgba(167, 139, 250, 0.1);
+    background: rgba(106, 109, 155, 0.25);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    box-shadow: 0 0 25px rgba(167, 139, 250, 0.08);
 }
 
 .nav-item.active a .nav-icon {
@@ -194,6 +241,26 @@ main {
     color: #e5e5e5;
     height: 100%;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Стилизация скроллбара */
+.content-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-area::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.4);
+    border-radius: 10px;
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(167, 139, 250, 0.6);
 }
 
 /* ============================================
@@ -353,7 +420,7 @@ main {
 
 /* ============================================
    МЕДИА-ЗАПРОСЫ
-   ============================================
+   ============================================ 
 @media (max-width: 1500px) {
     main {
         grid-template-columns: 200px 1fr;
@@ -383,6 +450,12 @@ main {
     
     .content-area {
         padding: 20px 20px;
+    }
+    
+    .menu-block,
+    .menu-block-settings {
+        margin: 0 8px 6px 8px;
+        padding: 4px 0;
     }
 }
 
@@ -430,6 +503,18 @@ main {
     
     .settings-card {
         padding: 14px 16px;
+    }
+    
+    .menu-block,
+    .menu-block-settings {
+        margin: 0 4px;
+        padding: 4px 0;
+        border: none;
+        background: transparent;
+    }
+    
+    .menu-divider {
+        display: none;
     }
 }
 
@@ -537,7 +622,6 @@ main {
     }
 }
 
-
 /* ============================================
    АНИМАЦИИ ДЛЯ КОНТЕНТА
    ============================================ */
@@ -615,36 +699,32 @@ main {
 }
 
 /* ============================================
-   ОСНОВНОЙ КОНТЕНТ
+   КОНТЕНТ С НАСТРОЙКАМИ - СКРОЛЛ
    ============================================ */
-.content {
-    height: 100%;
-    overflow: hidden;
+.settings-content-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    height: 100%;           /* ← Добавляем */
+    overflow-y: auto;       /* ← Добавляем скролл */
+    padding-right: 5px;     /* ← Чтобы скролл не наезжал на контент */
 }
 
-.content-area {
-    padding: 30px 35px;
-    color: #e5e5e5;
-    height: 100%;
-    overflow-y: auto; /* ← ВАЖНО: добавляем скролл */
-    overflow-x: hidden;
-}
-
-/* Стилизация скроллбара (красиво) */
-.content-area::-webkit-scrollbar {
+/* Стилизация скроллбара для настроек */
+.settings-content-wrapper::-webkit-scrollbar {
     width: 6px;
 }
 
-.content-area::-webkit-scrollbar-track {
+.settings-content-wrapper::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
 }
 
-.content-area::-webkit-scrollbar-thumb {
+.settings-content-wrapper::-webkit-scrollbar-thumb {
     background: rgba(167, 139, 250, 0.4);
     border-radius: 10px;
 }
 
-.content-area::-webkit-scrollbar-thumb:hover {
+.settings-content-wrapper::-webkit-scrollbar-thumb:hover {
     background: rgba(167, 139, 250, 0.6);
 }
+
