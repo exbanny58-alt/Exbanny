@@ -3,18 +3,49 @@ import os
 import subprocess
 import platform
 import threading
+import re
+import json
+import hashlib
+from datetime import datetime
 from settings_manager import load_settings, save_settings
 from file_dialogs import select_file_dialog, select_folder_dialog
 
 def register_routes(app):
     """Регистрирует все маршруты в приложении"""
 
+    # Путь к файлу кеша модов
+    MODS_CACHE_FILE = os.path.join(os.path.dirname(__file__), 'mods_cache.json')
+
+    def get_mods_cache():
+        """Загружает кеш модов из файла"""
+        if os.path.exists(MODS_CACHE_FILE):
+            try:
+                with open(MODS_CACHE_FILE, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except:
+                return None
+        return None
+
+    def save_mods_cache(mods_data):
+        """Сохраняет кеш модов в файл"""
+        try:
+            cache_data = {
+                'timestamp': datetime.now().isoformat(),
+                'mods': mods_data,
+                'hash': hashlib.md5(json.dumps(mods_data, sort_keys=True).encode()).hexdigest()
+            }
+            with open(MODS_CACHE_FILE, 'w', encoding='utf-8') as f:
+                json.dump(cache_data, f, indent=2, ensure_ascii=False)
+            return True
+        except Exception as e:
+            print(f'❌ Ошибка сохранения кеша модов: {e}')
+            return False
+
     # ============================================
     # ГЛАВНАЯ СТРАНИЦА
     # ============================================
     @app.route('/')
     def index():
-        """Главная страница - сразу менеджер"""
         return render_template('index.html')
 
     # ============================================
@@ -37,11 +68,10 @@ def register_routes(app):
         return send_from_directory('static/js', filename)
 
     # ============================================
-    # СТРАНИЦА НАСТРОЕК (внутри контента)
+    # СТРАНИЦА НАСТРОЕК
     # ============================================
     @app.route('/settings-content')
     def settings_content():
-        """Возвращает HTML с настройками для вставки в контент"""
         return render_template('settings_content.html')
 
     # ============================================
@@ -49,13 +79,11 @@ def register_routes(app):
     # ============================================
     @app.route('/api/settings', methods=['GET'])
     def get_settings():
-        """Получить настройки"""
         settings = load_settings()
         return jsonify(settings)
 
     @app.route('/api/settings', methods=['POST'])
     def save_settings_api():
-        """Сохранить настройки"""
         try:
             data = request.get_json()
             if data is None:
@@ -69,7 +97,6 @@ def register_routes(app):
 
     @app.route('/api/settings/reset/<field>', methods=['POST'])
     def reset_setting(field):
-        """Сбросить конкретную настройку (установить пустую строку)"""
         try:
             settings = load_settings()
             settings[field] = ""
@@ -83,7 +110,6 @@ def register_routes(app):
     # ============================================
     @app.route('/api/browse/file', methods=['POST'])
     def browse_file():
-        """Открыть диалог выбора файла через tkinter"""
         try:
             data = request.get_json()
             field = data.get('field')
@@ -123,7 +149,6 @@ def register_routes(app):
 
     @app.route('/api/browse/folder', methods=['POST'])
     def browse_folder():
-        """Открыть диалог выбора папки через tkinter"""
         try:
             data = request.get_json()
             field = data.get('field')
@@ -166,7 +191,6 @@ def register_routes(app):
     # ============================================
     @app.route('/api/open/explorer', methods=['POST'])
     def open_explorer():
-        """Открыть папку в проводнике"""
         try:
             data = request.get_json()
             path = data.get('path', '').strip()
@@ -187,9 +211,9 @@ def register_routes(app):
             
             if system == 'Windows':
                 os.startfile(path)
-            elif system == 'Darwin':  # macOS
+            elif system == 'Darwin':
                 subprocess.Popen(['open', path])
-            else:  # Linux
+            else:
                 subprocess.Popen(['xdg-open', path])
             
             return jsonify({
@@ -202,3 +226,269 @@ def register_routes(app):
                 'success': False,
                 'message': str(e)
             }), 500
+
+    # ============================================
+    # ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ МОДОВ
+    # ============================================
+    def read_mod_meta(mod_path):
+        meta_path = os.path.join(mod_path, 'meta.cpp')
+        if not os.path.exists(meta_path):
+            return None
+        
+        try:
+            with open(meta_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            name_match = re.search(r'name\s*=\s*"([^"]+)"', content)
+            if name_match:
+                return name_match.group(1).strip()
+            
+            name_match = re.search(r'name\s*=\s*\{([^}]+)\}', content)
+            if name_match:
+                return name_match.group(1).strip()
+            
+            return None
+        except Exception as e:
+            print(f'⚠️ Ошибка чтения meta.cpp в {mod_path}: {e}')
+            return None
+
+    def get_mod_version(mod_path):
+        meta_path = os.path.join(mod_path, 'meta.cpp')
+        if not os.path.exists(meta_path):
+            return None
+        
+        try:
+            with open(meta_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            version_match = re.search(r'version\s*=\s*"([^"]+)"', content)
+            if version_match:
+                return version_match.group(1).strip()
+            
+            version_match = re.search(r'version\s*=\s*\{([^}]+)\}', content)
+            if version_match:
+                return version_match.group(1).strip()
+            
+            return None
+        except:
+            return None
+
+    def scan_mods(workshop_path, custom_mods_path):
+        mods = []
+        mod_ids = set()
+        
+        if workshop_path and os.path.exists(workshop_path):
+            try:
+                for item in os.listdir(workshop_path):
+                    item_path = os.path.join(workshop_path, item)
+                    if os.path.isdir(item_path):
+                        has_meta = os.path.exists(os.path.join(item_path, 'meta.cpp'))
+                        has_config = os.path.exists(os.path.join(item_path, 'config.cpp'))
+                        
+                        if has_meta or has_config:
+                            mod_name = read_mod_meta(item_path)
+                            mod_version = get_mod_version(item_path)
+                            
+                            if not mod_name:
+                                mod_name = item
+                            
+                            mod_id = f"workshop_{item}"
+                            if mod_id not in mod_ids:
+                                mod_ids.add(mod_id)
+                                mods.append({
+                                    'id': mod_id,
+                                    'name': mod_name,
+                                    'folder': item,
+                                    'path': item_path,
+                                    'type': 'workshop',
+                                    'version': mod_version or 'Неизвестно',
+                                    'enabled': True,
+                                    'has_meta': has_meta
+                                })
+            except Exception as e:
+                print(f'⚠️ Ошибка сканирования Workshop: {e}')
+        
+        if custom_mods_path and os.path.exists(custom_mods_path):
+            try:
+                for item in os.listdir(custom_mods_path):
+                    item_path = os.path.join(custom_mods_path, item)
+                    if os.path.isdir(item_path):
+                        has_meta = os.path.exists(os.path.join(item_path, 'meta.cpp'))
+                        has_config = os.path.exists(os.path.join(item_path, 'config.cpp'))
+                        
+                        if has_meta or has_config:
+                            mod_name = read_mod_meta(item_path)
+                            mod_version = get_mod_version(item_path)
+                            
+                            if not mod_name:
+                                mod_name = item
+                            
+                            mod_id = f"custom_{item}"
+                            if mod_id not in mod_ids:
+                                mod_ids.add(mod_id)
+                                mods.append({
+                                    'id': mod_id,
+                                    'name': mod_name,
+                                    'folder': item,
+                                    'path': item_path,
+                                    'type': 'custom',
+                                    'version': mod_version or 'Неизвестно',
+                                    'enabled': True,
+                                    'has_meta': has_meta
+                                })
+            except Exception as e:
+                print(f'⚠️ Ошибка сканирования кастомных модов: {e}')
+        
+        mods.sort(key=lambda x: x['name'].lower())
+        return mods
+
+    # ============================================
+    # API ДЛЯ РАБОТЫ С МОДАМИ (с кешированием)
+    # ============================================
+    
+    @app.route('/api/mods/cache', methods=['GET'])
+    def get_mods_from_cache():
+        """Возвращает моды из кеша (МГНОВЕННО)"""
+        try:
+            cache = get_mods_cache()
+            if cache and cache.get('mods'):
+                # Применяем сохранённые состояния из настроек
+                settings = load_settings()
+                mods_state = settings.get('mods_state', {})
+                
+                mods = cache.get('mods')
+                for mod in mods:
+                    if mod['id'] in mods_state:
+                        mod['enabled'] = mods_state[mod['id']]
+                
+                return jsonify({
+                    'success': True,
+                    'from_cache': True,
+                    'timestamp': cache.get('timestamp'),
+                    'mods': mods,
+                    'stats': {
+                        'total': len(mods),
+                        'workshop': len([m for m in mods if m.get('type') == 'workshop']),
+                        'custom': len([m for m in mods if m.get('type') == 'custom']),
+                        'enabled': len([m for m in mods if m.get('enabled', True)])
+                    }
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Кеш не найден'
+                }), 404
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/mods/scan', methods=['GET'])
+    def scan_mods_api():
+        """Сканирует папки с модами (без сохранения в кеш)"""
+        try:
+            settings = load_settings()
+            workshop = settings.get('workshop', '')
+            custom_mods = settings.get('custom_mods', '')
+            
+            if not workshop and not custom_mods:
+                return jsonify({
+                    'success': False,
+                    'message': 'Не указаны папки с модами в настройках'
+                }), 400
+            
+            mods = scan_mods(workshop, custom_mods)
+            
+            # Применяем сохранённые состояния
+            mods_state = settings.get('mods_state', {})
+            for mod in mods:
+                if mod['id'] in mods_state:
+                    mod['enabled'] = mods_state[mod['id']]
+            
+            return jsonify({
+                'success': True,
+                'mods': mods,
+                'stats': {
+                    'total': len(mods),
+                    'workshop': len([m for m in mods if m['type'] == 'workshop']),
+                    'custom': len([m for m in mods if m['type'] == 'custom']),
+                    'enabled': len([m for m in mods if m.get('enabled', True)])
+                }
+            })
+        
+        except Exception as e:
+            print(f'❌ Ошибка сканирования модов: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/mods/scan-and-cache', methods=['POST'])
+    def scan_and_cache_mods():
+        """Сканирует моды, сохраняет в кеш и возвращает результат"""
+        try:
+            settings = load_settings()
+            workshop = settings.get('workshop', '')
+            custom_mods = settings.get('custom_mods', '')
+            
+            if not workshop and not custom_mods:
+                return jsonify({
+                    'success': False,
+                    'message': 'Не указаны папки с модами в настройках'
+                }), 400
+            
+            mods = scan_mods(workshop, custom_mods)
+            
+            # Применяем сохранённые состояния
+            mods_state = settings.get('mods_state', {})
+            for mod in mods:
+                if mod['id'] in mods_state:
+                    mod['enabled'] = mods_state[mod['id']]
+            
+            save_mods_cache(mods)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Кеш обновлён, найдено {len(mods)} модов',
+                'mods': mods,
+                'stats': {
+                    'total': len(mods),
+                    'workshop': len([m for m in mods if m.get('type') == 'workshop']),
+                    'custom': len([m for m in mods if m.get('type') == 'custom']),
+                    'enabled': len([m for m in mods if m.get('enabled', True)])
+                }
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/mods/toggle', methods=['POST'])
+    def toggle_mod():
+        try:
+            data = request.get_json()
+            mod_id = data.get('mod_id')
+            enabled = data.get('enabled')
+            
+            if not mod_id:
+                return jsonify({'success': False, 'message': 'Не указан ID мода'}), 400
+            
+            settings = load_settings()
+            mods_state = settings.get('mods_state', {})
+            mods_state[mod_id] = enabled
+            
+            settings['mods_state'] = mods_state
+            save_settings(settings)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Мод {"включён" if enabled else "выключен"}'
+            })
+        
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/mods/state', methods=['GET'])
+    def get_mods_state():
+        try:
+            settings = load_settings()
+            mods_state = settings.get('mods_state', {})
+            return jsonify({'success': True, 'state': mods_state})
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500

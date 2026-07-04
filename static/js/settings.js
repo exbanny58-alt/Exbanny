@@ -13,27 +13,45 @@ async function loadSettings() {
         
         fields.forEach((field, i) => {
             const input = document.getElementById(inputIds[i]);
-            if (data[field] && data[field].trim()) {
-                input.value = data[field];
-            } else {
-                input.value = '';
+            // Проверяем существование элемента
+            if (input) {
+                if (data[field] && data[field].trim()) {
+                    input.value = data[field];
+                } else {
+                    input.value = '';
+                }
             }
         });
     } catch (e) {
         console.error('Ошибка загрузки настроек:', e);
-        notifications.error('Ошибка загрузки настроек');
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка загрузки настроек');
+        }
     }
 }
 
 // Сохранение одного поля на сервер
 async function saveField(field, inputId, statusId) {
-    const value = document.getElementById(inputId).value.trim();
+    const input = document.getElementById(inputId);
+    if (!input) {
+        console.error('Элемент не найден:', inputId);
+        return;
+    }
+    
+    const value = input.value.trim();
     if (!value) {
-        document.getElementById(statusId).textContent = 'Укажите путь';
-        document.getElementById(statusId).style.color = '#f87171';
-        notifications.warning('Укажите путь перед сохранением');
+        const statusEl = document.getElementById(statusId);
+        if (statusEl) {
+            statusEl.textContent = 'Укажите путь';
+            statusEl.style.color = '#f87171';
+        }
+        if (typeof notifications !== 'undefined') {
+            notifications.warning('Укажите путь перед сохранением');
+        }
         setTimeout(() => {
-            document.getElementById(statusId).textContent = '';
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
         }, 2000);
         return;
     }
@@ -56,25 +74,41 @@ async function saveField(field, inputId, statusId) {
         
         const statusEl = document.getElementById(statusId);
         if (result.success) {
-            statusEl.textContent = '✓ Сохранено';
-            statusEl.style.color = '#4ade80';
-            notifications.success('Настройки сохранены успешно');
+            if (statusEl) {
+                statusEl.textContent = '✓ Сохранено';
+                statusEl.style.color = '#4ade80';
+            }
+            if (typeof notifications !== 'undefined') {
+                notifications.success('Настройки сохранены успешно');
+            }
         } else {
-            statusEl.textContent = '❌ Ошибка';
-            statusEl.style.color = '#f87171';
-            notifications.error('Ошибка сохранения настроек');
+            if (statusEl) {
+                statusEl.textContent = '❌ Ошибка';
+                statusEl.style.color = '#f87171';
+            }
+            if (typeof notifications !== 'undefined') {
+                notifications.error('Ошибка сохранения настроек');
+            }
         }
         
         setTimeout(() => {
-            statusEl.textContent = '';
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
         }, 2000);
     } catch (e) {
         const statusEl = document.getElementById(statusId);
-        statusEl.textContent = '❌ Ошибка';
-        statusEl.style.color = '#f87171';
-        notifications.error('Ошибка сохранения: ' + e.message);
+        if (statusEl) {
+            statusEl.textContent = '❌ Ошибка';
+            statusEl.style.color = '#f87171';
+        }
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка сохранения: ' + e.message);
+        }
         setTimeout(() => {
-            statusEl.textContent = '';
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
         }, 2000);
     }
 }
@@ -91,26 +125,42 @@ async function resetField(field, inputId, statusId) {
         const input = document.getElementById(inputId);
         
         if (result.success) {
-            input.value = '';
-            statusEl.textContent = '✓ Сброшено';
-            statusEl.style.color = '#4ade80';
-            notifications.success('Поле сброшено');
+            if (input) input.value = '';
+            if (statusEl) {
+                statusEl.textContent = '✓ Сброшено';
+                statusEl.style.color = '#4ade80';
+            }
+            if (typeof notifications !== 'undefined') {
+                notifications.success('Поле сброшено');
+            }
         } else {
-            statusEl.textContent = '❌ Ошибка';
-            statusEl.style.color = '#f87171';
-            notifications.error('Ошибка сброса');
+            if (statusEl) {
+                statusEl.textContent = '❌ Ошибка';
+                statusEl.style.color = '#f87171';
+            }
+            if (typeof notifications !== 'undefined') {
+                notifications.error('Ошибка сброса');
+            }
         }
         
         setTimeout(() => {
-            statusEl.textContent = '';
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
         }, 2000);
     } catch (e) {
         const statusEl = document.getElementById(statusId);
-        statusEl.textContent = '❌ Ошибка';
-        statusEl.style.color = '#f87171';
-        notifications.error('Ошибка: ' + e.message);
+        if (statusEl) {
+            statusEl.textContent = '❌ Ошибка';
+            statusEl.style.color = '#f87171';
+        }
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
         setTimeout(() => {
-            statusEl.textContent = '';
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
         }, 2000);
     }
 }
@@ -121,16 +171,22 @@ async function browseFile(inputId, type = 'file') {
     const field = btn?.dataset.field;
     if (!field) {
         console.error('Не найден field для inputId:', inputId);
-        notifications.error('Ошибка: не найден параметр');
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: не найден параметр');
+        }
         return;
     }
     
     // Показываем, что процесс начался
     const statusId = `status-${field}`;
     const statusEl = document.getElementById(statusId);
-    statusEl.textContent = '⏳ Открывается диалог...';
-    statusEl.style.color = '#60a5fa';
-    notifications.info('Открывается диалог выбора...');
+    if (statusEl) {
+        statusEl.textContent = '⏳ Открывается диалог...';
+        statusEl.style.color = '#60a5fa';
+    }
+    if (typeof notifications !== 'undefined') {
+        notifications.info('Открывается диалог выбора...');
+    }
     
     try {
         const endpoint = type === 'folder' ? '/api/browse/folder' : '/api/browse/file';
@@ -149,27 +205,43 @@ async function browseFile(inputId, type = 'file') {
         
         if (result.success && result.path) {
             const input = document.getElementById(inputId);
-            input.value = result.path;
+            if (input) {
+                input.value = result.path;
+            }
             
             // Автоматически сохраняем после выбора
             await saveField(field, inputId, statusId);
             
-            notifications.success('Путь выбран и сохранён');
+            if (typeof notifications !== 'undefined') {
+                notifications.success('Путь выбран и сохранён');
+            }
         } else if (!result.success) {
-            statusEl.textContent = '❌ ' + (result.message || 'Ошибка выбора');
-            statusEl.style.color = '#f87171';
-            notifications.error(result.message || 'Ошибка выбора');
+            if (statusEl) {
+                statusEl.textContent = '❌ ' + (result.message || 'Ошибка выбора');
+                statusEl.style.color = '#f87171';
+            }
+            if (typeof notifications !== 'undefined') {
+                notifications.error(result.message || 'Ошибка выбора');
+            }
             setTimeout(() => {
-                statusEl.textContent = '';
+                if (statusEl) {
+                    statusEl.textContent = '';
+                }
             }, 3000);
         }
     } catch (e) {
         console.error('Ошибка открытия проводника:', e);
-        statusEl.textContent = '❌ Ошибка: ' + e.message;
-        statusEl.style.color = '#f87171';
-        notifications.error('Ошибка: ' + e.message);
+        if (statusEl) {
+            statusEl.textContent = '❌ Ошибка: ' + e.message;
+            statusEl.style.color = '#f87171';
+        }
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
         setTimeout(() => {
-            statusEl.textContent = '';
+            if (statusEl) {
+                statusEl.textContent = '';
+            }
         }, 3000);
     }
 }
@@ -177,10 +249,19 @@ async function browseFile(inputId, type = 'file') {
 // Открыть выбранную папку в проводнике
 async function openInExplorer(inputId) {
     const input = document.getElementById(inputId);
+    if (!input) {
+        if (typeof notifications !== 'undefined') {
+            notifications.warning('Элемент не найден');
+        }
+        return;
+    }
+    
     const path = input.value.trim();
     
     if (!path) {
-        notifications.warning('Сначала выберите путь');
+        if (typeof notifications !== 'undefined') {
+            notifications.warning('Сначала выберите путь');
+        }
         return;
     }
     
@@ -196,31 +277,23 @@ async function openInExplorer(inputId) {
         const result = await response.json();
         
         if (result.success) {
-            notifications.success(result.message);
+            if (typeof notifications !== 'undefined') {
+                notifications.success(result.message);
+            }
         } else {
-            notifications.error(result.message);
+            if (typeof notifications !== 'undefined') {
+                notifications.error(result.message);
+            }
         }
     } catch (e) {
-        notifications.error('Ошибка: ' + e.message);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
     }
 }
 
-// Старые функции совместимости (если нужны)
-function showNotification(message, type = 'info', duration = null) {
-    return notifications.show(message, type, duration);
-}
-
-function openSettings() {
-    document.getElementById('settingsPage').style.display = 'flex';
-    loadSettings();
-}
-
-function closeSettings() {
-    document.getElementById('settingsPage').style.display = 'none';
-}
-
-// Вешаем обработчики после загрузки DOM
-document.addEventListener('DOMContentLoaded', function() {
+// Функция для прикрепления обработчиков (вызывается из script.js)
+function attachSettingsHandlers() {
     document.querySelectorAll('.save-single-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const field = this.dataset.field;
@@ -247,11 +320,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Добавляем кнопки "Открыть в проводнике"
     document.querySelectorAll('.open-explorer-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const target = this.dataset.target;
             openInExplorer(target);
         });
     });
-});
+}
+
+// Экспортируем для использования в script.js
+window.loadSettings = loadSettings;
+window.attachSettingsHandlers = attachSettingsHandlers;
+window.saveField = saveField;
+window.resetField = resetField;
+window.browseFile = browseFile;
+window.openInExplorer = openInExplorer;

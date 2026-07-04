@@ -1,8 +1,82 @@
+// ============================================
+// ГЛАВНЫЙ СКРИПТ - НАВИГАЦИЯ И УПРАВЛЕНИЕ КОНТЕНТОМ
+// ============================================
+
 // Контент для разных разделов
 const pages = {
     server: '<h1>Управление сервером</h1><p>Здесь будет панель управления сервером DayZ</p>',
     game: '<h1>Управление игрой</h1><p>Здесь будут настройки игры</p>',
-    mods: '<h1>Управление модами</h1><p>Здесь будет управление модами</p>'
+    mods: `
+        <div id="modsPageContent" style="height: 100%;">
+            <div class="mods-content-wrapper" style="height: 100%; overflow-y: auto; padding-right: 8px; padding-bottom: 20px; box-sizing: border-box;">
+                <div class="mods-header">
+                    <h1>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                        </svg>
+                        Управление модами
+                    </h1>
+                    <p class="mods-subtitle">Моды из Workshop и кастомные моды</p>
+                </div>
+
+                <!-- Статистика -->
+                <div class="mods-stats" id="modsStats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalModsCount">0</span>
+                        <span class="stat-label">Всего модов</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="enabledModsCount">0</span>
+                        <span class="stat-label">Включено</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="workshopModsCount">0</span>
+                        <span class="stat-label">Из Workshop</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="customModsCount">0</span>
+                        <span class="stat-label">Кастомных</span>
+                    </div>
+                </div>
+
+                <!-- Панель управления -->
+                <div class="mods-toolbar">
+                    <button class="btn btn-primary" id="refreshModsBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23,4 23,10 17,10"/>
+                            <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                            <polyline points="1,20 1,14 7,14"/>
+                            <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                        </svg>
+                        Обновить список
+                    </button>
+                    <button class="btn btn-secondary" id="openWorkshopBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                        </svg>
+                        Открыть Workshop
+                    </button>
+                    <button class="btn btn-secondary" id="openCustomModsBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                        </svg>
+                        Открыть кастомные
+                    </button>
+                    <div class="mods-filter">
+                        <input type="text" id="modsSearchInput" placeholder="🔍 Поиск модов..." class="mods-search">
+                    </div>
+                </div>
+
+                <!-- Список модов -->
+                <div class="mods-list-container" id="modsListContainer">
+                    <div class="loading-mods">
+                        <span class="spinner"></span>
+                        Загрузка модов...
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
 };
 
 // Текущий активный раздел
@@ -63,7 +137,6 @@ function getAnimationDirection(targetPage) {
 function switchContent(newHtml, page, direction, isFirst) {
     const contentArea = document.getElementById('contentArea');
     
-    // Если это первый клик - стартовая страница уезжает
     if (isFirst) {
         contentArea.classList.add('slide-up');
         
@@ -74,22 +147,22 @@ function switchContent(newHtml, page, direction, isFirst) {
             
             setTimeout(() => {
                 contentArea.classList.remove('slide-in-down');
+                initPageAfterLoad(page);
             }, 350);
         }, 300);
         return;
     }
     
-    // Если direction = 'in' - просто появляемся без ухода
     if (direction === 'in') {
         contentArea.innerHTML = newHtml;
         contentArea.classList.add('slide-in-up');
         setTimeout(() => {
             contentArea.classList.remove('slide-in-up');
+            initPageAfterLoad(page);
         }, 350);
         return;
     }
     
-    // Запускаем анимацию ухода
     contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
     
     setTimeout(() => {
@@ -99,19 +172,46 @@ function switchContent(newHtml, page, direction, isFirst) {
         
         setTimeout(() => {
             contentArea.classList.remove('slide-in-down', 'slide-in-up');
+            initPageAfterLoad(page);
         }, 350);
         
     }, 300);
 }
 
+// Инициализация страницы после загрузки
+function initPageAfterLoad(page) {
+    if (page === 'mods') {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function tryInitMods() {
+            attempts++;
+            const container = document.getElementById('modsListContainer');
+            
+            if (container) {
+                if (typeof initModsPage === 'function') {
+                    initModsPage();
+                }
+                return;
+            }
+            
+            if (attempts < maxAttempts) {
+                setTimeout(tryInitMods, 200);
+            } else {
+                console.warn('Не удалось найти modsListContainer после ' + maxAttempts + ' попыток');
+            }
+        }
+        
+        setTimeout(tryInitMods, 100);
+    }
+}
+
 // Показать стартовую страницу
 function showStartPage(direction = 'in') {
-    // Убираем активный класс у всех пунктов меню
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {
         const icon = link.querySelector('.nav-icon');
         const text = link.querySelector('.nav-text');
@@ -119,56 +219,38 @@ function showStartPage(direction = 'in') {
         if (text) text.style.color = '';
     });
     
-    // Получаем HTML стартовой страницы
     const html = getStartPageHTML();
-    
-    // Переключаем контент
     switchContent(html, 'start', direction, false);
-    
-    // Обновляем текущую страницу
     currentPage = null;
 }
 
 // Показать контент
-function showContent(page) {
-    // Получаем элемент, по которому кликнули
+function showContent(page, event) {
     const clickedItem = event.target.closest('.nav-item');
     if (!clickedItem) return;
     
-    // Проверяем - если этот пункт уже активен, закрываем его
     if (clickedItem.classList.contains('active')) {
-        // Показываем стартовую страницу
         const direction = currentPage ? getAnimationDirection('start') : 'in';
         showStartPage(direction);
         return;
     }
     
-    // Убираем активный класс у всех пунктов
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Добавляем активный класс нажатому пункту
     clickedItem.classList.add('active');
-    
-    // Определяем направление анимации
     const direction = getAnimationDirection(page);
-    
-    // Получаем HTML контента
     const html = pages[page] || '<h1>Страница не найдена</h1>';
     
-    // Переключаем контент (передаём флаг первого клика)
     switchContent(html, page, direction, isFirstClick);
     
-    // После первого клика снимаем флаг
     if (isFirstClick) {
         isFirstClick = false;
     }
     
-    // Обновляем текущую страницу
     currentPage = page;
     
-    // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {
         const icon = link.querySelector('.nav-icon');
         const text = link.querySelector('.nav-text');
@@ -178,32 +260,24 @@ function showContent(page) {
 }
 
 // Показать настройки
-function showSettings() {
-    // Получаем элемент, по которому кликнули
+function showSettings(event) {
     const clickedItem = event.target.closest('.nav-item');
     if (!clickedItem) return;
     
-    // Проверяем - если настройки уже активны, закрываем их
     if (clickedItem.classList.contains('active')) {
         const direction = currentPage ? getAnimationDirection('start') : 'in';
         showStartPage(direction);
         return;
     }
     
-    // Убираем активный класс у всех пунктов
     document.querySelectorAll('.nav-item').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Добавляем активный класс настройкам
     clickedItem.classList.add('active');
-    
-    // Определяем направление анимации
     const direction = getAnimationDirection('settings');
-    
     const contentArea = document.getElementById('contentArea');
     
-    // Если это первый клик - стартовая страница уезжает
     if (isFirstClick) {
         contentArea.classList.add('slide-up');
         
@@ -212,8 +286,12 @@ function showSettings() {
                 .then(response => response.text())
                 .then(html => {
                     contentArea.innerHTML = html;
-                    loadSettings();
-                    attachSettingsHandlers();
+                    if (typeof loadSettings === 'function') {
+                        loadSettings();
+                    }
+                    if (typeof attachSettingsHandlers === 'function') {
+                        attachSettingsHandlers();
+                    }
                     contentArea.classList.remove('slide-up');
                     contentArea.classList.add('slide-in-down');
                     setTimeout(() => {
@@ -247,14 +325,17 @@ function showSettings() {
         return;
     }
     
-    // Если direction = 'in' - просто загружаем без анимации ухода
     if (direction === 'in') {
         fetch('/settings-content')
             .then(response => response.text())
             .then(html => {
                 contentArea.innerHTML = html;
-                loadSettings();
-                attachSettingsHandlers();
+                if (typeof loadSettings === 'function') {
+                    loadSettings();
+                }
+                if (typeof attachSettingsHandlers === 'function') {
+                    attachSettingsHandlers();
+                }
                 contentArea.classList.add('slide-in-up');
                 setTimeout(() => {
                     contentArea.classList.remove('slide-in-up');
@@ -284,7 +365,6 @@ function showSettings() {
         return;
     }
     
-    // Запускаем анимацию ухода
     contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
     
     setTimeout(() => {
@@ -292,8 +372,12 @@ function showSettings() {
             .then(response => response.text())
             .then(html => {
                 contentArea.innerHTML = html;
-                loadSettings();
-                attachSettingsHandlers();
+                if (typeof loadSettings === 'function') {
+                    loadSettings();
+                }
+                if (typeof attachSettingsHandlers === 'function') {
+                    attachSettingsHandlers();
+                }
                 
                 contentArea.classList.remove('slide-up', 'slide-down');
                 contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
@@ -325,10 +409,8 @@ function showSettings() {
             
     }, 300);
     
-    // Обновляем текущую страницу
     currentPage = 'settings';
     
-    // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {
         const icon = link.querySelector('.nav-icon');
         const text = link.querySelector('.nav-text');
@@ -337,36 +419,9 @@ function showSettings() {
     });
 }
 
-// Прикрепляем обработчики для настроек
-function attachSettingsHandlers() {
-    document.querySelectorAll('.save-single-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const field = this.dataset.field;
-            const target = this.dataset.target;
-            const statusId = `status-${field}`;
-            saveField(field, target, statusId);
-        });
-    });
-    
-    document.querySelectorAll('.reset-single-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const field = this.dataset.field;
-            const target = this.dataset.target;
-            const statusId = `status-${field}`;
-            resetField(field, target, statusId);
-        });
-    });
-    
-    document.querySelectorAll('.browse-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const target = this.dataset.target;
-            const type = this.dataset.type || 'file';
-            browseFile(target, type);
-        });
-    });
-}
-
-// Случайные цвета для иконок при наведении
+// ============================================
+// РАЗНОЦВЕТНЫЕ ИКОНКИ ПРИ НАВЕДЕНИИ
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     const navItems = document.querySelectorAll('.nav-item a');
     
@@ -423,4 +478,37 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+
+// ============================================
+// ПРЕДВАРИТЕЛЬНАЯ ЗАГРУЗКА МОДОВ ПРИ СТАРТЕ
+// ============================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof loadModsState === 'function') {
+        loadModsState().then(() => {
+            // Пытаемся загрузить кеш (мгновенно)
+            if (typeof loadModsFromCache === 'function') {
+                console.log('⚡ Загрузка кеша модов...');
+                loadModsFromCache().then((loaded) => {
+                    if (loaded) {
+                        console.log('✅ Кеш модов загружен');
+                        // В фоне проверяем обновления через 3 секунды
+                        setTimeout(() => {
+                            if (typeof backgroundScanAndCache === 'function') {
+                                console.log('🔄 Фоновая проверка обновлений...');
+                                backgroundScanAndCache();
+                            }
+                        }, 3000);
+                    } else {
+                        // Кеша нет — запускаем сканирование в фоне
+                        console.log('🚀 Кеша нет, запуск фонового сканирования...');
+                        if (typeof scanMods === 'function') {
+                            scanMods(false);
+                        }
+                    }
+                });
+            }
+        });
+    }
 });

@@ -419,124 +419,6 @@ main {
 }
 
 /* ============================================
-   МЕДИА-ЗАПРОСЫ
-   ============================================ 
-@media (max-width: 1500px) {
-    main {
-        grid-template-columns: 200px 1fr;
-    }
-}
-
-@media (max-width: 1200px) {
-    main {
-        grid-template-columns: 180px 1fr;
-    }
-}
-
-@media (max-width: 992px) {
-    main {
-        grid-template-columns: 160px 1fr;
-    }
-    
-    .nav-text {
-        font-size: 0.8rem;
-    }
-    
-    .nav-item a {
-        padding: 10px 14px;
-        gap: 10px;
-        margin: 0 8px;
-    }
-    
-    .content-area {
-        padding: 20px 20px;
-    }
-    
-    .menu-block,
-    .menu-block-settings {
-        margin: 0 8px 6px 8px;
-        padding: 4px 0;
-    }
-}
-
-@media (max-width: 768px) {
-    main {
-        grid-template-columns: 50px 1fr;
-        width: 100vw;
-        height: 100vh;
-        border-radius: 0;
-        border: none;
-        margin: 0;
-    }
-    
-    .nav-text {
-        display: none;
-    }
-    
-    .nav-item a {
-        justify-content: center;
-        padding: 12px 0;
-        margin: 0 4px;
-        border: none;
-    }
-    
-    .nav-item a:hover {
-        border: none;
-        transform: none;
-    }
-    
-    .nav-item.active a {
-        border: none;
-    }
-    
-    .nav-item a::before {
-        display: none;
-    }
-    
-    .nav-icon {
-        font-size: 1.3rem;
-    }
-    
-    .content-area {
-        padding: 16px 14px;
-    }
-    
-    .settings-card {
-        padding: 14px 16px;
-    }
-    
-    .menu-block,
-    .menu-block-settings {
-        margin: 0 4px;
-        padding: 4px 0;
-        border: none;
-        background: transparent;
-    }
-    
-    .menu-divider {
-        display: none;
-    }
-}
-
-@media (max-width: 480px) {
-    main {
-        grid-template-columns: 44px 1fr;
-    }
-    
-    .settings-header h1 {
-        font-size: 1.3rem;
-    }
-    
-    .input-group {
-        flex-direction: column;
-    }
-    
-    .input-actions {
-        flex-wrap: wrap;
-    }
-}*/
-
-/* ============================================
    СТАРТОВАЯ СТРАНИЦА-ЗАГЛУШКА
    ============================================ */
 .start-page {
@@ -1118,4 +1000,374 @@ main {
         width: 14px;
         height: 14px;
     }
+}
+
+/* ============================================
+   СТРАНИЦА МОДОВ
+   ============================================ */
+.mods-content-wrapper {
+    max-width: 100%;
+    height: 100%;                    /* ← Добавляем */
+    overflow-y: auto;                /* ← Добавляем скролл */
+    padding-right: 8px;              /* ← Отступ для скроллбара */
+    padding-bottom: 20px;
+}
+
+/* Стилизация скроллбара для модов */
+.mods-content-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mods-content-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.mods-content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.4);
+    border-radius: 10px;
+}
+
+.mods-content-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(167, 139, 250, 0.6);
+}
+
+.mods-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.mods-header h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.mods-subtitle {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
+/* Статистика */
+.mods-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 14px 18px;
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #a78bfa;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Панель управления */
+.mods-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.mods-filter {
+    margin-left: auto;
+}
+
+.mods-search {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.3s ease;
+}
+
+.mods-search:focus {
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.mods-search::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Список модов */
+.mods-list-container {
+    min-height: 200px;
+}
+
+.mod-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.mod-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.mod-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.mod-name {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mod-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.mod-details span {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.mod-version {
+    color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.mod-type {
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.mod-type.workshop {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa !important;
+}
+
+.mod-type.custom {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24 !important;
+}
+
+.mod-warning {
+    color: #fbbf24 !important;
+}
+
+.mod-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Toggle switch */
+.mod-toggle {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    cursor: pointer;
+}
+
+.mod-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    transition: all 0.3s ease;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.mod-toggle input:checked + .toggle-slider {
+    background: rgba(74, 222, 128, 0.4);
+}
+
+.mod-toggle input:checked + .toggle-slider::before {
+    transform: translateX(18px);
+}
+
+.btn-mod-folder {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.3);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-mod-folder:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Пустое состояние */
+.empty-mods {
+    text-align: center;
+    padding: 50px 20px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.empty-mods p {
+    font-size: 1.1rem;
+}
+
+.empty-hint {
+    font-size: 0.85rem !important;
+    color: rgba(255, 255, 255, 0.15) !important;
+    margin-top: 4px;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .mods-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .mods-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .mods-filter {
+        margin-left: 0;
+    }
+    
+    .mods-search {
+        width: 100%;
+    }
+    
+    .mod-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .mod-actions {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .mods-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    
+    .stat-number {
+        font-size: 1.4rem;
+    }
+    
+    .mod-details {
+        gap: 8px;
+    }
+}
+
+/* ============================================
+   ОБЩИЙ СКРОЛЛ ДЛЯ ВСЕХ СТРАНИЦ
+   ============================================ */
+
+/* Контейнер контента */
+.content-area {
+    padding: 30px 35px;
+    color: #e5e5e5;
+    height: 100%;
+    overflow: hidden;  /* Оставляем hidden, скролл внутри страниц */
+}
+
+/* Все страницы внутри контента */
+.content-area > div {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Стилизация скроллбара для всех страниц */
+.content-area > div::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-area > div::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.content-area > div::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.4);
+    border-radius: 10px;
+}
+
+.content-area > div::-webkit-scrollbar-thumb:hover {
+    background: rgba(167, 139, 250, 0.6);
+}
+
+/* Стартовая страница - без скролла */
+#startPage {
+    overflow: hidden !important;
 }
