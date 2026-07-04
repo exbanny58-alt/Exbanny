@@ -1,3 +1,7 @@
+// ============================================
+// НАСТРОЙКИ С ИСПОЛЬЗОВАНИЕМ НОВОЙ СИСТЕМЫ УВЕДОМЛЕНИЙ
+// ============================================
+
 // Загрузка сохранённых путей из сервера
 async function loadSettings() {
     try {
@@ -17,6 +21,7 @@ async function loadSettings() {
         });
     } catch (e) {
         console.error('Ошибка загрузки настроек:', e);
+        notifications.error('Ошибка загрузки настроек');
     }
 }
 
@@ -26,6 +31,7 @@ async function saveField(field, inputId, statusId) {
     if (!value) {
         document.getElementById(statusId).textContent = 'Укажите путь';
         document.getElementById(statusId).style.color = '#f87171';
+        notifications.warning('Укажите путь перед сохранением');
         setTimeout(() => {
             document.getElementById(statusId).textContent = '';
         }, 2000);
@@ -52,9 +58,11 @@ async function saveField(field, inputId, statusId) {
         if (result.success) {
             statusEl.textContent = '✓ Сохранено';
             statusEl.style.color = '#4ade80';
+            notifications.success('Настройки сохранены успешно');
         } else {
             statusEl.textContent = '❌ Ошибка';
             statusEl.style.color = '#f87171';
+            notifications.error('Ошибка сохранения настроек');
         }
         
         setTimeout(() => {
@@ -64,6 +72,7 @@ async function saveField(field, inputId, statusId) {
         const statusEl = document.getElementById(statusId);
         statusEl.textContent = '❌ Ошибка';
         statusEl.style.color = '#f87171';
+        notifications.error('Ошибка сохранения: ' + e.message);
         setTimeout(() => {
             statusEl.textContent = '';
         }, 2000);
@@ -85,9 +94,11 @@ async function resetField(field, inputId, statusId) {
             input.value = '';
             statusEl.textContent = '✓ Сброшено';
             statusEl.style.color = '#4ade80';
+            notifications.success('Поле сброшено');
         } else {
             statusEl.textContent = '❌ Ошибка';
             statusEl.style.color = '#f87171';
+            notifications.error('Ошибка сброса');
         }
         
         setTimeout(() => {
@@ -97,6 +108,7 @@ async function resetField(field, inputId, statusId) {
         const statusEl = document.getElementById(statusId);
         statusEl.textContent = '❌ Ошибка';
         statusEl.style.color = '#f87171';
+        notifications.error('Ошибка: ' + e.message);
         setTimeout(() => {
             statusEl.textContent = '';
         }, 2000);
@@ -109,6 +121,7 @@ async function browseFile(inputId, type = 'file') {
     const field = btn?.dataset.field;
     if (!field) {
         console.error('Не найден field для inputId:', inputId);
+        notifications.error('Ошибка: не найден параметр');
         return;
     }
     
@@ -117,6 +130,7 @@ async function browseFile(inputId, type = 'file') {
     const statusEl = document.getElementById(statusId);
     statusEl.textContent = '⏳ Открывается диалог...';
     statusEl.style.color = '#60a5fa';
+    notifications.info('Открывается диалог выбора...');
     
     try {
         const endpoint = type === 'folder' ? '/api/browse/folder' : '/api/browse/file';
@@ -140,23 +154,23 @@ async function browseFile(inputId, type = 'file') {
             // Автоматически сохраняем после выбора
             await saveField(field, inputId, statusId);
             
-            showNotification('✅ Путь выбран и сохранён');
+            notifications.success('Путь выбран и сохранён');
         } else if (!result.success) {
             statusEl.textContent = '❌ ' + (result.message || 'Ошибка выбора');
             statusEl.style.color = '#f87171';
+            notifications.error(result.message || 'Ошибка выбора');
             setTimeout(() => {
                 statusEl.textContent = '';
             }, 3000);
-            showNotification('❌ ' + (result.message || 'Ошибка выбора'));
         }
     } catch (e) {
         console.error('Ошибка открытия проводника:', e);
         statusEl.textContent = '❌ Ошибка: ' + e.message;
         statusEl.style.color = '#f87171';
+        notifications.error('Ошибка: ' + e.message);
         setTimeout(() => {
             statusEl.textContent = '';
         }, 3000);
-        showNotification('❌ Ошибка: ' + e.message);
     }
 }
 
@@ -166,7 +180,7 @@ async function openInExplorer(inputId) {
     const path = input.value.trim();
     
     if (!path) {
-        showNotification('⚠️ Сначала выберите путь');
+        notifications.warning('Сначала выберите путь');
         return;
     }
     
@@ -182,53 +196,18 @@ async function openInExplorer(inputId) {
         const result = await response.json();
         
         if (result.success) {
-            showNotification('✅ ' + result.message);
+            notifications.success(result.message);
         } else {
-            showNotification('❌ ' + result.message);
+            notifications.error(result.message);
         }
     } catch (e) {
-        showNotification('❌ Ошибка: ' + e.message);
+        notifications.error('Ошибка: ' + e.message);
     }
 }
 
-// Уведомления
-function showNotification(message) {
-    let notification = document.querySelector('.settings-notification');
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.className = 'settings-notification';
-        notification.style.cssText = `
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(16, 21, 61, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 12px;
-            padding: 12px 24px;
-            color: #fff;
-            font-family: "Nunito", sans-serif;
-            font-size: 0.9rem;
-            z-index: 9999;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: translateX(-50%) translateY(20px);
-            pointer-events: none;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-        `;
-        document.body.appendChild(notification);
-    }
-    
-    notification.textContent = message;
-    notification.style.opacity = '1';
-    notification.style.transform = 'translateX(-50%) translateY(0)';
-    
-    clearTimeout(notification._hideTimeout);
-    notification._hideTimeout = setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(-50%) translateY(20px)';
-    }, 3000);
+// Старые функции совместимости (если нужны)
+function showNotification(message, type = 'info', duration = null) {
+    return notifications.show(message, type, duration);
 }
 
 function openSettings() {

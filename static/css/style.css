@@ -728,3 +728,394 @@ main {
     background: rgba(167, 139, 250, 0.6);
 }
 
+/* ============================================
+   УВЕДОМЛЕНИЯ (правый верхний угол)
+   ============================================ */
+
+.notification-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 380px;
+    min-width: 280px;
+    pointer-events: none;
+}
+
+.notification-item {
+    background: rgba(16, 21, 61, 0.55);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    font-family: "Nunito", sans-serif;
+    font-size: 0.9rem;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.1) inset;
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto;
+    cursor: default;
+}
+
+/* Добавляем блик на стекле */
+.notification-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.08) 0%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    border-radius: 14px 14px 0 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Второй слой блика для большего эффекта */
+.notification-item::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+        circle at 30% 30%,
+        rgba(255, 255, 255, 0.03) 0%,
+        transparent 70%
+    );
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.notification-item:hover::after {
+    opacity: 1;
+}
+
+.notification-item.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-item.hiding {
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+}
+
+/* Прогресс-бар с эффектом свечения */
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    border-radius: 0 0 0 3px;
+    animation: progressBar linear forwards;
+    animation-play-state: running;
+    width: 100%;
+    transform-origin: left;
+    z-index: 2;
+}
+
+/* Свечение для прогресс-бара */
+.notification-progress::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 7px;
+    filter: blur(4px);
+    opacity: 0.5;
+    border-radius: 0 0 0 3px;
+}
+
+@keyframes progressBar {
+    from {
+        transform: scaleX(1);
+    }
+    to {
+        transform: scaleX(0);
+    }
+}
+
+/* Иконка уведомления */
+.notification-icon {
+    flex-shrink: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    z-index: 2;
+}
+
+.notification-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
+}
+
+/* Цвета для иконок разных типов */
+.notification-success .notification-icon {
+    color: #4ade80;
+}
+
+.notification-success .notification-icon svg {
+    filter: drop-shadow(0 0 12px rgba(74, 222, 128, 0.3));
+}
+
+.notification-success .notification-progress {
+    background: linear-gradient(90deg, #4ade80, #34d399);
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
+}
+
+.notification-success .notification-progress::after {
+    background: linear-gradient(90deg, #4ade80, #34d399);
+}
+
+.notification-error .notification-icon {
+    color: #f87171;
+}
+
+.notification-error .notification-icon svg {
+    filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.3));
+}
+
+.notification-error .notification-progress {
+    background: linear-gradient(90deg, #f87171, #ef4444);
+    box-shadow: 0 0 12px rgba(248, 113, 113, 0.3);
+}
+
+.notification-error .notification-progress::after {
+    background: linear-gradient(90deg, #f87171, #ef4444);
+}
+
+.notification-warning .notification-icon {
+    color: #fbbf24;
+}
+
+.notification-warning .notification-icon svg {
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.3));
+}
+
+.notification-warning .notification-progress {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+}
+
+.notification-warning .notification-progress::after {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+}
+
+.notification-info .notification-icon {
+    color: #60a5fa;
+}
+
+.notification-info .notification-icon svg {
+    filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.3));
+}
+
+.notification-info .notification-progress {
+    background: linear-gradient(90deg, #60a5fa, #3b82f6);
+    box-shadow: 0 0 12px rgba(96, 165, 250, 0.3);
+}
+
+.notification-info .notification-progress::after {
+    background: linear-gradient(90deg, #60a5fa, #3b82f6);
+}
+
+/* Текст сообщения */
+.notification-message {
+    flex: 1;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Кнопка закрытия */
+.notification-close {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.4);
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+    backdrop-filter: blur(4px);
+}
+
+.notification-close svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2.5;
+    transition: transform 0.3s ease;
+}
+
+.notification-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.notification-close:hover svg {
+    transform: rotate(90deg);
+}
+
+.notification-close:active {
+    transform: scale(0.95);
+}
+
+/* Анимация пульсации для иконки */
+@keyframes notificationPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+}
+
+.notification-item.show .notification-icon {
+    animation: notificationPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Бордер слева для разных типов (с свечением) */
+.notification-success {
+    border-left: 3px solid rgba(74, 222, 128, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
+        0 0 20px rgba(74, 222, 128, 0.05);
+}
+
+.notification-error {
+    border-left: 3px solid rgba(248, 113, 113, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
+        0 0 20px rgba(248, 113, 113, 0.05);
+}
+
+.notification-warning {
+    border-left: 3px solid rgba(251, 191, 36, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
+        0 0 20px rgba(251, 191, 36, 0.05);
+}
+
+.notification-info {
+    border-left: 3px solid rgba(96, 165, 250, 0.6);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
+        0 0 20px rgba(96, 165, 250, 0.05);
+}
+
+/* Эффект парения при наведении */
+.notification-item:hover {
+    transform: translateX(0) translateY(-2px);
+    box-shadow: 
+        0 12px 48px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+        0 1px 0 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+.notification-item:hover .notification-progress {
+    animation-play-state: paused;
+}
+
+/* Медиа-запросы для адаптивности */
+@media (max-width: 768px) {
+    .notification-container {
+        top: 12px;
+        right: 12px;
+        max-width: calc(100% - 24px);
+        min-width: auto;
+        width: calc(100% - 24px);
+    }
+    
+    .notification-item {
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        border-radius: 12px;
+    }
+    
+    .notification-item::before {
+        border-radius: 12px 12px 0 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .notification-container {
+        top: 8px;
+        right: 8px;
+        max-width: calc(100% - 16px);
+        width: calc(100% - 16px);
+        gap: 8px;
+    }
+    
+    .notification-item {
+        padding: 12px 14px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+    }
+    
+    .notification-item::before {
+        border-radius: 10px 10px 0 0;
+    }
+    
+    .notification-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .notification-close {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .notification-close svg {
+        width: 14px;
+        height: 14px;
+    }
+}
