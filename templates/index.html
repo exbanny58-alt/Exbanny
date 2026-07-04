@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DayZ Менеджер</title>
     
-    <!-- Font Awesome (локально) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}" />
     <!-- Подключаем CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
@@ -18,19 +18,19 @@
             <div class="menu-top">
                 <ul>
                     <li class="nav-item">
-                        <a href="#">
+                        <a href="#" onclick="showContent('server')">
                             <i class="fa fa-server nav-icon"></i>
                             <span class="nav-text">Управление сервером</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#">
+                        <a href="#" onclick="showContent('game')">
                             <i class="fa fa-gamepad nav-icon"></i>
                             <span class="nav-text">Управление игрой</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#">
+                        <a href="#" onclick="showContent('mods')">
                             <i class="fa fa-folder nav-icon"></i>
                             <span class="nav-text">Управление модами</span>
                         </a>
@@ -40,8 +40,8 @@
 
             <div class="menu-bottom">
                 <ul>
-                    <li class="nav-item">
-                        <a href="#" onclick="openSettings()">
+                    <li class="nav-item active">
+                        <a href="#" onclick="showSettings()">
                             <i class="fa fa-gear nav-icon"></i>
                             <span class="nav-text">Настройки</span>
                         </a>
@@ -50,15 +50,13 @@
             </div>
         </nav>
 
-        <!-- Пустая область контента -->
+        <!-- Основной контент -->
         <section class="content">
-            <div class="left-content">
-                <!-- Здесь будет контент -->
+            <div class="content-area" id="contentArea">
+                <!-- Настройки по умолчанию -->
+                {% include 'settings_content.html' %}
             </div>
         </section>
-
-        <!-- Настройки системы -->
-        {% include 'settings.html' %}
     </main>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

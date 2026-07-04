@@ -1,11 +1,103 @@
-// Открытие настроек
-function openSettings() {
-    document.getElementById('settingsPage').style.display = 'flex';
-    loadSettings();
+// Показать контент (для пунктов меню)
+function showContent(page) {
+    // Убираем активный класс у всех пунктов
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    // Добавляем активный класс нажатому пункту
+    event.target.closest('.nav-item').classList.add('active');
+    
+    const contentArea = document.getElementById('contentArea');
+    
+    // Здесь будет логика для разных страниц
+    const pages = {
+        server: '<h1>Управление сервером</h1><p>Здесь будет панель управления сервером DayZ</p>',
+        game: '<h1>Управление игрой</h1><p>Здесь будут настройки игры</p>',
+        mods: '<h1>Управление модами</h1><p>Здесь будет управление модами</p>'
+    };
+    
+    if (pages[page]) {
+        contentArea.innerHTML = pages[page];
+    }
+    
+    // Сбрасываем цвета у всех иконок после клика
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        const icon = link.querySelector('.nav-icon');
+        const text = link.querySelector('.nav-text');
+        if (icon) icon.style.color = '';
+        if (text) text.style.color = '';
+    });
 }
 
-function closeSettings() {
-    document.getElementById('settingsPage').style.display = 'none';
+// Показать настройки
+function showSettings() {
+    // Убираем активный класс у всех пунктов
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    // Добавляем активный класс настройкам
+    event.target.closest('.nav-item').classList.add('active');
+    
+    const contentArea = document.getElementById('contentArea');
+    
+    // Загружаем настройки через fetch
+    fetch('/settings-content')
+        .then(response => response.text())
+        .then(html => {
+            contentArea.innerHTML = html;
+            // Перезагружаем скрипты настроек
+            loadSettings();
+            // Вешаем обработчики
+            attachSettingsHandlers();
+        })
+        .catch(() => {
+            contentArea.innerHTML = `
+                <div class="settings-content-wrapper">
+                    <div class="settings-header">
+                        <h1>⚙️ Настройки</h1>
+                        <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
+                    </div>
+                    <div class="settings-body">
+                        <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
+                            Загрузка настроек...
+                        </p>
+                    </div>
+                </div>
+            `;
+        });
+    
+    // Сбрасываем цвета у всех иконок после клика
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        const icon = link.querySelector('.nav-icon');
+        const text = link.querySelector('.nav-text');
+        if (icon) icon.style.color = '';
+        if (text) text.style.color = '';
+    });
+}
+
+// Прикрепляем обработчики для настроек
+function attachSettingsHandlers() {
+    document.querySelectorAll('.save-single-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const field = this.dataset.field;
+            const target = this.dataset.target;
+            const statusId = `status-${field}`;
+            saveField(field, target, statusId);
+        });
+    });
+    
+    document.querySelectorAll('.reset-single-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const field = this.dataset.field;
+            const target = this.dataset.target;
+            const statusId = `status-${field}`;
+            resetField(field, target, statusId);
+        });
+    });
+    
+    document.querySelectorAll('.browse-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const target = this.dataset.target;
+            const type = this.dataset.type || 'file';
+            browseFile(target, type);
+        });
+    });
 }
 
 // Случайные цвета для иконок при наведении
@@ -57,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         item.addEventListener('mouseleave', function() {
+            // ВСЕГДА сбрасываем цвет при уходе мыши
             if (icon) {
                 icon.style.color = '';
             }
@@ -66,3 +159,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Функции для настроек (из settings.js)
+function openSettings() {
+    // Просто вызываем showSettings
+    showSettings();
+}
+
+function closeSettings() {
+    // Не нужно, так как настройки теперь внутри контента
+}

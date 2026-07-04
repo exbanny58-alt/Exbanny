@@ -73,13 +73,16 @@ def select_file_dialog():
         return None
 
 # ============================================
-# ГЛАВНАЯ СТРАНИЦА - СРАЗУ МЕНЕДЖЕР
+# ГЛАВНАЯ СТРАНИЦА
 # ============================================
 @app.route('/')
 def index():
     """Главная страница - сразу менеджер"""
     return render_template('index.html')
 
+# ============================================
+# СТАТИЧЕСКИЕ ФАЙЛЫ
+# ============================================
 @app.route('/static/webfonts/<path:filename>')
 def serve_webfonts(filename):
     return send_from_directory('static/webfonts', filename)
@@ -88,10 +91,25 @@ def serve_webfonts(filename):
 def serve_images(filename):
     return send_from_directory('static/images', filename)
 
+@app.route('/static/css/<path:filename>')
+def serve_css(filename):
+    return send_from_directory('static/css', filename)
+
+@app.route('/static/js/<path:filename>')
+def serve_js(filename):
+    return send_from_directory('static/js', filename)
+
+# ============================================
+# СТРАНИЦА НАСТРОЕК (внутри контента)
+# ============================================
+@app.route('/settings-content')
+def settings_content():
+    """Возвращает HTML с настройками для вставки в контент"""
+    return render_template('settings_content.html')
+
 # ============================================
 # API ДЛЯ НАСТРОЕК
 # ============================================
-
 @app.route('/api/settings', methods=['GET'])
 def get_settings():
     """Получить настройки"""
@@ -126,7 +144,6 @@ def reset_setting(field):
 # ============================================
 # API ДЛЯ ОТКРЫТИЯ ПРОВОДНИКА
 # ============================================
-
 @app.route('/api/browse/file', methods=['POST'])
 def browse_file():
     """Открыть диалог выбора файла через tkinter"""
@@ -207,6 +224,56 @@ def browse_folder():
             'message': str(e)
         }), 500
 
+# ============================================
+# API ДЛЯ ОТКРЫТИЯ ПАПКИ В ПРОВОДНИКЕ
+# ============================================
+@app.route('/api/open/explorer', methods=['POST'])
+def open_explorer():
+    """Открыть папку в проводнике"""
+    try:
+        data = request.get_json()
+        path = data.get('path', '').strip()
+        
+        if not path:
+            return jsonify({
+                'success': False,
+                'message': 'Путь не указан'
+            })
+        
+        if not os.path.exists(path):
+            return jsonify({
+                'success': False,
+                'message': f'Путь не существует: {path}'
+            })
+        
+        # Определяем ОС и открываем проводник
+        system = platform.system()
+        
+        if system == 'Windows':
+            os.startfile(path)
+        elif system == 'Darwin':  # macOS
+            subprocess.Popen(['open', path])
+        else:  # Linux
+            subprocess.Popen(['xdg-open', path])
+        
+        return jsonify({
+            'success': True,
+            'message': f'Открыто: {path}'
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+# ============================================
+# ЗАПУСК СЕРВЕРА
+# ============================================
 if __name__ == '__main__':
-    print("🚀 Сервер запущен: http://127.0.0.1:5000")
+    print("=" * 50)
+    print("🚀 DayZ Менеджер запущен!")
+    print("📁 Адрес: http://127.0.0.1:5000")
+    print("⚙️  Настройки открываются в основном контенте")
+    print("=" * 50)
     app.run(debug=True, host='0.0.0.0', port=5000)
