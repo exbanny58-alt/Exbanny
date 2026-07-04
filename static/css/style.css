@@ -613,3 +613,38 @@ main {
         transform: translateY(0);
     }
 }
+
+/* ============================================
+   ОСНОВНОЙ КОНТЕНТ
+   ============================================ */
+.content {
+    height: 100%;
+    overflow: hidden;
+}
+
+.content-area {
+    padding: 30px 35px;
+    color: #e5e5e5;
+    height: 100%;
+    overflow-y: auto; /* ← ВАЖНО: добавляем скролл */
+    overflow-x: hidden;
+}
+
+/* Стилизация скроллбара (красиво) */
+.content-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content-area::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.4);
+    border-radius: 10px;
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(167, 139, 250, 0.6);
+}
