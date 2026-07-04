@@ -5,22 +5,115 @@ const pages = {
     mods: '<h1>Управление модами</h1><p>Здесь будет управление модами</p>'
 };
 
+// Текущий активный раздел
+let currentPage = null;
+
+// Флаг, был ли первый клик
+let isFirstClick = true;
+
+// Массив пунктов меню в порядке сверху вниз
+const menuOrder = ['server', 'game', 'mods', 'settings'];
+
+// Определить направление анимации
+function getAnimationDirection(targetPage) {
+    if (!currentPage) {
+        return 'in';
+    }
+    
+    const currentIndex = menuOrder.indexOf(currentPage);
+    const targetIndex = menuOrder.indexOf(targetPage);
+    
+    if (currentIndex === -1 || targetIndex === -1) {
+        return 'in';
+    }
+    
+    if (targetIndex < currentIndex) {
+        return 'down';
+    } else if (targetIndex > currentIndex) {
+        return 'up';
+    } else {
+        return 'in';
+    }
+}
+
+// Универсальная функция смены контента с анимацией
+function switchContent(newHtml, page, direction, isFirst) {
+    const contentArea = document.getElementById('contentArea');
+    
+    // Если это первый клик - стартовая страница уезжает
+    if (isFirst) {
+        // Стартовая страница уезжает вверх
+        contentArea.classList.add('slide-up');
+        
+        setTimeout(() => {
+            contentArea.innerHTML = newHtml;
+            contentArea.classList.remove('slide-up');
+            contentArea.classList.add('slide-in-down');
+            
+            setTimeout(() => {
+                contentArea.classList.remove('slide-in-down');
+            }, 350);
+        }, 300);
+        return;
+    }
+    
+    // Если direction = 'in' - просто появляемся без ухода
+    if (direction === 'in') {
+        contentArea.innerHTML = newHtml;
+        contentArea.classList.add('slide-in-up');
+        setTimeout(() => {
+            contentArea.classList.remove('slide-in-up');
+        }, 350);
+        return;
+    }
+    
+    // Запускаем анимацию ухода
+    contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
+    
+    setTimeout(() => {
+        // Меняем контент
+        contentArea.innerHTML = newHtml;
+        
+        // Убираем класс анимации ухода
+        contentArea.classList.remove('slide-up', 'slide-down');
+        
+        // Добавляем класс появления (с противоположной стороны)
+        contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
+        
+        setTimeout(() => {
+            contentArea.classList.remove('slide-in-down', 'slide-in-up');
+        }, 350);
+        
+    }, 300);
+}
+
 // Показать контент
 function showContent(page) {
     // Убираем активный класс у всех пунктов
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    
     // Добавляем активный класс нажатому пункту
     const clickedItem = event.target.closest('.nav-item');
     if (clickedItem) {
         clickedItem.classList.add('active');
     }
     
-    const contentArea = document.getElementById('contentArea');
+    // Определяем направление анимации
+    const direction = getAnimationDirection(page);
     
-    // Показываем контент
-    if (pages[page]) {
-        contentArea.innerHTML = pages[page];
+    // Получаем HTML контента
+    const html = pages[page] || '<h1>Страница не найдена</h1>';
+    
+    // Переключаем контент (передаём флаг первого клика)
+    switchContent(html, page, direction, isFirstClick);
+    
+    // После первого клика снимаем флаг
+    if (isFirstClick) {
+        isFirstClick = false;
     }
+    
+    // Обновляем текущую страницу
+    currentPage = page;
     
     // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {
@@ -35,39 +128,143 @@ function showContent(page) {
 function showSettings() {
     // Убираем активный класс у всех пунктов
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    
     // Добавляем активный класс настройкам
     const clickedItem = event.target.closest('.nav-item');
     if (clickedItem) {
         clickedItem.classList.add('active');
     }
     
+    // Определяем направление анимации
+    const direction = getAnimationDirection('settings');
+    
     const contentArea = document.getElementById('contentArea');
     
-    // Загружаем настройки через fetch
-    fetch('/settings-content')
-        .then(response => response.text())
-        .then(html => {
-            contentArea.innerHTML = html;
-            // Перезагружаем скрипты настроек
-            loadSettings();
-            // Вешаем обработчики
-            attachSettingsHandlers();
-        })
-        .catch(() => {
-            contentArea.innerHTML = `
-                <div class="settings-content-wrapper">
-                    <div class="settings-header">
-                        <h1>⚙️ Настройки</h1>
-                        <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
+    // Если это первый клик - стартовая страница уезжает
+    if (isFirstClick) {
+        contentArea.classList.add('slide-up');
+        
+        setTimeout(() => {
+            fetch('/settings-content')
+                .then(response => response.text())
+                .then(html => {
+                    contentArea.innerHTML = html;
+                    loadSettings();
+                    attachSettingsHandlers();
+                    contentArea.classList.remove('slide-up');
+                    contentArea.classList.add('slide-in-down');
+                    setTimeout(() => {
+                        contentArea.classList.remove('slide-in-down');
+                    }, 350);
+                })
+                .catch(() => {
+                    contentArea.innerHTML = `
+                        <div class="settings-content-wrapper">
+                            <div class="settings-header">
+                                <h1>⚙️ Настройки</h1>
+                                <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
+                            </div>
+                            <div class="settings-body">
+                                <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
+                                    Загрузка настроек...
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    contentArea.classList.remove('slide-up');
+                    contentArea.classList.add('slide-in-down');
+                    setTimeout(() => {
+                        contentArea.classList.remove('slide-in-down');
+                    }, 350);
+                });
+        }, 300);
+        
+        isFirstClick = false;
+        currentPage = 'settings';
+        return;
+    }
+    
+    // Если direction = 'in' - просто загружаем без анимации ухода
+    if (direction === 'in') {
+        fetch('/settings-content')
+            .then(response => response.text())
+            .then(html => {
+                contentArea.innerHTML = html;
+                loadSettings();
+                attachSettingsHandlers();
+                contentArea.classList.add('slide-in-up');
+                setTimeout(() => {
+                    contentArea.classList.remove('slide-in-up');
+                }, 350);
+            })
+            .catch(() => {
+                contentArea.innerHTML = `
+                    <div class="settings-content-wrapper">
+                        <div class="settings-header">
+                            <h1>⚙️ Настройки</h1>
+                            <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
+                        </div>
+                        <div class="settings-body">
+                            <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
+                                Загрузка настроек...
+                            </p>
+                        </div>
                     </div>
-                    <div class="settings-body">
-                        <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
-                            Загрузка настроек...
-                        </p>
+                `;
+                contentArea.classList.add('slide-in-up');
+                setTimeout(() => {
+                    contentArea.classList.remove('slide-in-up');
+                }, 350);
+            });
+        
+        currentPage = 'settings';
+        return;
+    }
+    
+    // Запускаем анимацию ухода
+    contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
+    
+    setTimeout(() => {
+        // Загружаем настройки
+        fetch('/settings-content')
+            .then(response => response.text())
+            .then(html => {
+                contentArea.innerHTML = html;
+                loadSettings();
+                attachSettingsHandlers();
+                
+                contentArea.classList.remove('slide-up', 'slide-down');
+                contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
+                
+                setTimeout(() => {
+                    contentArea.classList.remove('slide-in-down', 'slide-in-up');
+                }, 350);
+            })
+            .catch(() => {
+                contentArea.innerHTML = `
+                    <div class="settings-content-wrapper">
+                        <div class="settings-header">
+                            <h1>⚙️ Настройки</h1>
+                            <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
+                        </div>
+                        <div class="settings-body">
+                            <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
+                                Загрузка настроек...
+                            </p>
+                        </div>
                     </div>
-                </div>
-            `;
-        });
+                `;
+                contentArea.classList.remove('slide-up', 'slide-down');
+                contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
+                setTimeout(() => {
+                    contentArea.classList.remove('slide-in-down', 'slide-in-up');
+                }, 350);
+            });
+            
+    }, 300);
+    
+    // Обновляем текущую страницу
+    currentPage = 'settings';
     
     // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {

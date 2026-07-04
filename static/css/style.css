@@ -536,3 +536,80 @@ main {
         transform: translateY(0);
     }
 }
+
+
+/* ============================================
+   АНИМАЦИИ ДЛЯ КОНТЕНТА
+   ============================================ */
+.content-area {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+/* Уход ВВЕРХ (когда нажимаем на пункт НИЖЕ) */
+.content-area.slide-up {
+    animation: slideUp 0.3s ease forwards;
+}
+
+/* Уход ВНИЗ (когда нажимаем на пункт ВЫШЕ) */
+.content-area.slide-down {
+    animation: slideDown 0.3s ease forwards;
+}
+
+/* Появление СВЕРХУ (при уходе вниз) */
+.content-area.slide-in-up {
+    animation: slideInUp 0.35s ease forwards;
+}
+
+/* Появление СНИЗУ (при уходе вверх) */
+.content-area.slide-in-down {
+    animation: slideInDown 0.35s ease forwards;
+}
+
+/* Уход вверх - контент уезжает наверх */
+@keyframes slideUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-80px);
+    }
+}
+
+/* Уход вниз - контент уезжает вниз */
+@keyframes slideDown {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(80px);
+    }
+}
+
+/* Появление сверху (выезжает вниз) */
+@keyframes slideInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(-60px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Появление снизу (выезжает вверх) */
+@keyframes slideInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(60px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
