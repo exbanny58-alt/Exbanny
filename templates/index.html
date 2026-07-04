@@ -97,9 +97,14 @@
         </section>
     </main>
     
+    <!-- Сначала подключаем зависимости -->
     <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/mods.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+
+    <!-- Потом mods.js -->
+    <script src="{{ url_for('static', filename='js/mods.js') }}"></script>
+
+    <!-- И только потом script.js (который вызывает initModsPage) -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

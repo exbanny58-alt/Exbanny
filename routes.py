@@ -343,7 +343,7 @@ def register_routes(app):
         return mods
 
     # ============================================
-    # API ДЛЯ РАБОТЫ С МОДАМИ (с кешированием)
+    # API ДЛЯ РАБОТЫ С МОДАМИ
     # ============================================
     
     @app.route('/api/mods/cache', methods=['GET'])
@@ -352,14 +352,16 @@ def register_routes(app):
         try:
             cache = get_mods_cache()
             if cache and cache.get('mods'):
-                # Применяем сохранённые состояния из настроек
-                settings = load_settings()
-                mods_state = settings.get('mods_state', {})
+                # Загружаем конфиг модов
+                from settings_manager import load_mods_config
+                config = load_mods_config()
                 
                 mods = cache.get('mods')
                 for mod in mods:
-                    if mod['id'] in mods_state:
-                        mod['enabled'] = mods_state[mod['id']]
+                    if mod['id'] in config:
+                        mod['server'] = config[mod['id']].get('server', False)
+                        mod['server_mod'] = config[mod['id']].get('server_mod', False)
+                        mod['client'] = config[mod['id']].get('client', True)
                 
                 return jsonify({
                     'success': True,
@@ -397,11 +399,14 @@ def register_routes(app):
             
             mods = scan_mods(workshop, custom_mods)
             
-            # Применяем сохранённые состояния
-            mods_state = settings.get('mods_state', {})
+            # Загружаем конфиг модов
+            from settings_manager import load_mods_config
+            config = load_mods_config()
             for mod in mods:
-                if mod['id'] in mods_state:
-                    mod['enabled'] = mods_state[mod['id']]
+                if mod['id'] in config:
+                    mod['server'] = config[mod['id']].get('server', False)
+                    mod['server_mod'] = config[mod['id']].get('server_mod', False)
+                    mod['client'] = config[mod['id']].get('client', True)
             
             return jsonify({
                 'success': True,
@@ -437,11 +442,18 @@ def register_routes(app):
             
             mods = scan_mods(workshop, custom_mods)
             
-            # Применяем сохранённые состояния
-            mods_state = settings.get('mods_state', {})
+            # Загружаем конфиг модов
+            from settings_manager import load_mods_config, save_mods_config, init_mods_config
+            
+            # Инициализируем конфиг для новых модов
+            config = init_mods_config(mods)
+            
+            # Применяем конфиг к модам
             for mod in mods:
-                if mod['id'] in mods_state:
-                    mod['enabled'] = mods_state[mod['id']]
+                if mod['id'] in config:
+                    mod['server'] = config[mod['id']].get('server', False)
+                    mod['server_mod'] = config[mod['id']].get('server_mod', False)
+                    mod['client'] = config[mod['id']].get('client', True)
             
             save_mods_cache(mods)
             
@@ -459,8 +471,87 @@ def register_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
 
+    # ============================================
+    # API ДЛЯ КОНФИГА МОДОВ (три тумблера)
+    # ============================================
+    
+    @app.route('/api/mods/config', methods=['GET'])
+    def get_mods_config():
+        """Получить весь конфиг модов"""
+        try:
+            from settings_manager import load_mods_config
+            config = load_mods_config()
+            return jsonify({
+                'success': True,
+                'config': config
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/mods/config/<mod_id>', methods=['GET'])
+    def get_mod_config(mod_id):
+        """Получить конфиг конкретного мода"""
+        try:
+            from settings_manager import get_mod_full_state
+            state = get_mod_full_state(mod_id)
+            return jsonify({
+                'success': True,
+                'mod_id': mod_id,
+                'state': state
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/mods/config/<mod_id>/<attr>', methods=['POST'])
+    def set_mod_config(mod_id, attr):
+        """Установить состояние атрибута мода"""
+        try:
+            data = request.get_json()
+            value = data.get('value', False)
+            
+            if attr not in ['server', 'server_mod', 'client']:
+                return jsonify({'success': False, 'message': 'Неверный атрибут'}), 400
+            
+            from settings_manager import set_mod_state
+            result = set_mod_state(mod_id, attr, value)
+            
+            if result:
+                return jsonify({
+                    'success': True,
+                    'mod_id': mod_id,
+                    'attr': attr,
+                    'value': value,
+                    'message': f'{attr} = {value}'
+                })
+            else:
+                return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/mods/config/init', methods=['POST'])
+    def init_mods_config_api():
+        """Инициализирует конфиг для всех существующих модов"""
+        try:
+            settings = load_settings()
+            workshop = settings.get('workshop', '')
+            custom_mods = settings.get('custom_mods', '')
+            
+            mods = scan_mods(workshop, custom_mods)
+            
+            from settings_manager import init_mods_config
+            config = init_mods_config(mods)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Инициализировано {len(config)} модов',
+                'config': config
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
     @app.route('/api/mods/toggle', methods=['POST'])
     def toggle_mod():
+        """Старый API для совместимости (один тумблер)"""
         try:
             data = request.get_json()
             mod_id = data.get('mod_id')
@@ -469,12 +560,9 @@ def register_routes(app):
             if not mod_id:
                 return jsonify({'success': False, 'message': 'Не указан ID мода'}), 400
             
-            settings = load_settings()
-            mods_state = settings.get('mods_state', {})
-            mods_state[mod_id] = enabled
-            
-            settings['mods_state'] = mods_state
-            save_settings(settings)
+            # Для совместимости сохраняем в server_mod
+            from settings_manager import set_mod_state
+            set_mod_state(mod_id, 'server_mod', enabled)
             
             return jsonify({
                 'success': True,
@@ -486,9 +574,14 @@ def register_routes(app):
 
     @app.route('/api/mods/state', methods=['GET'])
     def get_mods_state():
+        """Старый API для совместимости"""
         try:
-            settings = load_settings()
-            mods_state = settings.get('mods_state', {})
-            return jsonify({'success': True, 'state': mods_state})
+            from settings_manager import load_mods_config
+            config = load_mods_config()
+            # Преобразуем в старый формат
+            state = {}
+            for mod_id, attrs in config.items():
+                state[mod_id] = attrs.get('server_mod', False)
+            return jsonify({'success': True, 'state': state})
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500

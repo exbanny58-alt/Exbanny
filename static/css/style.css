@@ -1371,3 +1371,246 @@ main {
 #startPage {
     overflow: hidden !important;
 }
+
+/* ============================================
+   ТРИ ТУМБЛЕРА ДЛЯ МОДОВ
+   ============================================ */
+
+.mod-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.toggle-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.toggle-label {
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.toggle-label.server {
+    color: #fbbf24;
+}
+
+.toggle-label.server-mod {
+    color: #60a5fa;
+}
+
+.toggle-label.client {
+    color: #4ade80;
+}
+
+/* Базовый тумблер */
+.mod-toggle {
+    position: relative;
+    width: 32px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.mod-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.mod-toggle input:checked + .toggle-slider::before {
+    transform: translateX(14px);
+}
+
+/* SERVER - жёлтый */
+.mod-toggle-server .toggle-slider {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.mod-toggle-server input:checked + .toggle-slider {
+    background: rgba(251, 191, 36, 0.3);
+    border-color: rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
+}
+
+.mod-toggle-server input:checked + .toggle-slider::before {
+    background: #fbbf24;
+}
+
+/* SERVER_MOD - синий */
+.mod-toggle-server-mod .toggle-slider {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.15);
+}
+
+.mod-toggle-server-mod input:checked + .toggle-slider {
+    background: rgba(96, 165, 250, 0.3);
+    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.1);
+}
+
+.mod-toggle-server-mod input:checked + .toggle-slider::before {
+    background: #60a5fa;
+}
+
+/* CLIENT - зелёный */
+.mod-toggle-client .toggle-slider {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+}
+
+.mod-toggle-client input:checked + .toggle-slider {
+    background: rgba(74, 222, 128, 0.3);
+    border-color: rgba(74, 222, 128, 0.4);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.1);
+}
+
+.mod-toggle-client input:checked + .toggle-slider::before {
+    background: #4ade80;
+}
+
+/* Легенда тумблеров */
+.mods-legend {
+    display: flex;
+    gap: 16px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.server {
+    background: #fbbf24;
+}
+
+.legend-dot.server-mod {
+    background: #60a5fa;
+}
+
+.legend-dot.client {
+    background: #4ade80;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .mod-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .toggle-wrapper {
+        flex-direction: row;
+        gap: 4px;
+    }
+    
+    .mod-toggle {
+        width: 28px;
+        height: 16px;
+    }
+    
+    .mod-toggle input:checked + .toggle-slider::before {
+        transform: translateX(12px);
+    }
+    
+    .toggle-slider::before {
+        height: 10px;
+        width: 10px;
+        left: 2px;
+        bottom: 2px;
+    }
+}
+
+/* ============================================
+   КНОПКИ ДЛЯ СТРАНИЦЫ МОДОВ
+   ============================================ */
+
+.btn-primary {
+    background: rgba(167, 139, 250, 0.15);
+    border: 1px solid rgba(167, 139, 250, 0.25);
+    color: #a78bfa;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    font-family: "Nunito", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-primary:hover {
+    background: rgba(167, 139, 250, 0.25);
+    border-color: rgba(167, 139, 250, 0.4);
+    color: #c4b5fd;
+    transform: translateY(-1px);
+    box-shadow: 0 0 25px rgba(167, 139, 250, 0.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0px);
+}
+
+.btn-primary svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+}
+
+.btn-primary.loading svg {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

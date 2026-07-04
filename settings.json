@@ -1,14 +1,14 @@
 {
   "custom_mods": "E:/Dayz/DayZ_Mods",
   "game_exe": "",
-  "server_exe": "",
-  "workshop": "",
   "mods_state": {
-    "custom_[M.W.P] Modular Weapon Pack": false,
-    "custom_Alcohol Production": false,
     "custom_AR15": false,
+    "custom_Alcohol Production": false,
     "custom_Auto Stack - Proper": false,
+    "custom_BLR Expansion TraderIcons": false,
     "custom_BetterDriving": false,
-    "custom_BLR Expansion TraderIcons": false
-  }
+    "custom_[M.W.P] Modular Weapon Pack": false
+  },
+  "server_exe": "",
+  "workshop": "E:/SteamLibrary/steamapps/workshop/content/221100"
 }

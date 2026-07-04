@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-04T21:42:24.429041",
+  "timestamp": "2026-07-04T22:32:53.777607",
   "mods": [
     {
       "id": "custom_[M.W.P] Modular Weapon Pack",
@@ -9,7 +9,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Alcohol Production",
@@ -19,7 +22,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_AR15",
@@ -29,7 +35,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Auto Stack - Proper",
@@ -39,7 +48,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_BetterDriving",
@@ -49,7 +61,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_BLR Expansion TraderIcons",
@@ -59,7 +74,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Bullet Holes",
@@ -69,7 +87,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_CarS RE_Start",
+      "name": "CarS RE:Start",
+      "folder": "CarS RE_Start",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\CarS RE_Start",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_CCTV System for DayZ",
@@ -79,7 +113,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_CF",
+      "name": "CF",
+      "folder": "CF",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\CF",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_CF",
@@ -89,7 +139,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_CJ187-Money-Rubles-Only",
@@ -99,7 +152,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_CJ187-MoreMoney",
@@ -109,7 +165,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_CloseAllDoors",
@@ -119,7 +178,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Community-Online-Tools",
@@ -129,7 +191,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_COT_Override",
@@ -139,7 +204,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_CraftSystem",
@@ -149,7 +217,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_Dabs Framework",
+      "name": "Dabs Framework",
+      "folder": "Dabs Framework",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\Dabs Framework",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Dabs Framework",
@@ -159,7 +243,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_DAG_Particle",
@@ -169,7 +256,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_DayZ Editor Loader",
@@ -179,7 +269,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_DayZ Mining System with Ores and Gems V2",
@@ -189,7 +282,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_DayZ-Expansion-Bundle",
+      "name": "DayZ-Expansion-Bundle",
+      "folder": "DayZ-Expansion-Bundle",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\DayZ-Expansion-Bundle",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_DayZ-Expansion-Bundle",
@@ -199,7 +308,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_DayZ-Expansion-Licensed",
+      "name": "DayZ-Expansion-Licensed",
+      "folder": "DayZ-Expansion-Licensed",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\DayZ-Expansion-Licensed",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_DayZ-Expansion-Licensed",
@@ -209,7 +334,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_DevCA_WeatherControl",
@@ -219,7 +347,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Dynamic Scavenging",
@@ -229,7 +360,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Fish's Knife Mod - Complete Collection",
@@ -239,7 +373,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_FOV Tool",
+      "name": "FOV Tool",
+      "folder": "FOV Tool",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\FOV Tool",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_FoXyRadio",
@@ -249,7 +399,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Fungi Neon Signs",
@@ -259,7 +412,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Fungi Shelf",
@@ -269,7 +425,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_GRINCH CROSSHAIR",
@@ -279,7 +438,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_GSC Gameworld Assets 2026",
@@ -289,7 +451,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_KM_Mods RepairBox",
@@ -299,7 +464,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Letter Board Signs",
@@ -309,7 +477,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_MBM_ApocalypticPAZ",
@@ -319,7 +490,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_MBM_BMWAlpina",
+      "name": "MBM_BMWAlpina",
+      "folder": "MBM_BMWAlpina",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\MBM_BMWAlpina",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_MBM_BMWAlpina",
@@ -329,7 +516,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_MH Anomaly",
@@ -339,7 +529,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_MH Core Mod",
@@ -349,7 +542,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_MPG_LootExtractor",
@@ -359,7 +555,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_My Delta Force Weapons",
@@ -369,7 +568,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NamantHs 2003 Cadillac Escalade",
@@ -379,7 +581,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NamantHs Alcohol NoRag",
@@ -389,7 +594,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NamantHs Buick Regal",
@@ -399,7 +607,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NamantHs Buick Regal GNX",
@@ -409,7 +620,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NamantHs Mercedes 560SEL",
@@ -419,7 +633,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NamantHs Nomad Wagon",
@@ -429,7 +646,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NoFuel",
@@ -439,7 +659,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_NoxZ_SkinManager",
@@ -449,7 +672,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_PripyatGamma v114",
@@ -459,7 +685,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_ProTraction",
@@ -469,7 +698,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Radio_Fungi_Car_Radio_Addon",
@@ -479,7 +711,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Radio_Fungi_NO_Music",
@@ -489,7 +724,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_RaG_Liquid_Framework",
@@ -499,7 +737,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_RaulexCore",
+      "name": "RaulexCore",
+      "folder": "RaulexCore",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\RaulexCore",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Rejects Quest Mod",
@@ -509,7 +763,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_RF",
@@ -519,7 +776,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_RF GARAGE",
@@ -529,7 +789,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_RF GARAGE (SERVER-SIDE)",
@@ -539,7 +802,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_Santavoz NIVA Retexture",
+      "name": "Santavoz NIVA Retexture",
+      "folder": "Santavoz NIVA Retexture",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\Santavoz NIVA Retexture",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_SF Vehicle Spawner",
@@ -549,7 +828,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_SFP",
@@ -559,7 +841,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_SFP_anim_system",
@@ -569,7 +854,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_SSM ARMY FURNITURE",
@@ -579,7 +867,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_SSM BACKPACKS PACK",
@@ -589,7 +880,23 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
+    },
+    {
+      "id": "workshop_Stalker Anomaly and Detectors Free by Ibourbon",
+      "name": "Stalker Anomaly and Detectors Free by Ibourbon",
+      "folder": "Stalker Anomaly and Detectors Free by Ibourbon",
+      "path": "E:/SteamLibrary/steamapps/workshop/content/221100\\Stalker Anomaly and Detectors Free by Ibourbon",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Stalker Anomaly and Detectors Free by Ibourbon",
@@ -599,7 +906,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Survival Tweaks",
@@ -609,7 +919,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_TF SortZ - Fixed Edition",
@@ -619,7 +932,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_TTL Classname Extractor",
@@ -629,7 +945,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Universal Weapon Cleaning",
@@ -639,7 +958,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Veteran Ranger",
@@ -649,7 +971,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_VPPAdminTools",
@@ -659,7 +984,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_VPPAdminTools RU Translate",
@@ -669,7 +997,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_VVN_Greenhouse",
@@ -679,7 +1010,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_Waraeger Armory Zryachiy Clothing Set",
@@ -689,7 +1023,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_WSP-TraderLayout",
@@ -699,7 +1036,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_zm workbench",
@@ -709,7 +1049,10 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     },
     {
       "id": "custom_ZombieEnhanced",
@@ -719,8 +1062,11 @@
       "type": "custom",
       "version": "Неизвестно",
       "enabled": true,
-      "has_meta": true
+      "has_meta": true,
+      "server": false,
+      "server_mod": false,
+      "client": false
     }
   ],
-  "hash": "f1234cab908ffb6dbdae56e8ffbe3c6e"
+  "hash": "b14c2a4f0bec4aa6618327f1836bcdc4"
 }

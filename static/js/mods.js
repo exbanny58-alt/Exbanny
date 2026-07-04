@@ -1,9 +1,9 @@
 // ============================================
-// УПРАВЛЕНИЕ МОДАМИ (с кешированием)
+// УПРАВЛЕНИЕ МОДАМИ (с тремя тумблерами)
 // ============================================
 
 let modsList = [];
-let modsState = {};
+let modsConfig = {};
 let isModsReady = false;
 let isCacheLoaded = false;
 
@@ -12,20 +12,27 @@ window.modsList = modsList;
 window.isModsReady = isModsReady;
 window._modsStats = null;
 
-// Загрузка состояния модов
-async function loadModsState() {
+// ============================================
+// ЗАГРУЗКА КОНФИГА МОДОВ
+// ============================================
+async function loadModsConfig() {
     try {
-        const response = await fetch('/api/mods/state');
+        const response = await fetch('/api/mods/config');
         const data = await response.json();
         if (data.success) {
-            modsState = data.state;
+            modsConfig = data.config;
+            console.log('✅ Конфиг модов загружен');
+            return true;
         }
     } catch (e) {
-        console.error('Ошибка загрузки состояния модов:', e);
+        console.error('❌ Ошибка загрузки конфига модов:', e);
     }
+    return false;
 }
 
-// Загрузка модов из кеша (МГНОВЕННО)
+// ============================================
+// ЗАГРУЗКА МОДОВ ИЗ КЕША
+// ============================================
 async function loadModsFromCache() {
     try {
         console.log('⚡ Загрузка модов из кеша...');
@@ -36,9 +43,22 @@ async function loadModsFromCache() {
             modsList = data.mods;
             window.modsList = modsList;
             
+            // Применяем конфиг к каждому моду
             modsList.forEach(mod => {
-                if (modsState[mod.id] !== undefined) {
-                    mod.enabled = modsState[mod.id];
+                if (modsConfig[mod.id]) {
+                    mod.server = modsConfig[mod.id].server || false;
+                    mod.server_mod = modsConfig[mod.id].server_mod || false;
+                    mod.client = modsConfig[mod.id].client || false;
+                } else {
+                    // Если конфига нет — создаём с false
+                    modsConfig[mod.id] = {
+                        server: false,
+                        server_mod: false,
+                        client: false
+                    };
+                    mod.server = false;
+                    mod.server_mod = false;
+                    mod.client = false;
                 }
             });
             
@@ -59,7 +79,9 @@ async function loadModsFromCache() {
     }
 }
 
-// Фоновое сканирование и обновление кеша
+// ============================================
+// ФОНОВОЕ СКАНИРОВАНИЕ
+// ============================================
 async function backgroundScanAndCache() {
     try {
         console.log('🔄 Фоновое сканирование модов...');
@@ -93,7 +115,9 @@ async function backgroundScanAndCache() {
     }
 }
 
-// Сканирование модов (вызывается при обновлении)
+// ============================================
+// СКАНИРОВАНИЕ МОДОВ
+// ============================================
 async function scanMods(showLoading = true) {
     const container = document.getElementById('modsListContainer');
     
@@ -121,9 +145,21 @@ async function scanMods(showLoading = true) {
             modsList = data.mods;
             window.modsList = modsList;
             
+            // Применяем конфиг к каждому моду
             modsList.forEach(mod => {
-                if (modsState[mod.id] !== undefined) {
-                    mod.enabled = modsState[mod.id];
+                if (modsConfig[mod.id]) {
+                    mod.server = modsConfig[mod.id].server || false;
+                    mod.server_mod = modsConfig[mod.id].server_mod || false;
+                    mod.client = modsConfig[mod.id].client || false;
+                } else {
+                    modsConfig[mod.id] = {
+                        server: false,
+                        server_mod: false,
+                        client: false
+                    };
+                    mod.server = false;
+                    mod.server_mod = false;
+                    mod.client = false;
                 }
             });
 
@@ -159,32 +195,9 @@ async function scanMods(showLoading = true) {
     }
 }
 
-// Мгновенное отображение модов (без сканирования)
-function renderModsInstant() {
-    const container = document.getElementById('modsListContainer');
-    
-    if (!container) {
-        console.error('Контейнер modsListContainer не найден');
-        return;
-    }
-
-    if (modsList.length > 0) {
-        renderMods(modsList);
-        if (window._modsStats) {
-            updateStats(window._modsStats);
-        }
-    } else {
-        container.innerHTML = `
-            <div class="empty-mods">
-                <p>📭 Модов не найдено</p>
-                <p class="empty-hint">Нажмите "Обновить список" для сканирования</p>
-            </div>
-        `;
-        updateStats({ total: 0, enabled: 0, workshop: 0, custom: 0 });
-    }
-}
-
-// Отрисовка списка модов
+// ============================================
+// ОТРИСОВКА СПИСКА МОДОВ
+// ============================================
 function renderMods(mods) {
     const container = document.getElementById('modsListContainer');
     
@@ -216,9 +229,12 @@ function renderMods(mods) {
 
     let html = '';
     filtered.forEach(mod => {
-        const isEnabled = mod.enabled !== false;
-        // Экранируем путь для безопасной передачи в onclick
         const escapedPath = mod.path.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        
+        const serverChecked = mod.server ? 'checked' : '';
+        const serverModChecked = mod.server_mod ? 'checked' : '';
+        const clientChecked = mod.client ? 'checked' : '';
+        
         html += `
             <div class="mod-item" data-mod-id="${mod.id}">
                 <div class="mod-info">
@@ -234,11 +250,33 @@ function renderMods(mods) {
                     </div>
                 </div>
                 <div class="mod-actions">
-                    <label class="mod-toggle">
-                        <input type="checkbox" ${isEnabled ? 'checked' : ''} 
-                               onchange="toggleMod('${mod.id}', this.checked)">
-                        <span class="toggle-slider"></span>
-                    </label>
+                    <div class="toggle-wrapper" title="Серверный мод">
+                        <label class="mod-toggle mod-toggle-server">
+                            <input type="checkbox" ${serverChecked} 
+                                   onchange="toggleModAttr('${mod.id}', 'server', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label server">S</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper" title="Мод для сервера">
+                        <label class="mod-toggle mod-toggle-server-mod">
+                            <input type="checkbox" ${serverModChecked} 
+                                   onchange="toggleModAttr('${mod.id}', 'server_mod', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label server-mod">M</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper" title="Клиентский мод">
+                        <label class="mod-toggle mod-toggle-client">
+                            <input type="checkbox" ${clientChecked} 
+                                   onchange="toggleModAttr('${mod.id}', 'client', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label client">C</span>
+                    </div>
+                    
                     <button class="btn-mod-folder" onclick="openModFolder('${escapedPath}')" title="Открыть папку мода">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
@@ -250,14 +288,11 @@ function renderMods(mods) {
     });
 
     container.innerHTML = html;
-    
-    // Проверяем, что функция openModFolder доступна глобально
-    if (typeof window.openModFolder === 'undefined') {
-        console.warn('⚠️ openModFolder не определена глобально');
-    }
 }
 
-// Обновление статистики
+// ============================================
+// ОБНОВЛЕНИЕ СТАТИСТИКИ
+// ============================================
 function updateStats(stats) {
     const totalEl = document.getElementById('totalModsCount');
     const enabledEl = document.getElementById('enabledModsCount');
@@ -270,36 +305,44 @@ function updateStats(stats) {
     if (customEl) customEl.textContent = stats.custom || 0;
 }
 
-// Включение/выключение мода
-async function toggleMod(modId, enabled) {
+// ============================================
+// ПЕРЕКЛЮЧЕНИЕ АТРИБУТА МОДА
+// ============================================
+async function toggleModAttr(modId, attr, value) {
+    console.log(`🔄 toggleModAttr: ${modId}, ${attr} = ${value}`);
+    
     try {
-        const response = await fetch('/api/mods/toggle', {
+        const response = await fetch(`/api/mods/config/${modId}/${attr}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ mod_id: modId, enabled: enabled })
+            body: JSON.stringify({ value: value })
         });
 
         const data = await response.json();
+        
         if (data.success) {
-            modsState[modId] = enabled;
+            if (!modsConfig[modId]) {
+                modsConfig[modId] = {};
+            }
+            modsConfig[modId][attr] = value;
             
             const mod = modsList.find(m => m.id === modId);
             if (mod) {
-                mod.enabled = enabled;
-                const stats = {
-                    total: modsList.length,
-                    workshop: modsList.filter(m => m.type === 'workshop').length,
-                    custom: modsList.filter(m => m.type === 'custom').length,
-                    enabled: modsList.filter(m => m.enabled !== false).length
-                };
-                updateStats(stats);
-                window._modsStats = stats;
+                mod[attr] = value;
             }
             
+            const labels = {
+                'server': '🟡 Сервер',
+                'server_mod': '🔵 Мод сервера',
+                'client': '🟢 Клиент'
+            };
+            
+            const status = value ? 'включён ✅' : 'выключен ❌';
+            
             if (typeof notifications !== 'undefined') {
-                notifications.success(enabled ? 'Мод включён' : 'Мод выключен');
+                notifications.success(`${labels[attr] || attr}: ${status}`);
             }
         } else {
             if (typeof notifications !== 'undefined') {
@@ -307,13 +350,16 @@ async function toggleMod(modId, enabled) {
             }
         }
     } catch (e) {
+        console.error('❌ Ошибка переключения:', e);
         if (typeof notifications !== 'undefined') {
             notifications.error('Ошибка: ' + e.message);
         }
     }
 }
 
-// Открыть папку с модом
+// ============================================
+// ОТКРЫТЬ ПАПКУ С МОДОМ
+// ============================================
 async function openModFolder(path) {
     console.log('📂 openModFolder вызвана с путём:', path);
     
@@ -351,7 +397,9 @@ async function openModFolder(path) {
     }
 }
 
-// Поиск модов
+// ============================================
+// ПОИСК МОДОВ
+// ============================================
 function setupModsSearch() {
     const searchInput = document.getElementById('modsSearchInput');
     if (searchInput) {
@@ -364,7 +412,9 @@ function setupModsSearch() {
     }
 }
 
-// Прикрепляем обработчики кнопок
+// ============================================
+// ПРИКРЕПЛЯЕМ ОБРАБОТЧИКИ КНОПОК
+// ============================================
 function attachModsButtonHandlers() {
     const refreshBtn = document.getElementById('refreshModsBtn');
     if (refreshBtn) {
@@ -416,7 +466,9 @@ function attachModsButtonHandlers() {
     }
 }
 
-// Инициализация страницы модов (МГНОВЕННАЯ)
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ МОДОВ
+// ============================================
 async function initModsPage() {
     const container = document.getElementById('modsListContainer');
     if (!container) {
@@ -424,11 +476,8 @@ async function initModsPage() {
         return;
     }
 
-    // Проверяем, что openModFolder доступна глобально
-    if (typeof window.openModFolder === 'undefined') {
-        window.openModFolder = openModFolder;
-        console.log('✅ openModFolder зарегистрирована глобально');
-    }
+    // Сначала загружаем конфиг
+    await loadModsConfig();
 
     const cacheLoaded = await loadModsFromCache();
     
@@ -456,23 +505,21 @@ async function initModsPage() {
 }
 
 // ============================================
-// ЭКСПОРТ ВСЕХ ФУНКЦИЙ В ГЛОБАЛЬНУЮ ОБЛАСТЬ
+// ЭКСПОРТ ФУНКЦИЙ В ГЛОБАЛЬНУЮ ОБЛАСТЬ
 // ============================================
 window.initModsPage = initModsPage;
-window.toggleMod = toggleMod;
+window.toggleModAttr = toggleModAttr;
 window.openModFolder = openModFolder;
 window.scanMods = scanMods;
-window.loadModsState = loadModsState;
+window.loadModsConfig = loadModsConfig;
 window.loadModsFromCache = loadModsFromCache;
 window.backgroundScanAndCache = backgroundScanAndCache;
 window.renderMods = renderMods;
-window.renderModsInstant = renderModsInstant;
 window.updateStats = updateStats;
 window.attachModsButtonHandlers = attachModsButtonHandlers;
 window.setupModsSearch = setupModsSearch;
 
-// Проверка после загрузки
-console.log('📦 mods.js загружен, функции экспортированы:');
+console.log('📦 mods.js загружен, функции экспортированы');
+console.log('  - initModsPage:', typeof window.initModsPage);
+console.log('  - toggleModAttr:', typeof window.toggleModAttr);
 console.log('  - openModFolder:', typeof window.openModFolder);
-console.log('  - toggleMod:', typeof window.toggleMod);
-console.log('  - scanMods:', typeof window.scanMods);

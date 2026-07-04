@@ -16,7 +16,6 @@ const pages = {
                         </svg>
                         Управление модами
                     </h1>
-                    <p class="mods-subtitle">Моды из Workshop и кастомные моды</p>
                 </div>
 
                 <!-- Статистика -->
