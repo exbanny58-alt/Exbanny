@@ -1,24 +1,28 @@
-// Показать контент (для пунктов меню)
+// Контент для разных разделов
+const pages = {
+    server: '<h1>Управление сервером</h1><p>Здесь будет панель управления сервером DayZ</p>',
+    game: '<h1>Управление игрой</h1><p>Здесь будут настройки игры</p>',
+    mods: '<h1>Управление модами</h1><p>Здесь будет управление модами</p>'
+};
+
+// Показать контент
 function showContent(page) {
     // Убираем активный класс у всех пунктов
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     // Добавляем активный класс нажатому пункту
-    event.target.closest('.nav-item').classList.add('active');
+    const clickedItem = event.target.closest('.nav-item');
+    if (clickedItem) {
+        clickedItem.classList.add('active');
+    }
     
     const contentArea = document.getElementById('contentArea');
     
-    // Здесь будет логика для разных страниц
-    const pages = {
-        server: '<h1>Управление сервером</h1><p>Здесь будет панель управления сервером DayZ</p>',
-        game: '<h1>Управление игрой</h1><p>Здесь будут настройки игры</p>',
-        mods: '<h1>Управление модами</h1><p>Здесь будет управление модами</p>'
-    };
-    
+    // Показываем контент
     if (pages[page]) {
         contentArea.innerHTML = pages[page];
     }
     
-    // Сбрасываем цвета у всех иконок после клика
+    // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {
         const icon = link.querySelector('.nav-icon');
         const text = link.querySelector('.nav-text');
@@ -32,7 +36,10 @@ function showSettings() {
     // Убираем активный класс у всех пунктов
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     // Добавляем активный класс настройкам
-    event.target.closest('.nav-item').classList.add('active');
+    const clickedItem = event.target.closest('.nav-item');
+    if (clickedItem) {
+        clickedItem.classList.add('active');
+    }
     
     const contentArea = document.getElementById('contentArea');
     
@@ -62,7 +69,7 @@ function showSettings() {
             `;
         });
     
-    // Сбрасываем цвета у всех иконок после клика
+    // Сбрасываем цвета у всех иконок
     document.querySelectorAll('.nav-item a').forEach(link => {
         const icon = link.querySelector('.nav-icon');
         const text = link.querySelector('.nav-text');
@@ -149,7 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         item.addEventListener('mouseleave', function() {
-            // ВСЕГДА сбрасываем цвет при уходе мыши
             if (icon) {
                 icon.style.color = '';
             }
@@ -159,13 +165,3 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// Функции для настроек (из settings.js)
-function openSettings() {
-    // Просто вызываем showSettings
-    showSettings();
-}
-
-function closeSettings() {
-    // Не нужно, так как настройки теперь внутри контента
-}

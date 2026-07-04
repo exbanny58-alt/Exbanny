@@ -40,7 +40,7 @@
 
             <div class="menu-bottom">
                 <ul>
-                    <li class="nav-item active">
+                    <li class="nav-item">
                         <a href="#" onclick="showSettings()">
                             <i class="fa fa-gear nav-icon"></i>
                             <span class="nav-text">Настройки</span>
@@ -53,8 +53,21 @@
         <!-- Основной контент -->
         <section class="content">
             <div class="content-area" id="contentArea">
-                <!-- Настройки по умолчанию -->
-                {% include 'settings_content.html' %}
+                <!-- Стартовая страница-заглушка -->
+                <div id="startPage" class="start-page">
+                    <div class="start-content">
+                        <div class="start-logo">
+                            <i class="fa fa-shield-halved"></i>
+                        </div>
+                        <h1>DayZ Менеджер</h1>
+                        <p>Выберите раздел в меню слева</p>
+                        <div class="start-hint">
+                            <span class="hint-dot"></span>
+                            <span class="hint-dot"></span>
+                            <span class="hint-dot"></span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
