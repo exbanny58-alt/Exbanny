@@ -7,128 +7,53 @@
     
     <!-- Font Awesome (локально) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}" />
-    <!-- Swiper CSS (локально) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper-bundle.min.css') }}" />
     <!-- Подключаем CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-    <!-- Основной контент -->
-    <main id="managerPage">
+    <!-- Основной контейнер -->
+    <main>
         <!-- Боковое меню -->
         <nav class="main-menu">
-            <div>
+            <div class="menu-top">
                 <ul>
-                    <li class="nav-item active">
-                        <a href="#" onclick="navigateTo('server')">
+                    <li class="nav-item">
+                        <a href="#">
                             <i class="fa fa-server nav-icon"></i>
-                            <span class="nav-text">Менеджер</span>
+                            <span class="nav-text">Управление сервером</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" onclick="navigateTo('stats')">
-                            <i class="fa fa-chart-line nav-icon"></i>
-                            <span class="nav-text">Статистика</span>
+                        <a href="#">
+                            <i class="fa fa-gamepad nav-icon"></i>
+                            <span class="nav-text">Управление игрой</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" onclick="navigateTo('players')">
-                            <i class="fa fa-users nav-icon"></i>
-                            <span class="nav-text">Игроки</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" onclick="navigateTo('mods')">
+                        <a href="#">
                             <i class="fa fa-folder nav-icon"></i>
-                            <span class="nav-text">Моды</span>
+                            <span class="nav-text">Управление модами</span>
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <ul>
-                <li class="nav-item">
-                    <a href="#" onclick="navigateTo('profile')">
-                        <i class="fa fa-user nav-icon"></i>
-                        <span class="nav-text">Профиль</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" onclick="openSettings()">
-                        <i class="fa fa-gear nav-icon"></i>
-                        <span class="nav-text">Система</span>
-                    </a>
-                </li>
-            </ul>
+            <div class="menu-bottom">
+                <ul>
+                    <li class="nav-item">
+                        <a href="#" onclick="openSettings()">
+                            <i class="fa fa-gear nav-icon"></i>
+                            <span class="nav-text">Настройки</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
-        <!-- Основной контент -->
+        <!-- Пустая область контента -->
         <section class="content">
             <div class="left-content">
-                <!-- Слайдер -->
-                <div class="slider-container">
-                    <div class="swiper">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide" data-slide="server">
-                                <img src="{{ url_for('static', filename='images/server.png') }}" />
-                                <div class="slide-overlay">
-                                    <h2>Управление сервером</h2>
-                                </div>
-                            </div>
-                            <div class="swiper-slide" data-slide="game">
-                                <img src="{{ url_for('static', filename='images/game.png') }}" />
-                                <div class="slide-overlay">
-                                    <h2>Управление игрой</h2>
-                                </div>
-                            </div>
-                            <div class="swiper-slide" data-slide="mods">
-                                <img src="{{ url_for('static', filename='images/mods.png') }}" />
-                                <div class="slide-overlay">
-                                    <h2>Управление модами</h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-pagination"></div>
-                    </div>
-                </div>
-
-                <!-- Динамический контент -->
-                <div class="content-placeholder" id="dynamicContent">
-                    <h1>Управление сервером</h1>
-                    <p>Здесь будет панель управления сервером DayZ</p>
-                </div>
-            </div>
-
-            <div class="right-content">
-                <div class="right-placeholder" id="rightPanel">
-                    <h1>Информация</h1>
-                    <p>Выберите раздел</p>
-                </div>
-
-                <!-- Музыкальный плеер -->
-                <div class="music-player">
-                    <div class="album-cover">
-                        <img id="rotatingImage" alt="" />
-                        <span class="point"></span>
-                    </div>
-
-                    <h2>Player Title</h2>
-                    <p>Artist Name</p>
-
-                    <input type="range" value="0" id="progress" max="100" />
-
-                    <div class="controls">
-                        <button class="backward">
-                            <i class="fa-solid fa-backward"></i>
-                        </button>
-                        <button class="play-pause-btn">
-                            <i class="fa-solid fa-play" id="controlIcon"></i>
-                        </button>
-                        <button class="forward">
-                            <i class="fa-solid fa-forward"></i>
-                        </button>
-                    </div>
-                </div>
+                <!-- Здесь будет контент -->
             </div>
         </section>
 
@@ -136,11 +61,7 @@
         {% include 'settings.html' %}
     </main>
 
-    <!-- Swiper JS -->
-    <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
-    <!-- Основной JS -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <!-- Настройки -->
     <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 </body>
 </html>
