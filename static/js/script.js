@@ -14,6 +14,29 @@ let isFirstClick = true;
 // Массив пунктов меню в порядке сверху вниз
 const menuOrder = ['server', 'game', 'mods', 'settings'];
 
+// Получить HTML стартовой страницы
+function getStartPageHTML() {
+    return `
+        <div id="startPage" class="start-page">
+            <div class="start-content">
+                <div class="start-logo">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </div>
+                <h1>DayZ Менеджер</h1>
+                <p>Выберите раздел в меню слева</p>
+                <div class="start-hint">
+                    <span class="hint-dot"></span>
+                    <span class="hint-dot"></span>
+                    <span class="hint-dot"></span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Определить направление анимации
 function getAnimationDirection(targetPage) {
     if (!currentPage) {
@@ -42,7 +65,6 @@ function switchContent(newHtml, page, direction, isFirst) {
     
     // Если это первый клик - стартовая страница уезжает
     if (isFirst) {
-        // Стартовая страница уезжает вверх
         contentArea.classList.add('slide-up');
         
         setTimeout(() => {
@@ -71,13 +93,8 @@ function switchContent(newHtml, page, direction, isFirst) {
     contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
     
     setTimeout(() => {
-        // Меняем контент
         contentArea.innerHTML = newHtml;
-        
-        // Убираем класс анимации ухода
         contentArea.classList.remove('slide-up', 'slide-down');
-        
-        // Добавляем класс появления (с противоположной стороны)
         contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
         
         setTimeout(() => {
@@ -87,16 +104,52 @@ function switchContent(newHtml, page, direction, isFirst) {
     }, 300);
 }
 
+// Показать стартовую страницу
+function showStartPage(direction = 'in') {
+    // Убираем активный класс у всех пунктов меню
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Сбрасываем цвета у всех иконок
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        const icon = link.querySelector('.nav-icon');
+        const text = link.querySelector('.nav-text');
+        if (icon) icon.style.color = '';
+        if (text) text.style.color = '';
+    });
+    
+    // Получаем HTML стартовой страницы
+    const html = getStartPageHTML();
+    
+    // Переключаем контент
+    switchContent(html, 'start', direction, false);
+    
+    // Обновляем текущую страницу
+    currentPage = null;
+}
+
 // Показать контент
 function showContent(page) {
+    // Получаем элемент, по которому кликнули
+    const clickedItem = event.target.closest('.nav-item');
+    if (!clickedItem) return;
+    
+    // Проверяем - если этот пункт уже активен, закрываем его
+    if (clickedItem.classList.contains('active')) {
+        // Показываем стартовую страницу
+        const direction = currentPage ? getAnimationDirection('start') : 'in';
+        showStartPage(direction);
+        return;
+    }
+    
     // Убираем активный класс у всех пунктов
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
     
     // Добавляем активный класс нажатому пункту
-    const clickedItem = event.target.closest('.nav-item');
-    if (clickedItem) {
-        clickedItem.classList.add('active');
-    }
+    clickedItem.classList.add('active');
     
     // Определяем направление анимации
     const direction = getAnimationDirection(page);
@@ -126,14 +179,24 @@ function showContent(page) {
 
 // Показать настройки
 function showSettings() {
+    // Получаем элемент, по которому кликнули
+    const clickedItem = event.target.closest('.nav-item');
+    if (!clickedItem) return;
+    
+    // Проверяем - если настройки уже активны, закрываем их
+    if (clickedItem.classList.contains('active')) {
+        const direction = currentPage ? getAnimationDirection('start') : 'in';
+        showStartPage(direction);
+        return;
+    }
+    
     // Убираем активный класс у всех пунктов
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
     
     // Добавляем активный класс настройкам
-    const clickedItem = event.target.closest('.nav-item');
-    if (clickedItem) {
-        clickedItem.classList.add('active');
-    }
+    clickedItem.classList.add('active');
     
     // Определяем направление анимации
     const direction = getAnimationDirection('settings');
@@ -225,7 +288,6 @@ function showSettings() {
     contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
     
     setTimeout(() => {
-        // Загружаем настройки
         fetch('/settings-content')
             .then(response => response.text())
             .then(html => {
