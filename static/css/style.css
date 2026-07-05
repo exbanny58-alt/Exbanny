@@ -1810,3 +1810,444 @@ main {
         font-size: 0.35rem;
     }
 }
+
+/* ============================================
+   СТРАНИЦА СЕРВЕРА
+   ============================================ */
+.server-content-wrapper {
+    max-width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 8px;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.server-content-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.server-content-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.server-content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.4);
+    border-radius: 10px;
+}
+
+.server-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.server-header h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.server-subtitle {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
+/* Статистика */
+.server-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+/* Панель управления */
+.server-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.server-filter {
+    margin-left: auto;
+}
+
+.server-search {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.3s ease;
+}
+
+.server-search:focus {
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.server-search::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Список серверных модов */
+.server-mods-list-container {
+    min-height: 200px;
+}
+
+.server-mod-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.server-mod-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.server-mod-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.server-mod-name {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.server-mod-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.server-mod-details span {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.server-mod-version {
+    color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.server-mod-type {
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.server-mod-type.workshop {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa !important;
+}
+
+.server-mod-type.custom {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24 !important;
+}
+
+.server-mod-type.unknown {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.server-mod-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .server-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .server-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .server-filter {
+        margin-left: 0;
+    }
+    
+    .server-search {
+        width: 100%;
+    }
+    
+    .server-mod-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .server-mod-actions {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 480px) {
+    .server-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Кнопка подключения мода */
+.btn-connect-mod {
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+    color: rgba(74, 222, 128, 0.6);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-family: "Nunito", sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.btn-connect-mod:hover {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    transform: translateY(-1px);
+}
+
+.btn-connect-mod:active {
+    transform: translateY(0px);
+}
+
+.btn-connect-mod svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ============================================
+   СТРАНИЦА ИГРЫ
+   ============================================ */
+.game-content-wrapper {
+    max-width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 8px;
+    padding-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.game-content-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.game-content-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.game-content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.4);
+    border-radius: 10px;
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.game-header h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.game-subtitle {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.95rem;
+    margin-top: 4px;
+}
+
+/* Панель управления */
+.game-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.game-filter {
+    margin-left: auto;
+}
+
+.game-search {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    width: 200px;
+    transition: border-color 0.3s ease;
+}
+
+.game-search:focus {
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.game-search::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Список клиентских модов */
+.game-mods-list-container {
+    min-height: 200px;
+}
+
+.game-mod-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px 18px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.game-mod-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.game-mod-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.game-mod-name {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.game-mod-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.game-mod-details span {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.game-mod-version {
+    color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.game-mod-type {
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.game-mod-type.workshop {
+    background: rgba(96, 165, 250, 0.15);
+    color: #60a5fa !important;
+}
+
+.game-mod-type.custom {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24 !important;
+}
+
+.game-mod-type.unknown {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.game-mod-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .game-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .game-filter {
+        margin-left: 0;
+    }
+    
+    .game-search {
+        width: 100%;
+    }
+    
+    .game-mod-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .game-mod-actions {
+        justify-content: flex-end;
+    }
+}

@@ -1,18 +1,18 @@
 {
   "custom_[M.W.P] Modular Weapon Pack": {
     "client": false,
-    "server_mod": false,
+    "server_mod": true,
     "server": false
   },
   "custom_Alcohol Production": {
     "server": false,
-    "server_mod": false,
-    "client": false
+    "server_mod": true,
+    "client": true
   },
   "custom_AR15": {
     "server": false,
     "server_mod": false,
-    "client": false
+    "client": true
   },
   "custom_Auto Stack - Proper": {
     "server": false,

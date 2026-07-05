@@ -4,8 +4,100 @@
 
 // Контент для разных разделов
 const pages = {
-    server: '<h1>Управление сервером</h1><p>Здесь будет панель управления сервером DayZ</p>',
-    game: '<h1>Управление игрой</h1><p>Здесь будут настройки игры</p>',
+    server: `
+        <div class="server-content-wrapper">
+            <div class="server-header">
+                <h1>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    Управление сервером
+                </h1>
+                <p class="server-subtitle">Список модов, отмеченных как "СерверМод"</p>
+            </div>
+
+            <!-- ❌ УДАЛЯЕМ ВЕСЬ БЛОК server-stats -->
+            <!--
+            <div class="server-stats" id="serverStats">
+                <div class="stat-card">
+                    <span class="stat-number" id="serverModsCount">0</span>
+                    <span class="stat-label">Серверных модов</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="serverWorkshopCount">0</span>
+                    <span class="stat-label">Из Workshop</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="serverCustomCount">0</span>
+                    <span class="stat-label">Кастомных</span>
+                </div>
+            </div>
+            -->
+
+            <!-- Панель управления -->
+            <div class="server-toolbar">
+                <button class="btn btn-primary" id="refreshServerModsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23,4 23,10 17,10"/>
+                        <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                        <polyline points="1,20 1,14 7,14"/>
+                        <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                    </svg>
+                    Обновить список
+                </button>
+                <div class="server-filter">
+                    <input type="text" id="serverModsSearchInput" placeholder="🔍 Поиск модов..." class="server-search">
+                </div>
+            </div>
+
+            <!-- Список серверных модов -->
+            <div class="server-mods-list-container" id="serverModsContainer">
+                <div class="loading-mods">
+                    <span class="spinner"></span>
+                    Загрузка серверных модов...
+                </div>
+            </div>
+        </div>
+    `,
+    game: `
+        <div class="game-content-wrapper">
+            <div class="game-header">
+                <h1>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="5,3 19,12 5,21"/>
+                    </svg>
+                    Управление игрой
+                </h1>
+                <p class="game-subtitle">Список модов, отмеченных как "КлиентМод"</p>
+            </div>
+
+            <!-- Панель управления -->
+            <div class="game-toolbar">
+                <button class="btn btn-primary" id="refreshGameModsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23,4 23,10 17,10"/>
+                        <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                        <polyline points="1,20 1,14 7,14"/>
+                        <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                    </svg>
+                    Обновить список
+                </button>
+                <div class="game-filter">
+                    <input type="text" id="gameModsSearchInput" placeholder="🔍 Поиск модов..." class="game-search">
+                </div>
+            </div>
+
+            <!-- Список клиентских модов -->
+            <div class="game-mods-list-container" id="gameModsContainer">
+                <div class="loading-mods">
+                    <span class="spinner"></span>
+                    Загрузка клиентских модов...
+                </div>
+            </div>
+        </div>
+    `,
     mods: `
         <div id="modsPageContent" style="height: 100%;">
             <div class="mods-content-wrapper" style="height: 100%; overflow-y: auto; padding-right: 8px; padding-bottom: 20px; box-sizing: border-box;">
@@ -175,6 +267,9 @@ function switchContent(newHtml, page, direction, isFirst) {
 
 // Инициализация страницы после загрузки
 function initPageAfterLoad(page) {
+    // ============================================
+    // СТРАНИЦА МОДОВ
+    // ============================================
     if (page === 'mods') {
         let attempts = 0;
         const maxAttempts = 10;
@@ -198,6 +293,98 @@ function initPageAfterLoad(page) {
         }
         
         setTimeout(tryInitMods, 100);
+    }
+    
+    // ============================================
+    // СТРАНИЦА СЕРВЕРА
+    // ============================================
+    if (page === 'server') {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function tryInitServer() {
+            attempts++;
+            const container = document.getElementById('serverModsContainer');
+            
+            if (container) {
+                // Инициализируем страницу сервера
+                if (typeof initServerPage === 'function') {
+                    initServerPage();
+                }
+                
+                // Настраиваем поиск
+                if (typeof setupServerModsSearch === 'function') {
+                    setupServerModsSearch();
+                }
+                
+                // Обработчик кнопки обновления
+                const refreshBtn = document.getElementById('refreshServerModsBtn');
+                if (refreshBtn) {
+                    // Удаляем старые обработчики, чтобы не дублировать
+                    const newRefreshBtn = refreshBtn.cloneNode(true);
+                    refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
+                    
+                    newRefreshBtn.addEventListener('click', () => {
+                        if (typeof refreshServerMods === 'function') {
+                            refreshServerMods();
+                        }
+                    });
+                }
+                return;
+            }
+            
+            if (attempts < maxAttempts) {
+                setTimeout(tryInitServer, 200);
+            } else {
+                console.warn('Не удалось найти serverModsContainer после ' + maxAttempts + ' попыток');
+            }
+        }
+        
+        setTimeout(tryInitServer, 100);
+    }
+
+    // ============================================
+    // СТРАНИЦА КЛИЕНТА
+    // ============================================   
+    if (page === 'game') {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function tryInitGame() {
+            attempts++;
+            const container = document.getElementById('gameModsContainer');
+            
+            if (container) {
+                if (typeof initGamePage === 'function') {
+                    initGamePage();
+                }
+                
+                if (typeof setupGameModsSearch === 'function') {
+                    setupGameModsSearch();
+                }
+                
+                const refreshBtn = document.getElementById('refreshGameModsBtn');
+                if (refreshBtn) {
+                    const newRefreshBtn = refreshBtn.cloneNode(true);
+                    refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
+                    
+                    newRefreshBtn.addEventListener('click', () => {
+                        if (typeof loadClientMods === 'function') {
+                            loadClientMods();
+                        }
+                    });
+                }
+                return;
+            }
+            
+            if (attempts < maxAttempts) {
+                setTimeout(tryInitGame, 200);
+            } else {
+                console.warn('Не удалось найти gameModsContainer после ' + maxAttempts + ' попыток');
+            }
+        }
+        
+        setTimeout(tryInitGame, 100);
     }
 }
 
