@@ -346,6 +346,7 @@ function initPageAfterLoad(page) {
     // ============================================
     // СТРАНИЦА КЛИЕНТА
     // ============================================   
+    // В функции initPageAfterLoad - для страницы game:
     if (page === 'game') {
         let attempts = 0;
         const maxAttempts = 10;
@@ -369,8 +370,8 @@ function initPageAfterLoad(page) {
                     refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
                     
                     newRefreshBtn.addEventListener('click', () => {
-                        if (typeof loadClientMods === 'function') {
-                            loadClientMods();
+                        if (typeof refreshGameMods === 'function') {
+                            refreshGameMods();
                         }
                     });
                 }

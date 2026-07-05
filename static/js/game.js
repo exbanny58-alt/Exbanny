@@ -3,13 +3,89 @@
 // ============================================
 
 let clientModsList = [];
+let gameLinks = {};
+let isGamePageVisible = true;
+let gameRefreshInterval = null;
 
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ ИГРЫ
 // ============================================
 async function initGamePage() {
     console.log('🎮 Инициализация страницы игры');
+    await loadGameLinks();
     await loadClientMods();
+    startGameAutoRefresh();
+}
+
+// ============================================
+// АВТОМАТИЧЕСКОЕ ОБНОВЛЕНИЕ
+// ============================================
+function startGameAutoRefresh() {
+    if (gameRefreshInterval) {
+        clearInterval(gameRefreshInterval);
+        gameRefreshInterval = null;
+    }
+    
+    gameRefreshInterval = setInterval(async () => {
+        if (isGamePageVisible) {
+            await refreshGameData();
+        }
+    }, 10000);
+    
+    console.log('🔄 Автообновление игры запущено (каждые 10 сек)');
+}
+
+function stopGameAutoRefresh() {
+    if (gameRefreshInterval) {
+        clearInterval(gameRefreshInterval);
+        gameRefreshInterval = null;
+        console.log('🔄 Автообновление игры остановлено');
+    }
+}
+
+// Отслеживаем видимость страницы
+document.addEventListener('visibilitychange', () => {
+    isGamePageVisible = !document.hidden;
+});
+
+async function refreshGameData() {
+    try {
+        await loadGameLinks();
+        let updated = false;
+        clientModsList.forEach(mod => {
+            const newState = gameLinks[mod.id] === true;
+            if (mod.is_connected !== newState) {
+                mod.is_connected = newState;
+                updated = true;
+            }
+        });
+        
+        if (updated) {
+            console.log('🔄 Обнаружены изменения в игре, обновляем список');
+            renderClientMods(clientModsList);
+        }
+    } catch (e) {
+        console.warn('⚠️ Ошибка автообновления игры:', e);
+    }
+}
+
+// ============================================
+// ЗАГРУЗКА ПОДКЛЮЧЕННЫХ МОДОВ ИГРЫ
+// ============================================
+async function loadGameLinks() {
+    try {
+        const response = await fetch('/api/game/links');
+        const data = await response.json();
+        if (data.success) {
+            gameLinks = data.links || {};
+            console.log(`🔗 Загружено ${Object.keys(gameLinks).length} подключенных модов игры`);
+            return true;
+        }
+        return false;
+    } catch (e) {
+        console.warn('⚠️ Не удалось загрузить список подключений игры:', e);
+        return false;
+    }
 }
 
 // ============================================
@@ -23,11 +99,9 @@ async function loadClientMods() {
     }
 
     try {
-        // Сначала загружаем КЕШ модов (чтобы получить полную информацию)
         let modsList = [];
         let modsConfig = {};
         
-        // Пробуем загрузить кеш
         try {
             const cacheResponse = await fetch('/api/mods/cache');
             const cacheData = await cacheResponse.json();
@@ -38,7 +112,6 @@ async function loadClientMods() {
             console.warn('⚠️ Не удалось загрузить кеш модов:', e);
         }
 
-        // Загружаем конфиг модов
         const response = await fetch('/api/mods/config');
         const data = await response.json();
         
@@ -53,11 +126,9 @@ async function loadClientMods() {
 
         modsConfig = data.config;
         
-        // Фильтруем моды с client: true
         const clientMods = [];
         for (const [modId, attrs] of Object.entries(modsConfig)) {
             if (attrs.client === true) {
-                // Ищем мод в списке из кеша
                 const modInfo = modsList.find(m => m.id === modId);
                 
                 if (modInfo) {
@@ -67,17 +138,18 @@ async function loadClientMods() {
                         folder: modInfo.folder || modId,
                         path: modInfo.path || '',
                         version: modInfo.version || 'Неизвестно',
-                        type: modInfo.type || 'unknown'
+                        type: modInfo.type || 'unknown',
+                        is_connected: gameLinks[modId] === true
                     });
                 } else {
-                    // Если мод не найден в кеше, но есть в конфиге
                     clientMods.push({
                         id: modId,
                         name: modId,
                         folder: modId,
                         path: '',
                         version: 'Неизвестно',
-                        type: 'unknown'
+                        type: 'unknown',
+                        is_connected: gameLinks[modId] === true
                     });
                 }
             }
@@ -128,6 +200,7 @@ function renderClientMods(mods) {
     let html = '';
     filtered.forEach(mod => {
         const escapedPath = mod.path.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const isConnected = mod.is_connected || false;
         
         html += `
             <div class="game-mod-item" data-mod-id="${mod.id}">
@@ -135,6 +208,7 @@ function renderClientMods(mods) {
                     <div class="game-mod-name">
                         ${mod.name}
                         ${mod.type === 'workshop' ? '🛠️' : mod.type === 'custom' ? '📁' : '❓'}
+                        ${isConnected ? '<span class="mod-connected-badge">🔗 Подключен</span>' : ''}
                     </div>
                     <div class="game-mod-details">
                         <span class="game-mod-folder">${mod.folder}</span>
@@ -143,12 +217,16 @@ function renderClientMods(mods) {
                     </div>
                 </div>
                 <div class="game-mod-actions">
-                    <button class="btn btn-connect-mod" onclick="connectClientMod('${mod.id}')" title="Подключить мод к игре">
+                    <button class="btn btn-connect-mod ${isConnected ? 'connected' : ''}" 
+                            onclick="toggleGameModConnection('${mod.id}')" 
+                            title="${isConnected ? 'Отключить мод от игры' : 'Подключить мод к игре'}">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 5v14"/>
-                            <path d="M5 12h14"/>
+                            ${isConnected ? 
+                                '<path d="M18 6L6 18"/><path d="M6 6l12 12"/>' :
+                                '<path d="M12 5v14"/><path d="M5 12h14"/>'
+                            }
                         </svg>
-                        Подключить
+                        ${isConnected ? 'Отключить' : 'Подключить'}
                     </button>
                     
                     <button class="btn-mod-folder" onclick="openModFolder('${escapedPath}')" title="Открыть папку мода" ${!mod.path ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>
@@ -162,6 +240,124 @@ function renderClientMods(mods) {
     });
 
     container.innerHTML = html;
+}
+
+// ============================================
+// ПОДКЛЮЧЕНИЕ/ОТКЛЮЧЕНИЕ МОДА К ИГРЕ
+// ============================================
+async function toggleGameModConnection(modId) {
+    console.log(`🎮 Переключение подключения мода к игре: ${modId}`);
+    
+    const mod = clientModsList.find(m => m.id === modId);
+    if (!mod) {
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Мод не найден');
+        }
+        return;
+    }
+
+    if (!mod.path) {
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Путь к моду не найден');
+        }
+        return;
+    }
+
+    try {
+        const settingsResponse = await fetch('/api/settings');
+        const settings = await settingsResponse.json();
+        
+        if (!settings.game_exe || !settings.game_exe.trim()) {
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Сначала укажите путь к игре в настройках');
+            }
+            return;
+        }
+
+        const gameDir = getGameDirectory(settings.game_exe);
+        if (!gameDir) {
+            if (typeof notifications !== 'undefined') {
+                notifications.error('Не удалось определить папку игры');
+            }
+            return;
+        }
+
+        const isConnected = gameLinks[modId] === true;
+        
+        const btn = document.querySelector(`.game-mod-item[data-mod-id="${modId}"] .btn-connect-mod`);
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ ...';
+        }
+
+        if (isConnected) {
+            const response = await fetch(`/api/game/mods/${modId}/disconnect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                delete gameLinks[modId];
+                mod.is_connected = false;
+                if (typeof notifications !== 'undefined') {
+                    notifications.success(`Мод "${mod.name}" отключён от игры`);
+                }
+            } else {
+                if (typeof notifications !== 'undefined') {
+                    notifications.error(data.message || 'Ошибка');
+                }
+            }
+        } else {
+            const response = await fetch(`/api/game/mods/${modId}/connect`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    mod_path: mod.path,
+                    mod_name: mod.name,
+                    mod_folder: mod.folder,
+                    game_dir: gameDir
+                })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                gameLinks[modId] = true;
+                mod.is_connected = true;
+                if (typeof notifications !== 'undefined') {
+                    notifications.success(`Мод "${mod.name}" подключён к игре`);
+                }
+            } else {
+                if (typeof notifications !== 'undefined') {
+                    notifications.error(data.message || 'Ошибка');
+                }
+            }
+        }
+        
+        renderClientMods(clientModsList);
+        
+    } catch (e) {
+        console.error('❌ Ошибка:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+        renderClientMods(clientModsList);
+    }
+}
+
+// ============================================
+// ПОЛУЧИТЬ ПАПКУ ИГРЫ ИЗ ПУТИ К EXE
+// ============================================
+function getGameDirectory(exePath) {
+    if (!exePath) return null;
+    const normalized = exePath.replace(/\\/g, '/');
+    const lastSlash = normalized.lastIndexOf('/');
+    if (lastSlash === -1) return null;
+    return normalized.substring(0, lastSlash);
 }
 
 // ============================================
@@ -180,22 +376,34 @@ function setupGameModsSearch() {
 }
 
 // ============================================
-// ПОДКЛЮЧЕНИЕ МОДА К ИГРЕ (ЗАГЛУШКА)
+// ОБНОВЛЕНИЕ СПИСКА (кнопка)
 // ============================================
-function connectClientMod(modId) {
-    console.log(`🎮 Подключение клиентского мода: ${modId}`);
-    
-    const mod = clientModsList.find(m => m.id === modId);
-    if (mod) {
-        console.log(`📦 Мод: ${mod.name} (${mod.folder})`);
-        console.log(`📂 Путь: ${mod.path}`);
+async function refreshGameMods() {
+    const btn = document.getElementById('refreshGameModsBtn');
+    if (btn) {
+        btn.classList.add('loading');
+        btn.disabled = true;
     }
     
-    // TODO: Здесь будет логика подключения мода к игре
+    await loadGameLinks();
+    await loadClientMods();
+    
+    if (btn) {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
     
     if (typeof notifications !== 'undefined') {
-        notifications.info(`Подключение мода к игре: ${mod?.name || modId} (заглушка)`);
+        notifications.success('Список клиентских модов обновлён');
     }
+}
+
+// ============================================
+// ОСТАНОВКА АВТООБНОВЛЕНИЯ
+// ============================================
+function destroyGamePage() {
+    stopGameAutoRefresh();
+    console.log('🎮 Страница игры уничтожена');
 }
 
 // ============================================
@@ -205,6 +413,11 @@ window.initGamePage = initGamePage;
 window.loadClientMods = loadClientMods;
 window.renderClientMods = renderClientMods;
 window.setupGameModsSearch = setupGameModsSearch;
-window.connectClientMod = connectClientMod;
+window.toggleGameModConnection = toggleGameModConnection;
+window.refreshGameMods = refreshGameMods;
+window.loadGameLinks = loadGameLinks;
+window.destroyGamePage = destroyGamePage;
+window.startGameAutoRefresh = startGameAutoRefresh;
+window.stopGameAutoRefresh = stopGameAutoRefresh;
 
 console.log('🎮 game.js загружен');

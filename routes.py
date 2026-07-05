@@ -585,3 +585,179 @@ def register_routes(app):
             return jsonify({'success': True, 'state': state})
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+        
+        # ============================================
+    # API ДЛЯ УПРАВЛЕНИЯ ССЫЛКАМИ МОДОВ
+    # ============================================
+    
+    @app.route('/api/server/links', methods=['GET'])
+    def get_server_links():
+        """Получить список подключённых модов"""
+        try:
+            from server_links import load_server_links
+            links = load_server_links()
+            # Возвращаем только ID модов для простоты
+            connected = {mod_id: True for mod_id in links.keys()}
+            return jsonify({
+                'success': True,
+                'links': connected,
+                'details': links
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/links/check', methods=['GET'])
+    def check_server_links():
+        """Проверить целостность ссылок и восстановить битые"""
+        try:
+            from server_links import check_links_integrity, repair_links
+            import threading
+            
+            # Проверяем в фоновом потоке
+            def check_and_repair():
+                try:
+                    # Проверяем целостность (автоматически удаляет битые)
+                    check_links_integrity()
+                except Exception as e:
+                    print(f'❌ Ошибка проверки ссылок: {e}')
+            
+            thread = threading.Thread(target=check_and_repair)
+            thread.start()
+            
+            # Загружаем актуальное состояние
+            from server_links import load_server_links
+            links = load_server_links()
+            
+            return jsonify({
+                'success': True,
+                'links': {mod_id: True for mod_id in links.keys()},
+                'details': links,
+                'message': 'Проверка выполнена'
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/mods/<mod_id>/connect', methods=['POST'])
+    def connect_mod(mod_id):
+        """Подключить мод к серверу"""
+        try:
+            data = request.get_json()
+            mod_path = data.get('mod_path')
+            mod_name = data.get('mod_name')
+            mod_folder = data.get('mod_folder')
+            server_dir = data.get('server_dir')
+            
+            if not mod_path:
+                return jsonify({'success': False, 'message': 'Путь к моду не указан'}), 400
+            if not server_dir:
+                return jsonify({'success': False, 'message': 'Путь к серверу не указан'}), 400
+            
+            from server_links import connect_mod_to_server
+            result = connect_mod_to_server(mod_id, mod_path, mod_name, mod_folder, server_dir)
+            return jsonify(result)
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/mods/<mod_id>/disconnect', methods=['POST'])
+    def disconnect_mod(mod_id):
+        """Отключить мод от сервера"""
+        try:
+            from server_links import disconnect_mod_from_server
+            result = disconnect_mod_from_server(mod_id)
+            return jsonify(result)
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/mods/check', methods=['GET'])
+    def check_mod_links():
+        """Проверить целостность ссылок"""
+        try:
+            from server_links import check_links_integrity
+            broken = check_links_integrity()
+            return jsonify({
+                'success': True,
+                'broken': broken,
+                'count': len(broken)
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+        
+    @app.route('/api/server/keys/rebuild', methods=['POST'])
+    def rebuild_keys():
+        """Пересобрать ключи для всех подключённых модов"""
+        try:
+            settings = load_settings()
+            server_exe = settings.get('server_exe', '')
+            
+            if not server_exe:
+                return jsonify({'success': False, 'message': 'Путь к серверу не указан'}), 400
+            
+            server_dir = os.path.dirname(server_exe)
+            if not os.path.exists(server_dir):
+                return jsonify({'success': False, 'message': f'Папка сервера не найдена: {server_dir}'}), 400
+            
+            from server_links import get_connected_mods_list, rebuild_all_keys
+            connected = get_connected_mods_list(settings)
+            rebuild_all_keys(server_dir, connected)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Ключи пересобраны, подключено модов: {len(connected)}'
+            })
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+        
+    # ============================================
+    # API ДЛЯ УПРАВЛЕНИЯ ССЫЛКАМИ МОДОВ ИГРЫ
+    # ============================================
+
+    @app.route('/api/game/links', methods=['GET'])
+    def get_game_links():
+        """Получить список подключённых модов игры"""
+        try:
+            from game_links import load_game_links
+            links = load_game_links()
+            connected = {mod_id: True for mod_id in links.keys()}
+            return jsonify({
+                'success': True,
+                'links': connected,
+                'details': links
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/game/mods/<mod_id>/connect', methods=['POST'])
+    def connect_game_mod(mod_id):
+        """Подключить мод к игре"""
+        try:
+            data = request.get_json()
+            mod_path = data.get('mod_path')
+            mod_name = data.get('mod_name')
+            mod_folder = data.get('mod_folder')
+            game_dir = data.get('game_dir')
+            
+            if not mod_path:
+                return jsonify({'success': False, 'message': 'Путь к моду не указан'}), 400
+            if not game_dir:
+                return jsonify({'success': False, 'message': 'Путь к игре не указан'}), 400
+            
+            from game_links import connect_game_mod
+            result = connect_game_mod(mod_id, mod_path, mod_name, mod_folder, game_dir)
+            return jsonify(result)
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/game/mods/<mod_id>/disconnect', methods=['POST'])
+    def disconnect_game_mod(mod_id):
+        """Отключить мод от игры"""
+        try:
+            from game_links import disconnect_game_mod
+            result = disconnect_game_mod(mod_id)
+            return jsonify(result)
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500

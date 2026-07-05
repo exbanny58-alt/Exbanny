@@ -2520,3 +2520,76 @@ main {
         height: 24px;
     }
 }
+
+/* ============================================
+   СТАТУС ПОДКЛЮЧЕНИЯ МОДА
+   ============================================ */
+
+.mod-connected-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    margin-left: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.btn-connect-mod {
+    background: rgba(74, 222, 128, 0.08);
+    border: 1px solid rgba(74, 222, 128, 0.15);
+    color: rgba(74, 222, 128, 0.6);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-family: "Nunito", sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.btn-connect-mod:hover {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: rgba(74, 222, 128, 0.3);
+    color: #4ade80;
+    transform: translateY(-1px);
+}
+
+.btn-connect-mod:active {
+    transform: translateY(0px);
+}
+
+.btn-connect-mod.connected {
+    background: rgba(248, 113, 113, 0.08);
+    border-color: rgba(248, 113, 113, 0.15);
+    color: rgba(248, 113, 113, 0.6);
+}
+
+.btn-connect-mod.connected:hover {
+    background: rgba(248, 113, 113, 0.15);
+    border-color: rgba(248, 113, 113, 0.3);
+    color: #f87171;
+}
+
+.btn-connect-mod:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-connect-mod svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+}

@@ -11,7 +11,7 @@
   },
   "custom_AR15": {
     "server": false,
-    "server_mod": false,
+    "server_mod": true,
     "client": true
   },
   "custom_Auto Stack - Proper": {
