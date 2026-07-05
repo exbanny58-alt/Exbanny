@@ -694,3 +694,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ КОНСОЛИ ПРИ СТАРТЕ
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Инициализируем консоль после загрузки страницы
+    setTimeout(() => {
+        if (typeof initConsole === 'function') {
+            initConsole();
+        }
+    }, 500);
+});
