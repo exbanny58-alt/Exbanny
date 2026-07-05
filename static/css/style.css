@@ -1614,3 +1614,199 @@ main {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ============================================
+   КНОПКИ ДЛЯ МОДОВ (вместо тумблеров)
+   ============================================ */
+
+.mod-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Базовый стиль кнопки мода */
+.mod-btn {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 4px 8px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: "Nunito", sans-serif;
+    font-weight: 600;
+    gap: 0px;
+    user-select: none;
+    line-height: 1;
+}
+
+.mod-btn .btn-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.25s ease;
+}
+
+.mod-btn .btn-status {
+    font-size: 0.45rem;
+    font-weight: 400;
+    opacity: 0.5;
+    transition: all 0.25s ease;
+    letter-spacing: 0.3px;
+}
+
+/* Серверная кнопка (жёлтая) */
+.mod-btn-server {
+    border-color: rgba(251, 191, 36, 0.15);
+    color: rgba(251, 191, 36, 0.4);
+}
+
+.mod-btn-server:hover {
+    background: rgba(251, 191, 36, 0.08);
+    border-color: rgba(251, 191, 36, 0.25);
+    transform: translateY(-1px);
+}
+
+.mod-btn-server.active {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.5);
+    color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.08);
+}
+
+.mod-btn-server.active .btn-status {
+    opacity: 1;
+    color: #fbbf24;
+}
+
+/* Мод сервера кнопка (синяя) */
+.mod-btn-server-mod {
+    border-color: rgba(96, 165, 250, 0.15);
+    color: rgba(96, 165, 250, 0.4);
+}
+
+.mod-btn-server-mod:hover {
+    background: rgba(96, 165, 250, 0.08);
+    border-color: rgba(96, 165, 250, 0.25);
+    transform: translateY(-1px);
+}
+
+.mod-btn-server-mod.active {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: rgba(96, 165, 250, 0.5);
+    color: #60a5fa;
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.08);
+}
+
+.mod-btn-server-mod.active .btn-status {
+    opacity: 1;
+    color: #60a5fa;
+}
+
+/* Клиентская кнопка (зелёная) */
+.mod-btn-client {
+    border-color: rgba(74, 222, 128, 0.15);
+    color: rgba(74, 222, 128, 0.4);
+}
+
+.mod-btn-client:hover {
+    background: rgba(74, 222, 128, 0.08);
+    border-color: rgba(74, 222, 128, 0.25);
+    transform: translateY(-1px);
+}
+
+.mod-btn-client.active {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: rgba(74, 222, 128, 0.5);
+    color: #4ade80;
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.08);
+}
+
+.mod-btn-client.active .btn-status {
+    opacity: 1;
+    color: #4ade80;
+}
+
+/* Легенда для кнопок (обновлённая) */
+.mods-legend {
+    display: flex;
+    gap: 16px;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.server {
+    background: #fbbf24;
+}
+
+.legend-dot.server-mod {
+    background: #60a5fa;
+}
+
+.legend-dot.client {
+    background: #4ade80;
+}
+
+/* Адаптив для кнопок */
+@media (max-width: 768px) {
+    .mod-btn {
+        min-width: 32px;
+        height: 32px;
+        padding: 3px 6px;
+    }
+    
+    .mod-btn .btn-label {
+        font-size: 0.65rem;
+    }
+    
+    .mod-btn .btn-status {
+        font-size: 0.4rem;
+    }
+    
+    .mod-actions {
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mod-btn {
+        min-width: 28px;
+        height: 28px;
+        padding: 2px 4px;
+        border-radius: 6px;
+    }
+    
+    .mod-btn .btn-label {
+        font-size: 0.55rem;
+    }
+    
+    .mod-btn .btn-status {
+        font-size: 0.35rem;
+    }
+}

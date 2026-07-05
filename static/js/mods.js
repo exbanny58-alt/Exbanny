@@ -1,5 +1,5 @@
 // ============================================
-// УПРАВЛЕНИЕ МОДАМИ (с тремя тумблерами)
+// УПРАВЛЕНИЕ МОДАМИ (с тремя кнопками вместо тумблеров)
 // ============================================
 
 let modsList = [];
@@ -196,7 +196,7 @@ async function scanMods(showLoading = true) {
 }
 
 // ============================================
-// ОТРИСОВКА СПИСКА МОДОВ
+// ОТРИСОВКА СПИСКА МОДОВ (с кнопками)
 // ============================================
 function renderMods(mods) {
     const container = document.getElementById('modsListContainer');
@@ -231,9 +231,10 @@ function renderMods(mods) {
     filtered.forEach(mod => {
         const escapedPath = mod.path.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         
-        const serverChecked = mod.server ? 'checked' : '';
-        const serverModChecked = mod.server_mod ? 'checked' : '';
-        const clientChecked = mod.client ? 'checked' : '';
+        // Определяем классы для кнопок
+        const serverActive = mod.server ? 'active' : '';
+        const serverModActive = mod.server_mod ? 'active' : '';
+        const clientActive = mod.client ? 'active' : '';
         
         html += `
             <div class="mod-item" data-mod-id="${mod.id}">
@@ -250,32 +251,26 @@ function renderMods(mods) {
                     </div>
                 </div>
                 <div class="mod-actions">
-                    <div class="toggle-wrapper" title="Серверный мод">
-                        <label class="mod-toggle mod-toggle-server">
-                            <input type="checkbox" ${serverChecked} 
-                                   onchange="toggleModAttr('${mod.id}', 'server', this.checked)">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span class="toggle-label server">S</span>
-                    </div>
+                    <button class="mod-btn mod-btn-server ${serverActive}" 
+                            onclick="toggleModAttr('${mod.id}', 'server', !this.classList.contains('active'))"
+                            title="Серверный мод">
+                        <span class="btn-label">Серверный</span>
+                        <span class="btn-status">${mod.server ? 'Вкл' : 'Выкл'}</span>
+                    </button>
                     
-                    <div class="toggle-wrapper" title="Мод для сервера">
-                        <label class="mod-toggle mod-toggle-server-mod">
-                            <input type="checkbox" ${serverModChecked} 
-                                   onchange="toggleModAttr('${mod.id}', 'server_mod', this.checked)">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span class="toggle-label server-mod">M</span>
-                    </div>
+                    <button class="mod-btn mod-btn-server-mod ${serverModActive}" 
+                            onclick="toggleModAttr('${mod.id}', 'server_mod', !this.classList.contains('active'))"
+                            title="Мод для сервера">
+                        <span class="btn-label">СерверМод</span>
+                        <span class="btn-status">${mod.server_mod ? 'Вкл' : 'Выкл'}</span>
+                    </button>
                     
-                    <div class="toggle-wrapper" title="Клиентский мод">
-                        <label class="mod-toggle mod-toggle-client">
-                            <input type="checkbox" ${clientChecked} 
-                                   onchange="toggleModAttr('${mod.id}', 'client', this.checked)">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span class="toggle-label client">C</span>
-                    </div>
+                    <button class="mod-btn mod-btn-client ${clientActive}" 
+                            onclick="toggleModAttr('${mod.id}', 'client', !this.classList.contains('active'))"
+                            title="Клиентский мод">
+                        <span class="btn-label">КлиентМод</span>
+                        <span class="btn-status">${mod.client ? 'Вкл' : 'Выкл'}</span>
+                    </button>
                     
                     <button class="btn-mod-folder" onclick="openModFolder('${escapedPath}')" title="Открыть папку мода">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -306,7 +301,7 @@ function updateStats(stats) {
 }
 
 // ============================================
-// ПЕРЕКЛЮЧЕНИЕ АТРИБУТА МОДА
+// ПЕРЕКЛЮЧЕНИЕ АТРИБУТА МОДА (с кнопками)
 // ============================================
 async function toggleModAttr(modId, attr, value) {
     console.log(`🔄 toggleModAttr: ${modId}, ${attr} = ${value}`);
@@ -333,6 +328,9 @@ async function toggleModAttr(modId, attr, value) {
                 mod[attr] = value;
             }
             
+            // Обновляем только эту кнопку, а не весь список
+            updateModButton(modId, attr, value);
+            
             const labels = {
                 'server': '🟡 Сервер',
                 'server_mod': '🔵 Мод сервера',
@@ -354,6 +352,48 @@ async function toggleModAttr(modId, attr, value) {
         if (typeof notifications !== 'undefined') {
             notifications.error('Ошибка: ' + e.message);
         }
+    }
+}
+
+// ============================================
+// ОБНОВЛЕНИЕ СОСТОЯНИЯ КНОПКИ (без перерисовки всего списка)
+// ============================================
+function updateModButton(modId, attr, value) {
+    const modItem = document.querySelector(`.mod-item[data-mod-id="${modId}"]`);
+    if (!modItem) return;
+    
+    let btnClass;
+    let label;
+    
+    switch(attr) {
+        case 'server':
+            btnClass = 'mod-btn-server';
+            label = 'S';
+            break;
+        case 'server_mod':
+            btnClass = 'mod-btn-server-mod';
+            label = 'M';
+            break;
+        case 'client':
+            btnClass = 'mod-btn-client';
+            label = 'C';
+            break;
+        default:
+            return;
+    }
+    
+    const btn = modItem.querySelector(`.${btnClass}`);
+    if (!btn) return;
+    
+    if (value) {
+        btn.classList.add('active');
+    } else {
+        btn.classList.remove('active');
+    }
+    
+    const statusSpan = btn.querySelector('.btn-status');
+    if (statusSpan) {
+        statusSpan.textContent = value ? 'Вкл' : 'Выкл';
     }
 }
 
@@ -509,6 +549,7 @@ async function initModsPage() {
 // ============================================
 window.initModsPage = initModsPage;
 window.toggleModAttr = toggleModAttr;
+window.updateModButton = updateModButton;
 window.openModFolder = openModFolder;
 window.scanMods = scanMods;
 window.loadModsConfig = loadModsConfig;
@@ -522,4 +563,5 @@ window.setupModsSearch = setupModsSearch;
 console.log('📦 mods.js загружен, функции экспортированы');
 console.log('  - initModsPage:', typeof window.initModsPage);
 console.log('  - toggleModAttr:', typeof window.toggleModAttr);
+console.log('  - updateModButton:', typeof window.updateModButton);
 console.log('  - openModFolder:', typeof window.openModFolder);
