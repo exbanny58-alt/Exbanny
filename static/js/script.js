@@ -61,6 +61,7 @@ const pages = {
             </div>
         </div>
     `,
+// В pages.game - добавляем кнопку
     game: `
         <div class="game-content-wrapper">
             <div class="game-header">
@@ -84,6 +85,16 @@ const pages = {
                     </svg>
                     Обновить список
                 </button>
+                
+                <!-- НОВАЯ КНОПКА -->
+                <button class="btn btn-game-connect-all" id="connectAllGameModsBtn" title="Подключить все моды, которые используются на сервере">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14"/>
+                        <path d="M5 12h14"/>
+                    </svg>
+                    Подключить все моды сервера
+                </button>
+                
                 <div class="game-filter">
                     <input type="text" id="gameModsSearchInput" placeholder="🔍 Поиск модов..." class="game-search">
                 </div>

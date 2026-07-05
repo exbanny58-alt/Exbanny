@@ -761,3 +761,25 @@ def register_routes(app):
             
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+        
+    @app.route('/api/mods/config/<mod_id>/client', methods=['POST'])
+    def set_mod_client(mod_id):
+        """Отметить мод как клиентский"""
+        try:
+            data = request.get_json()
+            value = data.get('value', True)
+            
+            from settings_manager import set_mod_state
+            result = set_mod_state(mod_id, 'client', value)
+            
+            if result:
+                return jsonify({
+                    'success': True,
+                    'mod_id': mod_id,
+                    'client': value,
+                    'message': f'Мод отмечен как {"клиентский" if value else "не клиентский"}'
+                })
+            else:
+                return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500

@@ -15,6 +15,13 @@ async function initGamePage() {
     await loadGameLinks();
     await loadClientMods();
     startGameAutoRefresh();
+    
+    const connectAllBtn = document.getElementById('connectAllGameModsBtn');
+    if (connectAllBtn) {
+        const newBtn = connectAllBtn.cloneNode(true);
+        connectAllBtn.parentNode.replaceChild(newBtn, connectAllBtn);
+        newBtn.addEventListener('click', connectAllServerMods);
+    }
 }
 
 // ============================================
@@ -43,7 +50,6 @@ function stopGameAutoRefresh() {
     }
 }
 
-// Отслеживаем видимость страницы
 document.addEventListener('visibilitychange', () => {
     isGamePageVisible = !document.hidden;
 });
@@ -51,19 +57,7 @@ document.addEventListener('visibilitychange', () => {
 async function refreshGameData() {
     try {
         await loadGameLinks();
-        let updated = false;
-        clientModsList.forEach(mod => {
-            const newState = gameLinks[mod.id] === true;
-            if (mod.is_connected !== newState) {
-                mod.is_connected = newState;
-                updated = true;
-            }
-        });
-        
-        if (updated) {
-            console.log('🔄 Обнаружены изменения в игре, обновляем список');
-            renderClientMods(clientModsList);
-        }
+        await loadClientMods();
     } catch (e) {
         console.warn('⚠️ Ошибка автообновления игры:', e);
     }
@@ -99,6 +93,8 @@ async function loadClientMods() {
     }
 
     try {
+        await loadGameLinks();
+        
         let modsList = [];
         let modsConfig = {};
         
@@ -128,8 +124,11 @@ async function loadClientMods() {
         
         const clientMods = [];
         for (const [modId, attrs] of Object.entries(modsConfig)) {
-            if (attrs.client === true) {
+            // Показываем ВСЕ моды, у которых client = true
+            // ИЛИ которые уже подключены к игре (gameLinks)
+            if (attrs.client === true || gameLinks[modId] === true) {
                 const modInfo = modsList.find(m => m.id === modId);
+                const isConnected = gameLinks[modId] === true;
                 
                 if (modInfo) {
                     clientMods.push({
@@ -139,7 +138,8 @@ async function loadClientMods() {
                         path: modInfo.path || '',
                         version: modInfo.version || 'Неизвестно',
                         type: modInfo.type || 'unknown',
-                        is_connected: gameLinks[modId] === true
+                        is_connected: isConnected,
+                        is_client: attrs.client === true
                     });
                 } else {
                     clientMods.push({
@@ -149,14 +149,16 @@ async function loadClientMods() {
                         path: '',
                         version: 'Неизвестно',
                         type: 'unknown',
-                        is_connected: gameLinks[modId] === true
+                        is_connected: isConnected,
+                        is_client: attrs.client === true
                     });
                 }
             }
         }
 
         clientModsList = clientMods;
-        renderClientMods(clientMods);
+        console.log(`📋 Загружено ${clientModsList.length} клиентских модов`);
+        renderClientMods(clientModsList);
 
     } catch (e) {
         console.error('❌ Ошибка загрузки клиентских модов:', e);
@@ -190,8 +192,8 @@ function renderClientMods(mods) {
         container.innerHTML = `
             <div class="empty-mods">
                 <p>📭 Клиентских модов не найдено</p>
-                ${mods.length === 0 ? '<p class="empty-hint">Отметьте моды как "КлиентМод" в разделе "Управление модами"</p>' : ''}
                 ${searchValue ? '<p class="empty-hint">Попробуйте изменить поиск</p>' : ''}
+                <p class="empty-hint">Нажмите "Подключить все моды сервера" чтобы автоматически добавить их</p>
             </div>
         `;
         return;
@@ -209,6 +211,7 @@ function renderClientMods(mods) {
                         ${mod.name}
                         ${mod.type === 'workshop' ? '🛠️' : mod.type === 'custom' ? '📁' : '❓'}
                         ${isConnected ? '<span class="mod-connected-badge">🔗 Подключен</span>' : ''}
+                        ${!mod.is_client && isConnected ? '<span class="mod-warning-badge">⚠️ Не отмечен как клиентский</span>' : ''}
                     </div>
                     <div class="game-mod-details">
                         <span class="game-mod-folder">${mod.folder}</span>
@@ -240,6 +243,246 @@ function renderClientMods(mods) {
     });
 
     container.innerHTML = html;
+}
+
+// ============================================
+// ПОДКЛЮЧИТЬ ВСЕ МОДЫ СЕРВЕРА
+// ============================================
+async function connectAllServerMods() {
+    console.log('🎮 Подключение всех модов сервера...');
+    
+    const btn = document.getElementById('connectAllGameModsBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.textContent = '⏳ Подключение...';
+    }
+
+    try {
+        const settingsResponse = await fetch('/api/settings');
+        const settings = await settingsResponse.json();
+        
+        if (!settings.game_exe || !settings.game_exe.trim()) {
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Сначала укажите путь к игре в настройках');
+            }
+            restoreButton(btn);
+            return;
+        }
+
+        const gameDir = getGameDirectory(settings.game_exe);
+        if (!gameDir) {
+            if (typeof notifications !== 'undefined') {
+                notifications.error('Не удалось определить папку игры');
+            }
+            restoreButton(btn);
+            return;
+        }
+
+        // Получаем конфиг модов
+        const modsConfigResponse = await fetch('/api/mods/config');
+        const modsConfigData = await modsConfigResponse.json();
+        
+        if (!modsConfigData.success) {
+            if (typeof notifications !== 'undefined') {
+                notifications.error('Ошибка загрузки конфига модов');
+            }
+            restoreButton(btn);
+            return;
+        }
+
+        // Получаем список серверных модов
+        const serverModsConfig = modsConfigData.config;
+        const serverModIds = Object.keys(serverModsConfig).filter(
+            modId => serverModsConfig[modId].server_mod === true
+        );
+
+        if (serverModIds.length === 0) {
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Нет модов с пометкой "СерверМод"');
+            }
+            restoreButton(btn);
+            return;
+        }
+
+        // Получаем кеш модов
+        const cacheResponse = await fetch('/api/mods/cache');
+        const cacheData = await cacheResponse.json();
+        const modsList = cacheData.success ? cacheData.mods : [];
+
+        // Обновляем gameLinks
+        await loadGameLinks();
+
+        let connectedCount = 0;
+        let skippedCount = 0;
+        let errorCount = 0;
+        let markedAsClient = 0;
+        let total = serverModIds.length;
+
+        if (typeof notifications !== 'undefined') {
+            notifications.info(`Обработка ${total} модов...`);
+        }
+
+        for (const modId of serverModIds) {
+            // Проверяем, отмечен ли мод как клиентский
+            const modConfig = modsConfigData.config[modId];
+            if (!modConfig || modConfig.client !== true) {
+                // Отмечаем мод как клиентский
+                try {
+                    const markResponse = await fetch(`/api/mods/config/${modId}/client`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ value: true })
+                    });
+                    const markData = await markResponse.json();
+                    if (markData.success) {
+                        markedAsClient++;
+                        console.log(`✅ Мод ${modId} отмечен как клиентский`);
+                    }
+                } catch (e) {
+                    console.warn(`⚠️ Не удалось отметить мод ${modId} как клиентский:`, e);
+                }
+            }
+
+            // Проверяем, уже подключен ли мод
+            if (gameLinks[modId] === true) {
+                skippedCount++;
+                continue;
+            }
+
+            const modInfo = modsList.find(m => m.id === modId);
+            if (!modInfo || !modInfo.path || !modInfo.folder) {
+                errorCount++;
+                console.warn(`⚠️ Не найдена информация о моде: ${modId}`);
+                continue;
+            }
+
+            try {
+                const response = await fetch(`/api/game/mods/${modId}/connect`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mod_path: modInfo.path,
+                        mod_name: modInfo.name || modId,
+                        mod_folder: modInfo.folder,
+                        game_dir: gameDir
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    gameLinks[modId] = true;
+                    connectedCount++;
+                    console.log(`✅ Подключен: ${modInfo.name}`);
+                } else {
+                    errorCount++;
+                    console.error(`❌ Ошибка подключения ${modInfo.name}: ${data.message}`);
+                }
+            } catch (e) {
+                errorCount++;
+                console.error(`❌ Ошибка подключения ${modId}: ${e.message}`);
+            }
+        }
+
+        // Принудительно перезагружаем список
+        console.log('🔄 Принудительное обновление списка...');
+        await loadGameLinks();
+        await loadClientMods();
+
+        let message = `✅ Подключено: ${connectedCount}`;
+        if (skippedCount > 0) message += `, уже подключены: ${skippedCount}`;
+        if (markedAsClient > 0) message += `, отмечено как клиентские: ${markedAsClient}`;
+        if (errorCount > 0) message += `, ошибок: ${errorCount}`;
+        
+        if (typeof notifications !== 'undefined') {
+            if (errorCount === 0 && connectedCount > 0) {
+                notifications.success(message);
+            } else if (connectedCount === 0 && skippedCount > 0 && errorCount === 0) {
+                notifications.info(`Все моды уже подключены (${skippedCount})`);
+            } else if (errorCount > 0) {
+                notifications.warning(message);
+            } else {
+                notifications.info('Нет модов для подключения');
+            }
+        }
+
+    } catch (e) {
+        console.error('❌ Ошибка:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+
+    restoreButton(btn);
+}
+
+function restoreButton(btn) {
+    if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14"/>
+                <path d="M5 12h14"/>
+            </svg>
+            Подключить все моды сервера
+        `;
+    }
+}
+
+// ============================================
+// ПОЛУЧИТЬ ПАПКУ ИГРЫ ИЗ ПУТИ К EXE
+// ============================================
+function getGameDirectory(exePath) {
+    if (!exePath) return null;
+    const normalized = exePath.replace(/\\/g, '/');
+    const lastSlash = normalized.lastIndexOf('/');
+    if (lastSlash === -1) return null;
+    return normalized.substring(0, lastSlash);
+}
+
+// ============================================
+// ПОИСК КЛИЕНТСКИХ МОДОВ
+// ============================================
+function setupGameModsSearch() {
+    const searchInput = document.getElementById('gameModsSearchInput');
+    if (searchInput) {
+        const newInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newInput, searchInput);
+        
+        newInput.addEventListener('input', () => {
+            renderClientMods(clientModsList);
+        });
+    }
+}
+
+// ============================================
+// ОБНОВЛЕНИЕ СПИСКА (кнопка)
+// ============================================
+async function refreshGameMods() {
+    const btn = document.getElementById('refreshGameModsBtn');
+    if (btn) {
+        btn.classList.add('loading');
+        btn.disabled = true;
+    }
+    
+    console.log('🔄 Принудительное обновление списка...');
+    await loadGameLinks();
+    await loadClientMods();
+    
+    if (btn) {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+    }
+    
+    if (typeof notifications !== 'undefined') {
+        notifications.success('Список клиентских модов обновлён');
+    }
 }
 
 // ============================================
@@ -350,55 +593,6 @@ async function toggleGameModConnection(modId) {
 }
 
 // ============================================
-// ПОЛУЧИТЬ ПАПКУ ИГРЫ ИЗ ПУТИ К EXE
-// ============================================
-function getGameDirectory(exePath) {
-    if (!exePath) return null;
-    const normalized = exePath.replace(/\\/g, '/');
-    const lastSlash = normalized.lastIndexOf('/');
-    if (lastSlash === -1) return null;
-    return normalized.substring(0, lastSlash);
-}
-
-// ============================================
-// ПОИСК КЛИЕНТСКИХ МОДОВ
-// ============================================
-function setupGameModsSearch() {
-    const searchInput = document.getElementById('gameModsSearchInput');
-    if (searchInput) {
-        const newInput = searchInput.cloneNode(true);
-        searchInput.parentNode.replaceChild(newInput, searchInput);
-        
-        newInput.addEventListener('input', () => {
-            renderClientMods(clientModsList);
-        });
-    }
-}
-
-// ============================================
-// ОБНОВЛЕНИЕ СПИСКА (кнопка)
-// ============================================
-async function refreshGameMods() {
-    const btn = document.getElementById('refreshGameModsBtn');
-    if (btn) {
-        btn.classList.add('loading');
-        btn.disabled = true;
-    }
-    
-    await loadGameLinks();
-    await loadClientMods();
-    
-    if (btn) {
-        btn.classList.remove('loading');
-        btn.disabled = false;
-    }
-    
-    if (typeof notifications !== 'undefined') {
-        notifications.success('Список клиентских модов обновлён');
-    }
-}
-
-// ============================================
 // ОСТАНОВКА АВТООБНОВЛЕНИЯ
 // ============================================
 function destroyGamePage() {
@@ -419,5 +613,6 @@ window.loadGameLinks = loadGameLinks;
 window.destroyGamePage = destroyGamePage;
 window.startGameAutoRefresh = startGameAutoRefresh;
 window.stopGameAutoRefresh = stopGameAutoRefresh;
+window.connectAllServerMods = connectAllServerMods;
 
 console.log('🎮 game.js загружен');
