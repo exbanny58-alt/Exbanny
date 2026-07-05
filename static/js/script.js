@@ -25,10 +25,6 @@ const pages = {
                         <span class="stat-label">Всего модов</span>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-number" id="enabledModsCount">0</span>
-                        <span class="stat-label">Включено</span>
-                    </div>
-                    <div class="stat-card">
                         <span class="stat-number" id="workshopModsCount">0</span>
                         <span class="stat-label">Из Workshop</span>
                     </div>

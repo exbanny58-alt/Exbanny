@@ -290,12 +290,10 @@ function renderMods(mods) {
 // ============================================
 function updateStats(stats) {
     const totalEl = document.getElementById('totalModsCount');
-    const enabledEl = document.getElementById('enabledModsCount');
     const workshopEl = document.getElementById('workshopModsCount');
     const customEl = document.getElementById('customModsCount');
     
     if (totalEl) totalEl.textContent = stats.total || 0;
-    if (enabledEl) enabledEl.textContent = stats.enabled || 0;
     if (workshopEl) workshopEl.textContent = stats.workshop || 0;
     if (customEl) customEl.textContent = stats.custom || 0;
 }
