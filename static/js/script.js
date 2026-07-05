@@ -398,6 +398,35 @@ function initPageAfterLoad(page) {
         
         setTimeout(tryInitGame, 100);
     }
+
+
+    // ============================================
+    // СТРАНИЦА STEAMCMD
+    // ============================================   
+    if (page === 'steamcmd') {
+        let attempts = 0;
+        const maxAttempts = 10;
+        
+        function tryInitSteamCMD() {
+            attempts++;
+            const container = document.getElementById('installServerBtn');
+            
+            if (container) {
+                if (typeof initSteamCMD === 'function') {
+                    initSteamCMD();
+                }
+                return;
+            }
+            
+            if (attempts < maxAttempts) {
+                setTimeout(tryInitSteamCMD, 200);
+            } else {
+                console.warn('Не удалось инициализировать SteamCMD');
+            }
+        }
+        
+        setTimeout(tryInitSteamCMD, 100);
+    }
 }
 
 // Показать стартовую страницу

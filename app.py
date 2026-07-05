@@ -2,8 +2,27 @@ from flask import Flask
 from routes import register_routes
 import logging
 import sys
+from server_manager import DayZServer  # ← НОВЫЙ ИМПОРТ
+import os
 
 app = Flask(__name__)
+
+# Глобальный экземпляр сервера (будет инициализирован при первом запуске)
+server_instance = None
+
+def get_server():
+    """Возвращает экземпляр сервера, создавая его при необходимости"""
+    global server_instance
+    if server_instance is None:
+        from settings_manager import load_settings
+        settings = load_settings()
+        server_exe = settings.get('server_exe', '')
+        if server_exe and server_exe.strip():
+            server_dir = os.path.dirname(server_exe)
+            server_instance = DayZServer(server_dir)
+        else:
+            server_instance = DayZServer('')  # Пустой путь, будет ошибка при запуске
+    return server_instance
 
 # Регистрируем все маршруты из routes.py
 register_routes(app)

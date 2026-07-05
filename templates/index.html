@@ -46,6 +46,18 @@
                                 <span class="nav-text">Управление модами</span>
                             </a>
                         </li>
+                        <!-- НОВЫЙ ПУНКТ: STEAMCMD -->
+                        <li class="nav-item">
+                            <a href="#" onclick="showContent('steamcmd', event)">
+                                <!-- Иконка Steam -->
+                                <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0z"/>
+                                    <path d="M12 8v4l2 2"/>
+                                </svg>
+                                <span class="nav-text">SteamCMD</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -125,7 +137,6 @@
                 </div>
             </div>
         </nav>
-
         <!-- Основной контент -->
         <section class="content">
             <div class="content-area" id="contentArea">
@@ -157,6 +168,6 @@
 <script src="{{ url_for('static', filename='js/server.js') }}"></script>
 <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 <script src="{{ url_for('static', filename='js/controls.js') }}"></script>
-<script src="{{ url_for('static', filename='js/console.js') }}"></script>  <!-- ← НОВЫЙ -->
-<script src="{{ url_for('static', filename='js/script.js') }}"></script></body>
+<script src="{{ url_for('static', filename='js/console.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </html>

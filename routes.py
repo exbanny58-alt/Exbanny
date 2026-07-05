@@ -1,3 +1,4 @@
+# routes.py
 from flask import render_template, send_from_directory, request, jsonify
 import os
 import subprocess
@@ -6,6 +7,9 @@ import threading
 import re
 import json
 import hashlib
+import queue
+import traceback
+import uuid
 from datetime import datetime
 from settings_manager import load_settings, save_settings
 from file_dialogs import select_file_dialog, select_folder_dialog
@@ -348,11 +352,9 @@ def register_routes(app):
     
     @app.route('/api/mods/cache', methods=['GET'])
     def get_mods_from_cache():
-        """Возвращает моды из кеша (МГНОВЕННО)"""
         try:
             cache = get_mods_cache()
             if cache and cache.get('mods'):
-                # Загружаем конфиг модов
                 from settings_manager import load_mods_config
                 config = load_mods_config()
                 
@@ -385,7 +387,6 @@ def register_routes(app):
 
     @app.route('/api/mods/scan', methods=['GET'])
     def scan_mods_api():
-        """Сканирует папки с модами (без сохранения в кеш)"""
         try:
             settings = load_settings()
             workshop = settings.get('workshop', '')
@@ -399,7 +400,6 @@ def register_routes(app):
             
             mods = scan_mods(workshop, custom_mods)
             
-            # Загружаем конфиг модов
             from settings_manager import load_mods_config
             config = load_mods_config()
             for mod in mods:
@@ -428,7 +428,6 @@ def register_routes(app):
 
     @app.route('/api/mods/scan-and-cache', methods=['POST'])
     def scan_and_cache_mods():
-        """Сканирует моды, сохраняет в кеш и возвращает результат"""
         try:
             settings = load_settings()
             workshop = settings.get('workshop', '')
@@ -442,13 +441,10 @@ def register_routes(app):
             
             mods = scan_mods(workshop, custom_mods)
             
-            # Загружаем конфиг модов
-            from settings_manager import load_mods_config, save_mods_config, init_mods_config
+            from settings_manager import init_mods_config
             
-            # Инициализируем конфиг для новых модов
             config = init_mods_config(mods)
             
-            # Применяем конфиг к модам
             for mod in mods:
                 if mod['id'] in config:
                     mod['server'] = config[mod['id']].get('server', False)
@@ -472,12 +468,11 @@ def register_routes(app):
             return jsonify({'success': False, 'message': str(e)}), 500
 
     # ============================================
-    # API ДЛЯ КОНФИГА МОДОВ (три тумблера)
+    # API ДЛЯ КОНФИГА МОДОВ
     # ============================================
     
     @app.route('/api/mods/config', methods=['GET'])
     def get_mods_config():
-        """Получить весь конфиг модов"""
         try:
             from settings_manager import load_mods_config
             config = load_mods_config()
@@ -490,7 +485,6 @@ def register_routes(app):
 
     @app.route('/api/mods/config/<mod_id>', methods=['GET'])
     def get_mod_config(mod_id):
-        """Получить конфиг конкретного мода"""
         try:
             from settings_manager import get_mod_full_state
             state = get_mod_full_state(mod_id)
@@ -504,7 +498,6 @@ def register_routes(app):
 
     @app.route('/api/mods/config/<mod_id>/<attr>', methods=['POST'])
     def set_mod_config(mod_id, attr):
-        """Установить состояние атрибута мода"""
         try:
             data = request.get_json()
             value = data.get('value', False)
@@ -530,7 +523,6 @@ def register_routes(app):
 
     @app.route('/api/mods/config/init', methods=['POST'])
     def init_mods_config_api():
-        """Инициализирует конфиг для всех существующих модов"""
         try:
             settings = load_settings()
             workshop = settings.get('workshop', '')
@@ -551,7 +543,6 @@ def register_routes(app):
 
     @app.route('/api/mods/toggle', methods=['POST'])
     def toggle_mod():
-        """Старый API для совместимости (один тумблер)"""
         try:
             data = request.get_json()
             mod_id = data.get('mod_id')
@@ -560,7 +551,6 @@ def register_routes(app):
             if not mod_id:
                 return jsonify({'success': False, 'message': 'Не указан ID мода'}), 400
             
-            # Для совместимости сохраняем в server_mod
             from settings_manager import set_mod_state
             set_mod_state(mod_id, 'server_mod', enabled)
             
@@ -574,11 +564,9 @@ def register_routes(app):
 
     @app.route('/api/mods/state', methods=['GET'])
     def get_mods_state():
-        """Старый API для совместимости"""
         try:
             from settings_manager import load_mods_config
             config = load_mods_config()
-            # Преобразуем в старый формат
             state = {}
             for mod_id, attrs in config.items():
                 state[mod_id] = attrs.get('server_mod', False)
@@ -586,17 +574,15 @@ def register_routes(app):
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
         
-        # ============================================
-    # API ДЛЯ УПРАВЛЕНИЯ ССЫЛКАМИ МОДОВ
+    # ============================================
+    # API ДЛЯ УПРАВЛЕНИЯ ССЫЛКАМИ МОДОВ СЕРВЕРА
     # ============================================
     
     @app.route('/api/server/links', methods=['GET'])
     def get_server_links():
-        """Получить список подключённых модов"""
         try:
             from server_links import load_server_links
             links = load_server_links()
-            # Возвращаем только ID модов для простоты
             connected = {mod_id: True for mod_id in links.keys()}
             return jsonify({
                 'success': True,
@@ -608,15 +594,12 @@ def register_routes(app):
 
     @app.route('/api/server/links/check', methods=['GET'])
     def check_server_links():
-        """Проверить целостность ссылок и восстановить битые"""
         try:
             from server_links import check_links_integrity, repair_links
             import threading
             
-            # Проверяем в фоновом потоке
             def check_and_repair():
                 try:
-                    # Проверяем целостность (автоматически удаляет битые)
                     check_links_integrity()
                 except Exception as e:
                     print(f'❌ Ошибка проверки ссылок: {e}')
@@ -624,7 +607,6 @@ def register_routes(app):
             thread = threading.Thread(target=check_and_repair)
             thread.start()
             
-            # Загружаем актуальное состояние
             from server_links import load_server_links
             links = load_server_links()
             
@@ -639,7 +621,6 @@ def register_routes(app):
 
     @app.route('/api/server/mods/<mod_id>/connect', methods=['POST'])
     def connect_mod(mod_id):
-        """Подключить мод к серверу"""
         try:
             data = request.get_json()
             mod_path = data.get('mod_path')
@@ -661,7 +642,6 @@ def register_routes(app):
 
     @app.route('/api/server/mods/<mod_id>/disconnect', methods=['POST'])
     def disconnect_mod(mod_id):
-        """Отключить мод от сервера"""
         try:
             from server_links import disconnect_mod_from_server
             result = disconnect_mod_from_server(mod_id)
@@ -672,7 +652,6 @@ def register_routes(app):
 
     @app.route('/api/server/mods/check', methods=['GET'])
     def check_mod_links():
-        """Проверить целостность ссылок"""
         try:
             from server_links import check_links_integrity
             broken = check_links_integrity()
@@ -686,7 +665,6 @@ def register_routes(app):
         
     @app.route('/api/server/keys/rebuild', methods=['POST'])
     def rebuild_keys():
-        """Пересобрать ключи для всех подключённых модов"""
         try:
             settings = load_settings()
             server_exe = settings.get('server_exe', '')
@@ -716,7 +694,6 @@ def register_routes(app):
 
     @app.route('/api/game/links', methods=['GET'])
     def get_game_links():
-        """Получить список подключённых модов игры"""
         try:
             from game_links import load_game_links
             links = load_game_links()
@@ -731,7 +708,6 @@ def register_routes(app):
 
     @app.route('/api/game/mods/<mod_id>/connect', methods=['POST'])
     def connect_game_mod(mod_id):
-        """Подключить мод к игре"""
         try:
             data = request.get_json()
             mod_path = data.get('mod_path')
@@ -753,7 +729,6 @@ def register_routes(app):
 
     @app.route('/api/game/mods/<mod_id>/disconnect', methods=['POST'])
     def disconnect_game_mod(mod_id):
-        """Отключить мод от игры"""
         try:
             from game_links import disconnect_game_mod
             result = disconnect_game_mod(mod_id)
@@ -764,7 +739,6 @@ def register_routes(app):
         
     @app.route('/api/mods/config/<mod_id>/client', methods=['POST'])
     def set_mod_client(mod_id):
-        """Отметить мод как клиентский"""
         try:
             data = request.get_json()
             value = data.get('value', True)
@@ -783,3 +757,163 @@ def register_routes(app):
                 return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+        
+    # ============================================
+    # API ДЛЯ УПРАВЛЕНИЯ СЕРВЕРОМ
+    # ============================================
+    @app.route('/api/server/start', methods=['POST'])
+    def start_server_api():
+        try:
+            from app import get_server
+            from settings_manager import load_settings
+            from server_links import load_server_links
+            
+            server = get_server()
+            
+            settings = load_settings()
+            if not settings.get('server_exe') or not settings.get('server_exe').strip():
+                return jsonify({
+                    'success': False,
+                    'message': 'Путь к серверу не указан в настройках'
+                }), 400
+            
+            server_links = load_server_links()
+            
+            mods_for_server = {}
+            for mod_id, link_info in server_links.items():
+                if link_info.get('enabled', False):
+                    mods_for_server[mod_id] = {'connected': True}
+            
+            success, message = server.start(mods_for_server if mods_for_server else None)
+            
+            return jsonify({
+                'success': success,
+                'message': message
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка запуска сервера: {e}')
+            traceback.print_exc()
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+        
+    @app.route('/api/server/stop', methods=['POST'])
+    def stop_server_api():
+        try:
+            from app import get_server
+            server = get_server()
+            
+            success, message = server.stop()
+            
+            return jsonify({
+                'success': success,
+                'message': message
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка остановки сервера: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/server/restart', methods=['POST'])
+    def restart_server_api():
+        try:
+            from app import get_server
+            from settings_manager import load_settings, load_mods_config
+            
+            server = get_server()
+            
+            settings = load_settings()
+            if not settings.get('server_exe') or not settings.get('server_exe').strip():
+                return jsonify({
+                    'success': False,
+                    'message': 'Путь к серверу не указан в настройках'
+                }), 400
+            
+            if server.is_running():
+                success, message = server.stop()
+                if not success:
+                    return jsonify({
+                        'success': False,
+                        'message': f'Ошибка остановки: {message}'
+                    }), 500
+            
+            mods_config = load_mods_config()
+            
+            mods_for_server = {}
+            for mod_id, attrs in mods_config.items():
+                if attrs.get('server_mod', False) or attrs.get('server', False):
+                    from server_links import load_server_links
+                    links = load_server_links()
+                    if mod_id in links:
+                        mods_for_server[mod_id] = {
+                            'server': attrs.get('server', False),
+                            'server_mod': attrs.get('server_mod', False),
+                            'connected': True
+                        }
+                    else:
+                        mods_for_server[mod_id] = {
+                            'server': attrs.get('server', False),
+                            'server_mod': attrs.get('server_mod', False),
+                            'connected': False
+                        }
+            
+            success, message = server.start(mods_for_server if mods_for_server else None)
+            
+            return jsonify({
+                'success': success,
+                'message': f'Перезапуск: {message}'
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка перезапуска сервера: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/server/status', methods=['GET'])
+    def server_status_api():
+        try:
+            from app import get_server
+            server = get_server()
+            
+            status = server.status()
+            
+            return jsonify({
+                'success': True,
+                'status': status
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения статуса: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/server/logs', methods=['GET'])
+    def server_logs_api():
+        try:
+            from app import get_server
+            server = get_server()
+            
+            logs = server.get_logs()
+            
+            return jsonify({
+                'success': True,
+                'logs': logs,
+                'count': len(logs)
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения логов: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+        

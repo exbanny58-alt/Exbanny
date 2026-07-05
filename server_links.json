@@ -7,7 +7,7 @@
     "link_name": "@CF",
     "link_path": "E:/SteamLibrary/steamapps/common/DayZServer\\@CF",
     "server_dir": "E:/SteamLibrary/steamapps/common/DayZServer",
-    "created_at": "2026-07-05T19:12:47.137013",
+    "created_at": "2026-07-05T20:29:34.169052",
     "enabled": true
   },
   "custom_Community-Online-Tools": {
@@ -18,7 +18,7 @@
     "link_name": "@Community-Online-Tools",
     "link_path": "E:/SteamLibrary/steamapps/common/DayZServer\\@Community-Online-Tools",
     "server_dir": "E:/SteamLibrary/steamapps/common/DayZServer",
-    "created_at": "2026-07-05T19:12:47.911838",
+    "created_at": "2026-07-05T20:29:34.921224",
     "enabled": true
   }
 }
