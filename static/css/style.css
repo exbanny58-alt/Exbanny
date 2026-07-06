@@ -3065,3 +3065,92 @@ main {
         padding: 6px 12px;
     }
 }
+
+/* ============================================
+   НОВЫЕ ТИПЫ СООБЩЕНИЙ ДЛЯ КОНСОЛИ (RPT)
+   ============================================ */
+
+.console-line.console-start {
+    color: rgba(96, 165, 250, 0.8);
+    font-weight: 600;
+}
+
+.console-line.console-steam {
+    color: rgba(102, 192, 244, 0.7);
+}
+
+.console-line.console-mission {
+    color: rgba(251, 191, 36, 0.7);
+}
+
+.console-line.console-economy {
+    color: rgba(251, 146, 60, 0.7);
+}
+
+.console-line.console-network {
+    color: rgba(74, 222, 128, 0.7);
+}
+
+.console-line.console-save {
+    color: rgba(74, 222, 128, 0.9);
+    font-weight: 600;
+    background: rgba(74, 222, 128, 0.05);
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 2px 0;
+}
+
+.console-line.console-player_join {
+    color: rgba(74, 222, 128, 0.6);
+}
+
+.console-line.console-player_leave {
+    color: rgba(248, 113, 113, 0.6);
+}
+
+.console-line.console-death {
+    color: rgba(248, 113, 113, 0.8);
+}
+
+.console-line.console-system {
+    color: rgba(167, 139, 250, 0.6);
+    font-style: italic;
+}
+
+/* Кнопка RPT в консоли */
+.console-window-actions .rpt-toggle-btn {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+}
+
+.console-window-actions .rpt-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(74, 222, 128, 0.8) !important;
+}
+
+.console-window-actions .rpt-toggle-btn[data-active="true"] {
+    color: rgba(74, 222, 128, 0.5);
+    border-color: rgba(74, 222, 128, 0.15);
+}
+
+.console-window-actions .rpt-toggle-btn[data-active="false"] {
+    color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.03);
+}
+
+/* Бейдж для RPT логов */
+.rpt-badge {
+    display: inline-block;
+    font-size: 0.5rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(74, 222, 128, 0.1);
+    color: rgba(74, 222, 128, 0.5);
+    border: 1px solid rgba(74, 222, 128, 0.1);
+    margin-left: 6px;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}

@@ -6,6 +6,7 @@ import threading
 import time
 import queue
 import sys
+from rpt_monitor import RPTMonitor  # ← ДОБАВЛЯЕМ
 
 class DayZServer:
     def __init__(self, server_path, executable="DayZServer_x64.exe", config="serverDZ.cfg"):
@@ -16,6 +17,39 @@ class DayZServer:
         self.log_queue = queue.Queue()
         self.reader_thread = None
         self.should_read = False
+        
+        # ← ДОБАВЛЯЕМ RPT монитор
+        self.rpt_monitor = None
+        self.rpt_thread = None
+        self.rpt_log_queue = queue.Queue()
+        self.should_monitor_rpt = False
+        
+        # Путь к папке profiles (для RPT логов)
+        self.profiles_dir = os.path.join(server_path, "profiles") if server_path else ""
+
+    def _rpt_monitor_loop(self):
+        """Запускает RPT монитор в отдельном потоке."""
+        if not self.profiles_dir or not os.path.exists(self.profiles_dir):
+            self.rpt_log_queue.put({
+                'type': 'system',
+                'message': f'⚠️ Папка profiles не найдена: {self.profiles_dir}'
+            })
+            return
+        
+        # Создаём и запускаем монитор
+        self.rpt_monitor = RPTMonitor(self.profiles_dir)
+        self.rpt_monitor.start()
+        
+        # Передаём логи из монитора в очередь
+        while self.should_monitor_rpt and self.rpt_monitor:
+            logs = self.rpt_monitor.get_logs()
+            for log in logs:
+                self.rpt_log_queue.put(log)
+            time.sleep(0.1)
+        
+        if self.rpt_monitor:
+            self.rpt_monitor.stop()
+            self.rpt_monitor = None
 
     def start(self, mods_config=None):
         """Запускает сервер, если он еще не запущен."""
@@ -55,16 +89,13 @@ class DayZServer:
                     print(f"  ⚠️ {mod_name}: НЕ добавлен")
                     continue
                 
-                # 🔥 БЕРЁМ ИМЯ ПАПКИ ИЗ server_links.json
                 from server_links import load_server_links
                 server_links = load_server_links()
                 
-                # Получаем mod_folder из server_links
                 link_info = server_links.get(mod_name, {})
                 mod_folder = link_info.get('mod_folder', '')
                 
                 if mod_folder:
-                    # Добавляем @ перед именем папки
                     mod_list.append('@' + mod_folder)
                     print(f"  ✅ {mod_name}: добавлен как @{mod_folder}")
                 else:
@@ -106,6 +137,9 @@ class DayZServer:
             self.reader_thread = threading.Thread(target=self._read_output, daemon=True)
             self.reader_thread.start()
             
+            # ← ЗАПУСКАЕМ RPT МОНИТОР
+            self._start_rpt_monitor()
+            
             time.sleep(2)
             
             if self.is_running():
@@ -117,10 +151,32 @@ class DayZServer:
             self.process = None
             return False, f"Ошибка запуска: {str(e)}"
 
+    def _start_rpt_monitor(self):
+        """Запускает мониторинг RPT логов."""
+        self.should_monitor_rpt = True
+        
+        # Обновляем путь к profiles
+        self.profiles_dir = os.path.join(self.server_path, "profiles")
+        
+        if not os.path.exists(self.profiles_dir):
+            print(f"⚠️ Папка profiles не найдена: {self.profiles_dir}")
+            self.rpt_log_queue.put({
+                'type': 'system',
+                'message': f'⚠️ Папка profiles не найдена: {self.profiles_dir}'
+            })
+            return
+        
+        self.rpt_thread = threading.Thread(target=self._rpt_monitor_loop, daemon=True)
+        self.rpt_thread.start()
+        print(f"📟 RPT монитор запущен, папка: {self.profiles_dir}")
+
     def stop(self):
         """Останавливает сервер и все дочерние процессы."""
         if not self.is_running():
             return False, "Сервер не запущен."
+        
+        # ← ОСТАНАВЛИВАЕМ RPT МОНИТОР
+        self._stop_rpt_monitor()
         
         self.should_read = False
         
@@ -138,6 +194,16 @@ class DayZServer:
             return True, "Сервер остановлен."
         except Exception as e:
             return False, f"Ошибка остановки: {str(e)}"
+
+    def _stop_rpt_monitor(self):
+        """Останавливает мониторинг RPT логов."""
+        self.should_monitor_rpt = False
+        if self.rpt_monitor:
+            self.rpt_monitor.stop()
+            self.rpt_monitor = None
+        if self.rpt_thread:
+            self.rpt_thread.join(timeout=2)
+            self.rpt_thread = None
 
     def is_running(self):
         """Проверяет, жив ли процесс сервера."""
@@ -181,6 +247,25 @@ class DayZServer:
                     logs.append("--- Сервер остановлен ---")
                     break
                 logs.append(line)
+            except queue.Empty:
+                break
+        return logs
+
+    def get_rpt_logs(self):
+        """
+        Извлекает все накопленные RPT логи из очереди.
+        Возвращает список словарей с полями:
+        - type: 'info', 'start', 'steam', 'mission', 'economy', 'network', 
+                'save', 'player_join', 'player_leave', 'error', 'warning', 'death', 'system'
+        - message: форматированное сообщение
+        - raw: исходная строка из лога
+        - timestamp: время получения
+        """
+        logs = []
+        while True:
+            try:
+                item = self.rpt_log_queue.get_nowait()
+                logs.append(item)
             except queue.Empty:
                 break
         return logs

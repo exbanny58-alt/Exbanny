@@ -1117,3 +1117,52 @@ def register_routes(app):
                 'success': False,
                 'message': str(e)
             }), 500
+        
+    # ============================================
+    # API ДЛЯ RPT ЛОГОВ
+    # ============================================
+
+    @app.route('/api/server/rpt-logs', methods=['GET'])
+    def get_rpt_logs_api():
+        """Возвращает RPT логи сервера."""
+        try:
+            from app import get_server
+            server = get_server()
+            
+            logs = server.get_rpt_logs()
+            
+            return jsonify({
+                'success': True,
+                'logs': logs,
+                'count': len(logs)
+            })
+        except Exception as e:
+            print(f'❌ Ошибка получения RPT логов: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    # ============================================
+    # API ДЛЯ СТАТУСА RPT МОНИТОРА
+    # ============================================
+
+    @app.route('/api/server/rpt-status', methods=['GET'])
+    def get_rpt_status_api():
+        """Возвращает статус RPT монитора."""
+        try:
+            from app import get_server
+            server = get_server()
+            
+            is_monitoring = hasattr(server, 'rpt_monitor') and server.rpt_monitor and server.rpt_monitor.is_running()
+            
+            return jsonify({
+                'success': True,
+                'monitoring': is_monitoring,
+                'profiles_dir': getattr(server, 'profiles_dir', '')
+            })
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
