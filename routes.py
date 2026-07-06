@@ -917,3 +917,132 @@ def register_routes(app):
                 'message': str(e)
             }), 500
         
+    # ============================================
+    # API ДЛЯ УПРАВЛЕНИЯ ИГРОЙ
+    # ============================================
+    @app.route('/api/game/start', methods=['POST'])
+    def start_game_api():
+        try:
+            from app import get_game
+            from settings_manager import load_settings
+            from game_links import load_game_links
+            import json
+            
+            game = get_game()
+            
+            settings = load_settings()
+            if not settings.get('game_exe') or not settings.get('game_exe').strip():
+                return jsonify({
+                    'success': False,
+                    'message': 'Путь к игре не указан в настройках'
+                }), 400
+            
+            # Загружаем подключённые моды
+            game_links = load_game_links()
+            
+            # Формируем конфиг для запуска
+            mods_for_game = {}
+            for mod_id, link_info in game_links.items():
+                if link_info.get('enabled', False):
+                    mods_for_game[mod_id] = {
+                        'link_name': link_info.get('link_name', ''),
+                        'enabled': True
+                    }
+            
+            # Параметры подключения (если есть JSON тело)
+            connect_ip = '127.0.0.1'
+            connect_port = '2302'
+            player_name = 'player'
+            
+            # Пытаемся прочитать JSON только если есть тело запроса
+            if request.data and request.data.strip():
+                try:
+                    data = request.get_json(silent=True)
+                    if data:
+                        connect_ip = data.get('connect_ip', '127.0.0.1')
+                        connect_port = data.get('connect_port', '2302')
+                        player_name = data.get('player_name', 'player')
+                except:
+                    pass  # Если JSON невалидный - используем значения по умолчанию
+            
+            success, message = game.start(
+                mods_for_game if mods_for_game else None,
+                connect_ip=connect_ip,
+                connect_port=connect_port,
+                player_name=player_name
+            )
+            
+            return jsonify({
+                'success': success,
+                'message': message
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка запуска игры: {e}')
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/game/stop', methods=['POST'])
+    def stop_game_api():
+        try:
+            from app import get_game
+            game = get_game()
+            
+            success, message = game.stop()
+            
+            return jsonify({
+                'success': success,
+                'message': message
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка остановки игры: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/game/status', methods=['GET'])
+    def game_status_api():
+        try:
+            from app import get_game
+            game = get_game()
+            
+            status = game.status()
+            
+            return jsonify({
+                'success': True,
+                'status': status
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения статуса игры: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/game/logs', methods=['GET'])
+    def game_logs_api():
+        try:
+            from app import get_game
+            game = get_game()
+            
+            logs = game.get_logs()
+            
+            return jsonify({
+                'success': True,
+                'logs': logs,
+                'count': len(logs)
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения логов игры: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500

@@ -205,10 +205,10 @@ function updateStatusIndicator(running, status) {
 }
 
 // ============================================
-// УПРАВЛЕНИЕ ИГРОЙ
+// УПРАВЛЕНИЕ ИГРОЙ (РЕАЛЬНЫЕ ВЫЗОВЫ)
 // ============================================
 
-function controlGame(action, event) {
+async function controlGame(action, event) {
     // Предотвращаем переход по ссылке
     if (event) {
         event.preventDefault();
@@ -233,11 +233,94 @@ function controlGame(action, event) {
     
     console.log(`${actionIcons[action]} ${actionNames[action]}`);
     
-    // TODO: Здесь будет реальная логика запуска игры
-    // Пока что заглушка с уведомлением
+    // Находим кнопку
+    const btn = document.querySelector(`.control-btn.control-game-${action === 'start' ? 'start' : 'stop'}`);
+    if (btn) {
+        btn.classList.add('loading');
+        btn.style.opacity = '0.6';
+        btn.style.pointerEvents = 'none';
+    }
     
-    if (typeof notifications !== 'undefined') {
-        notifications.info(`${actionIcons[action]} ${actionNames[action]} (в разработке)`);
+    isGameActionInProgress = true;
+    
+    try {
+        const endpoint = `/api/game/${action}`;
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (typeof notifications !== 'undefined') {
+                notifications.success(data.message || `${actionNames[action]} выполнен`);
+            }
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.error(data.message || `Ошибка ${actionNames[action]}`);
+            }
+        }
+        
+        // Обновляем статус игры
+        await updateGameStatus();
+        
+    } catch (e) {
+        console.error('❌ Ошибка:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+    
+    // Восстанавливаем кнопку
+    if (btn) {
+        btn.classList.remove('loading');
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+    }
+    
+    isGameActionInProgress = false;
+}
+
+// ============================================
+// ПОЛУЧЕНИЕ СТАТУСА ИГРЫ
+// ============================================
+
+async function updateGameStatus() {
+    try {
+        const response = await fetch('/api/game/status');
+        const data = await response.json();
+        
+        if (data.success && data.status) {
+            const status = data.status;
+            
+            const startBtn = document.querySelector('.control-btn.control-game-start');
+            const stopBtn = document.querySelector('.control-btn.control-game-stop');
+            
+            if (status.running) {
+                if (startBtn) {
+                    startBtn.style.opacity = '0.5';
+                    startBtn.title = 'Игра уже запущена';
+                }
+                if (stopBtn) {
+                    stopBtn.style.opacity = '1';
+                    stopBtn.title = 'Остановить игру';
+                }
+            } else {
+                if (startBtn) {
+                    startBtn.style.opacity = '1';
+                    startBtn.title = 'Запустить игру';
+                }
+                if (stopBtn) {
+                    stopBtn.style.opacity = '0.5';
+                    stopBtn.title = 'Игра не запущена';
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ Ошибка получения статуса игры:', e);
     }
 }
 
@@ -287,6 +370,18 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(() => {
         updateServerStatus();
     }, 10000);
+
+    // Проверяем статус сервера при загрузке
+    setTimeout(() => {
+        updateServerStatus();
+        updateGameStatus();  // ← ДОБАВЛЯЕМ
+    }, 1000);
+    
+    // Обновляем статус каждые 10 секунд
+    setInterval(() => {
+        updateServerStatus();
+        updateGameStatus();  // ← ДОБАВЛЯЕМ
+    }, 10000);
 });
 
 // ============================================
@@ -296,5 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.controlServer = controlServer;
 window.controlGame = controlGame;
 window.updateServerStatus = updateServerStatus;
+window.updateGameStatus = updateGameStatus;
 
 console.log('🎮 controls.js загружен (с реальным API)');

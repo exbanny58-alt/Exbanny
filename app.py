@@ -2,13 +2,15 @@ from flask import Flask
 from routes import register_routes
 import logging
 import sys
-from server_manager import DayZServer  # ← НОВЫЙ ИМПОРТ
+from server_manager import DayZServer
+from game_manager import DayZGame  # ← НОВЫЙ ИМПОРТ
 import os
 
 app = Flask(__name__)
 
-# Глобальный экземпляр сервера (будет инициализирован при первом запуске)
+# Глобальные экземпляры
 server_instance = None
+game_instance = None  # ← НОВЫЙ ЭКЗЕМПЛЯР
 
 def get_server():
     """Возвращает экземпляр сервера, создавая его при необходимости"""
@@ -21,8 +23,22 @@ def get_server():
             server_dir = os.path.dirname(server_exe)
             server_instance = DayZServer(server_dir)
         else:
-            server_instance = DayZServer('')  # Пустой путь, будет ошибка при запуске
+            server_instance = DayZServer('')
     return server_instance
+
+def get_game():  # ← НОВАЯ ФУНКЦИЯ
+    """Возвращает экземпляр игры, создавая его при необходимости"""
+    global game_instance
+    if game_instance is None:
+        from settings_manager import load_settings
+        settings = load_settings()
+        game_exe = settings.get('game_exe', '')
+        if game_exe and game_exe.strip():
+            game_dir = os.path.dirname(game_exe)
+            game_instance = DayZGame(game_dir)
+        else:
+            game_instance = DayZGame('')
+    return game_instance
 
 # Регистрируем все маршруты из routes.py
 register_routes(app)

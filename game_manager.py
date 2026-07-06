@@ -1,0 +1,175 @@
+# game_manager.py
+import psutil
+import subprocess
+import os
+import threading
+import time
+import queue
+import sys
+
+class DayZGame:
+    def __init__(self, game_path, executable="DayZ_x64.exe"):
+        self.game_path = game_path
+        self.executable = executable
+        self.process = None
+        self.log_queue = queue.Queue()
+        self.reader_thread = None
+        self.should_read = False
+
+    def start(self, mods_config=None, connect_ip="127.0.0.1", connect_port="2302", player_name="player"):
+        """Запускает игру с указанными модами"""
+        if self.is_running():
+            return False, "Игра уже запущена."
+
+        if not self.game_path or not os.path.exists(self.game_path):
+            return False, f"Папка игры не найдена: {self.game_path}"
+
+        executable_path = os.path.join(self.game_path, self.executable)
+        if not os.path.exists(executable_path):
+            return False, f"Исполняемый файл не найден: {executable_path}"
+
+        # Базовые аргументы
+        command = [
+            executable_path,
+            f"-connect={connect_ip}",
+            f"-port={connect_port}",
+            f"-name={player_name}"
+        ]
+        
+        # ============ ФОРМИРУЕМ АРГУМЕНТЫ МОДОВ ============
+        if mods_config:
+            mod_list = []
+            
+            print("\n" + "="*80)
+            print("🎮 ФОРМИРОВАНИЕ -mod= для игры")
+            print("="*80)
+            
+            for mod_id, mod_info in mods_config.items():
+                # Проверяем, что мод включён
+                if not mod_info.get("enabled", False):
+                    print(f"  ⚠️ {mod_id}: отключён")
+                    continue
+                
+                # Берём link_name из game_links.json
+                link_name = mod_info.get("link_name", "")
+                
+                if link_name:
+                    # Добавляем в список (уже с @)
+                    mod_list.append(link_name)
+                    print(f"  ✅ {mod_id}: добавлен как {link_name}")
+                else:
+                    print(f"  ⚠️ {mod_id}: НЕ найден link_name")
+            
+            if mod_list:
+                mod_string = ';'.join(mod_list)
+                # Вставляем -mod= после executable
+                command.insert(1, f"-mod={mod_string}")
+                print(f"\n📋 Итоговый -mod: {mod_string}")
+            else:
+                print("\n⚠️ НЕТ МОДОВ для добавления")
+            
+            print("="*80 + "\n")
+        
+        # ============ ВЫВОДИМ КОМАНДУ ============
+        print("\n" + "="*80)
+        print("🚀 ФИНАЛЬНАЯ КОМАНДА ЗАПУСКА ИГРЫ:")
+        print("="*80)
+        print(' '.join(command))
+        print("="*80 + "\n")
+        
+        try:
+            # Запускаем процесс
+            self.process = subprocess.Popen(
+                command,
+                cwd=self.game_path,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                stdin=subprocess.PIPE,
+                universal_newlines=True,
+                encoding='utf-8',
+                errors='replace',
+                creationflags=subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
+            )
+            
+            self.should_read = True
+            self.reader_thread = threading.Thread(target=self._read_output, daemon=True)
+            self.reader_thread.start()
+            
+            time.sleep(2)
+            
+            if self.is_running():
+                return True, f"Игра запущена (PID: {self.process.pid})"
+            else:
+                return False, "Игра не запустилась, проверьте логи"
+                
+        except Exception as e:
+            self.process = None
+            return False, f"Ошибка запуска: {str(e)}"
+
+    def stop(self):
+        """Останавливает игру и все дочерние процессы"""
+        if not self.is_running():
+            return False, "Игра не запущена."
+        
+        self.should_read = False
+        
+        try:
+            parent = psutil.Process(self.process.pid)
+            children = parent.children(recursive=True)
+            for child in children:
+                child.terminate()
+            
+            gone, alive = psutil.wait_procs(children + [parent], timeout=5)
+            for p in alive:
+                p.kill()
+                
+            self.process = None
+            return True, "Игра остановлена."
+        except Exception as e:
+            return False, f"Ошибка остановки: {str(e)}"
+
+    def is_running(self):
+        """Проверяет, жив ли процесс игры"""
+        if self.process is None:
+            return False
+        return self.process.poll() is None
+
+    def status(self):
+        """Возвращает статус игры"""
+        if self.is_running():
+            try:
+                p = psutil.Process(self.process.pid)
+                mem_mb = p.memory_info().rss / 1024 / 1024
+                cpu = p.cpu_percent(interval=0.1)
+                return {
+                    "running": True,
+                    "pid": self.process.pid,
+                    "memory_mb": f"{mem_mb:.1f}",
+                    "cpu_percent": f"{cpu:.1f}"
+                }
+            except:
+                return {"running": True, "pid": self.process.pid}
+        return {"running": False}
+
+    def _read_output(self):
+        """Читает вывод игры в отдельном потоке"""
+        while self.should_read and self.process and self.process.stdout:
+            line = self.process.stdout.readline()
+            if not line:
+                break
+            self.log_queue.put(line.strip())
+        self.log_queue.put(None)
+
+    def get_logs(self):
+        """Извлекает все накопленные логи из очереди"""
+        logs = []
+        while True:
+            try:
+                line = self.log_queue.get_nowait()
+                if line is None:
+                    logs.append("--- Игра остановлена ---")
+                    break
+                logs.append(line)
+            except queue.Empty:
+                break
+        return logs
