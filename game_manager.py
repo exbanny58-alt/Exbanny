@@ -28,15 +28,18 @@ class DayZGame:
         if not os.path.exists(executable_path):
             return False, f"Исполняемый файл не найден: {executable_path}"
 
+        print(f"🎮 Используется ник: '{player_name}'")
+
         # Базовые аргументы
         command = [
             executable_path,
             f"-connect={connect_ip}",
             f"-port={connect_port}",
             f"-name={player_name}"
-        ]
-        
+        ]        
         # ============ ФОРМИРУЕМ АРГУМЕНТЫ МОДОВ ============
+        mod_string = None
+        
         if mods_config:
             mod_list = []
             
@@ -45,16 +48,13 @@ class DayZGame:
             print("="*80)
             
             for mod_id, mod_info in mods_config.items():
-                # Проверяем, что мод включён
                 if not mod_info.get("enabled", False):
                     print(f"  ⚠️ {mod_id}: отключён")
                     continue
                 
-                # Берём link_name из game_links.json
                 link_name = mod_info.get("link_name", "")
                 
                 if link_name:
-                    # Добавляем в список (уже с @)
                     mod_list.append(link_name)
                     print(f"  ✅ {mod_id}: добавлен как {link_name}")
                 else:
@@ -62,13 +62,14 @@ class DayZGame:
             
             if mod_list:
                 mod_string = ';'.join(mod_list)
-                # Вставляем -mod= после executable
-                command.insert(1, f"-mod={mod_string}")
                 print(f"\n📋 Итоговый -mod: {mod_string}")
             else:
                 print("\n⚠️ НЕТ МОДОВ для добавления")
             
             print("="*80 + "\n")
+        
+        if mod_string:
+            command.insert(1, f"-mod={mod_string}")
         
         # ============ ВЫВОДИМ КОМАНДУ ============
         print("\n" + "="*80)
@@ -78,7 +79,11 @@ class DayZGame:
         print("="*80 + "\n")
         
         try:
-            # Запускаем процесс
+            # Создаем флаги для Windows
+            creationflags = 0
+            if sys.platform == 'win32':
+                creationflags = subprocess.CREATE_NEW_CONSOLE
+            
             self.process = subprocess.Popen(
                 command,
                 cwd=self.game_path,
@@ -88,7 +93,7 @@ class DayZGame:
                 universal_newlines=True,
                 encoding='utf-8',
                 errors='replace',
-                creationflags=subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
+                creationflags=creationflags
             )
             
             self.should_read = True
@@ -152,7 +157,7 @@ class DayZGame:
         return {"running": False}
 
     def _read_output(self):
-        """Читает вывод игры в отдельном потоке"""
+        """Читает вывод игры в отдельном потоке и кладет строки в очередь"""
         while self.should_read and self.process and self.process.stdout:
             line = self.process.stdout.readline()
             if not line:

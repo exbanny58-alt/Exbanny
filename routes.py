@@ -949,21 +949,29 @@ def register_routes(app):
                         'enabled': True
                     }
             
-            # Параметры подключения (если есть JSON тело)
+            # Параметры подключения
             connect_ip = '127.0.0.1'
             connect_port = '2302'
             player_name = 'player'
             
-            # Пытаемся прочитать JSON только если есть тело запроса
+            # Получаем ник из настроек
+            player_name = settings.get('game_nickname', 'player')
+            if not player_name or not player_name.strip():
+                player_name = 'player'
+            
+            # Если есть JSON тело - можно переопределить
             if request.data and request.data.strip():
                 try:
                     data = request.get_json(silent=True)
                     if data:
                         connect_ip = data.get('connect_ip', '127.0.0.1')
                         connect_port = data.get('connect_port', '2302')
-                        player_name = data.get('player_name', 'player')
+                        if data.get('player_name'):
+                            player_name = data.get('player_name')
                 except:
-                    pass  # Если JSON невалидный - используем значения по умолчанию
+                    pass
+            
+            print(f"🎮 Запуск игры с ником: '{player_name}'")
             
             success, message = game.start(
                 mods_for_game if mods_for_game else None,
@@ -985,7 +993,7 @@ def register_routes(app):
                 'success': False,
                 'message': str(e)
             }), 500
-
+        
     @app.route('/api/game/stop', methods=['POST'])
     def stop_game_api():
         try:
@@ -1042,6 +1050,69 @@ def register_routes(app):
             
         except Exception as e:
             print(f'❌ Ошибка получения логов игры: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+        
+    # ============================================
+    # API ДЛЯ РАБОТЫ С НИКОМ В ИГРЕ
+    # ============================================
+
+    @app.route('/api/game/nickname', methods=['GET'])
+    def get_nickname_api():
+        try:
+            from settings_manager import load_settings
+            settings = load_settings()
+            nickname = settings.get('game_nickname', 'player')
+            return jsonify({
+                'success': True,
+                'nickname': nickname
+            })
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    @app.route('/api/game/nickname', methods=['POST'])
+    def set_nickname_api():
+        try:
+            from settings_manager import load_settings, save_settings
+            
+            data = request.get_json()
+            if not data:
+                return jsonify({
+                    'success': False,
+                    'message': 'Нет данных'
+                }), 400
+            
+            nickname = data.get('nickname', '').strip()
+            
+            if not nickname:
+                return jsonify({
+                    'success': False,
+                    'message': 'Ник не может быть пустым'
+                }), 400
+            
+            # Ограничиваем длину ника (DayZ ограничение)
+            if len(nickname) > 32:
+                return jsonify({
+                    'success': False,
+                    'message': 'Ник не может быть длиннее 32 символов'
+                }), 400
+            
+            settings = load_settings()
+            settings['game_nickname'] = nickname
+            save_settings(settings)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Ник сохранён: {nickname}',
+                'nickname': nickname
+            })
+            
+        except Exception as e:
             return jsonify({
                 'success': False,
                 'message': str(e)
