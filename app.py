@@ -52,6 +52,10 @@ if __name__ == '__main__':
         flaskwebgui_logger = logging.getLogger('flaskwebgui')
         flaskwebgui_logger.setLevel(logging.ERROR)
         
+        # Инициализируем сервер до запуска GUI
+        # (RPT монитор запустится автоматически)
+        get_server()
+        
         FlaskUI(
             app=app,
             server="flask",
@@ -61,6 +65,9 @@ if __name__ == '__main__':
         ).run()
     else:
         # Запуск в браузере (по умолчанию)
+        # Инициализируем сервер до запуска
+        get_server()
+        
         app.run(
             host='127.0.0.1',
             port=5000,

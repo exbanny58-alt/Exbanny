@@ -1154,7 +1154,10 @@ def register_routes(app):
             from app import get_server
             server = get_server()
             
-            is_monitoring = hasattr(server, 'rpt_monitor') and server.rpt_monitor and server.rpt_monitor.is_running()
+            # Проверяем, активен ли RPT монитор
+            is_monitoring = False
+            if hasattr(server, 'rpt_monitor') and server.rpt_monitor:
+                is_monitoring = server.rpt_monitor.is_running()
             
             return jsonify({
                 'success': True,

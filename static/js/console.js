@@ -23,8 +23,13 @@ function initConsole() {
     // Добавляем кнопку RPT
     addRptToggleButton();
     
-    // Запускаем опрос RPT логов
+    // ЗАПУСКАЕМ ОПРОС СРАЗУ (RPT монитор уже активен)
     startRptPolling();
+    
+    // Проверяем статус RPT через 2 секунды
+    setTimeout(() => {
+        checkRptStatus();
+    }, 2000);
 }
 
 // ============================================
@@ -84,8 +89,8 @@ function createConsoleWindow() {
             </div>
         </div>
         <div class="console-window-body" id="consoleWindowBody">
-            <div class="console-line console-system">[Система] Консоль загружена</div>
-            <div class="console-line console-system">[Система] Ожидание RPT логов сервера...</div>
+            <div class="console-line console-system">📟 Консоль загружена</div>
+            <div class="console-line console-system">⏳ Ожидание RPT логов сервера...</div>
         </div>
     `;
     
@@ -148,7 +153,7 @@ function clearConsoleWindow() {
     if (!body) return;
     
     body.innerHTML = '';
-    addConsoleLine('system', '[Система] Консоль очищена');
+    addConsoleLine('system', '📟 Консоль очищена');
 }
 
 // ============================================
@@ -167,7 +172,7 @@ async function fetchRPTLogs() {
                 let message = log.message || log.raw || '';
                 
                 // Пропускаем пустые сообщения
-                if (!message.trim()) return;
+                if (!message || !message.trim()) return;
                 
                 // Обрезаем слишком длинные строки
                 if (message.length > 500) {
@@ -177,11 +182,12 @@ async function fetchRPTLogs() {
                 addConsoleLine(type, message);
             });
             
-            // Обновляем статус RPT
+            // Обновляем статус RPT (он активен)
             updateRptStatus(true);
         }
     } catch (e) {
-        console.warn('⚠️ Ошибка получения RPT логов:', e);
+        // Не выводим ошибку в консоль, чтобы не спамить
+        console.debug('⚠️ Ошибка получения RPT логов:', e.message);
     }
 }
 
@@ -215,7 +221,7 @@ function startRptPolling() {
     console.log('📟 Запуск опроса RPT логов...');
     
     // Первый запрос сразу
-    setTimeout(() => fetchRPTLogs(), 500);
+    setTimeout(() => fetchRPTLogs(), 300);
     
     // Затем каждые 2 секунды
     rptPollingInterval = setInterval(() => {
@@ -310,74 +316,6 @@ function toggleRptLogs() {
 }
 
 // ============================================
-// ФОРМАТИРОВАНИЕ СООБЩЕНИЙ RPT
-// ============================================
-function formatRptMessage(log) {
-    if (!log) return null;
-    
-    const type = log.type || 'info';
-    const message = log.message || log.raw || '';
-    
-    // Специальная обработка для определённых типов
-    switch(type) {
-        case 'save':
-            return {
-                type: 'save',
-                message: message,
-                prefix: '💾'
-            };
-        case 'player_join':
-            return {
-                type: 'player_join',
-                message: message,
-                prefix: '👤'
-            };
-        case 'player_leave':
-            return {
-                type: 'player_leave',
-                message: message,
-                prefix: '🚪'
-            };
-        case 'death':
-            return {
-                type: 'death',
-                message: message,
-                prefix: '💀'
-            };
-        case 'start':
-            return {
-                type: 'start',
-                message: message,
-                prefix: '🚀'
-            };
-        case 'error':
-            return {
-                type: 'error',
-                message: message,
-                prefix: '❌'
-            };
-        case 'warning':
-            return {
-                type: 'warning',
-                message: message,
-                prefix: '⚠️'
-            };
-        case 'system':
-            return {
-                type: 'system',
-                message: message,
-                prefix: '⚙️'
-            };
-        default:
-            return {
-                type: type,
-                message: message,
-                prefix: ''
-            };
-    }
-}
-
-// ============================================
 // ПОЛУЧЕНИЕ СТАТУСА RPT МОНИТОРА
 // ============================================
 async function checkRptStatus() {
@@ -387,38 +325,24 @@ async function checkRptStatus() {
         
         if (data.success) {
             const isMonitoring = data.monitoring || false;
+            
+            // Обновляем статус
             updateRptStatus(isMonitoring && isRptEnabled);
             
+            // Если монитор не активен - пробуем перезапустить
             if (!isMonitoring && isRptEnabled) {
-                // Если монитор не активен, но должен быть - пробуем перезапустить
-                addConsoleLine('system', '⚠️ RPT монитор не активен, попытка перезапуска...');
+                console.log('⚠️ RPT монитор не активен, пробуем перезапустить...');
                 // Перезапускаем опрос
                 stopRptPolling();
-                setTimeout(() => startRptPolling(), 1000);
+                setTimeout(() => {
+                    startRptPolling();
+                    // Проверяем статус через 3 секунды
+                    setTimeout(() => checkRptStatus(), 3000);
+                }, 1000);
             }
         }
     } catch (e) {
-        console.warn('⚠️ Ошибка проверки статуса RPT:', e);
-    }
-}
-
-// ============================================
-// ПЕРИОДИЧЕСКАЯ ПРОВЕРКА СТАТУСА
-// ============================================
-let statusCheckInterval = null;
-
-function startStatusCheck() {
-    if (statusCheckInterval) return;
-    
-    statusCheckInterval = setInterval(() => {
-        checkRptStatus();
-    }, 30000); // Каждые 30 секунд
-}
-
-function stopStatusCheck() {
-    if (statusCheckInterval) {
-        clearInterval(statusCheckInterval);
-        statusCheckInterval = null;
+        console.debug('⚠️ Ошибка проверки статуса RPT:', e.message);
     }
 }
 
@@ -435,14 +359,5 @@ window.stopRptPolling = stopRptPolling;
 window.toggleRptLogs = toggleRptLogs;
 window.checkRptStatus = checkRptStatus;
 window.updateRptStatus = updateRptStatus;
-window.formatRptMessage = formatRptMessage;
-
-// Запускаем проверку статуса
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        startStatusCheck();
-        checkRptStatus();
-    }, 2000);
-});
 
 console.log('📟 console.js загружен с RPT поддержкой');
