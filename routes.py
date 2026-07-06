@@ -1169,3 +1169,74 @@ def register_routes(app):
                 'success': False,
                 'message': str(e)
             }), 500
+        
+    # ============================================
+    # API ДЛЯ РАБОТЫ С ИГРОКАМИ
+    # ============================================
+
+    @app.route('/api/players/current', methods=['GET'])
+    def get_current_players():
+        """Возвращает список текущих игроков онлайн."""
+        try:
+            from app import get_server
+            server = get_server()
+            
+            if hasattr(server, 'rpt_monitor') and server.rpt_monitor:
+                players = server.rpt_monitor.get_current_players()
+                online_count = server.rpt_monitor.get_online_count()
+                return jsonify({
+                    'success': True,
+                    'players': players,
+                    'online_count': online_count
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'RPT монитор не активен'
+                }), 404
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/players/history', methods=['GET'])
+    def get_player_history():
+        """Возвращает историю игроков."""
+        try:
+            from app import get_server
+            server = get_server()
+            limit = request.args.get('limit', 50, type=int)
+            
+            if hasattr(server, 'rpt_monitor') and server.rpt_monitor:
+                history = server.rpt_monitor.get_player_history(limit)
+                return jsonify({
+                    'success': True,
+                    'history': history,
+                    'count': len(history)
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'RPT монитор не активен'
+                }), 404
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/players/all', methods=['GET'])
+    def get_players_all():
+        """Возвращает полную информацию об игроках (текущие + история)."""
+        try:
+            from app import get_server
+            server = get_server()
+            
+            if hasattr(server, 'rpt_monitor') and server.rpt_monitor:
+                data = server.rpt_monitor.get_players_json()
+                return jsonify({
+                    'success': True,
+                    'data': data
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'RPT монитор не активен'
+                }), 404
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500

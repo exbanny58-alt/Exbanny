@@ -1,0 +1,86 @@
+{
+  "last_updated": "2026-07-06T23:11:28.070632",
+  "total_entries": 11,
+  "history": [
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "42814112",
+      "timestamp": "2026-07-06T22:55:41.210383",
+      "time": "22:55:41"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "nUbp2LgOfRhyNdxqjDc7u8BBxIfAOMR16Um2I1lh1Ts=",
+      "timestamp": "2026-07-06T22:57:08.846466",
+      "time": "22:57:08"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "76561200015496920",
+      "timestamp": "2026-07-06T22:57:08.852375",
+      "time": "22:57:08"
+    },
+    {
+      "type": "leave",
+      "name": "Exbanny",
+      "steam_id": "42814112",
+      "timestamp": "2026-07-06T22:58:07.545367",
+      "time": "22:58:07",
+      "duration": "2м 26с"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "663418476",
+      "timestamp": "2026-07-06T23:06:03.078963",
+      "time": "23:06:03"
+    },
+    {
+      "type": "leave",
+      "name": "Exbanny",
+      "steam_id": "663418476",
+      "timestamp": "2026-07-06T23:08:01.294947",
+      "time": "23:08:01",
+      "duration": "1м 58с"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "76561200015496920",
+      "timestamp": "2026-07-06T23:09:13.775269",
+      "time": "23:09:13"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "946390539",
+      "timestamp": "2026-07-06T23:10:44.492930",
+      "time": "23:10:44"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "nUbp2LgOfRhyNdxqjDc7u8BBxIfAOMR16Um2I1lh1Ts=",
+      "timestamp": "2026-07-06T23:11:28.040813",
+      "time": "23:11:28"
+    },
+    {
+      "type": "join",
+      "name": "Exbanny",
+      "steam_id": "76561200015496920",
+      "timestamp": "2026-07-06T23:11:28.051478",
+      "time": "23:11:28"
+    },
+    {
+      "type": "leave",
+      "name": "Exbanny",
+      "steam_id": "946390539",
+      "timestamp": "2026-07-06T23:11:28.070575",
+      "time": "23:11:28",
+      "duration": "43с"
+    }
+  ]
+}

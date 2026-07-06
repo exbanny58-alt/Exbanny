@@ -16,6 +16,12 @@ async function controlServer(action, event) {
         event.preventDefault();
     }
     
+    // Проверяем, не заблокирована ли кнопка
+    const btn = document.querySelector(`.control-btn.control-${action === 'start' ? 'start' : action === 'restart' ? 'restart' : 'stop'}`);
+    if (btn && btn.disabled) {
+        return; // Кнопка заблокирована — ничего не делаем
+    }
+    
     if (isServerActionInProgress) {
         if (typeof notifications !== 'undefined') {
             notifications.warning('Подождите, выполняется предыдущая операция...');
@@ -38,11 +44,10 @@ async function controlServer(action, event) {
     console.log(`${actionIcons[action]} ${actionNames[action]}`);
     
     // Находим кнопку
-    const btn = document.querySelector(`.control-btn.control-${action === 'start' ? 'start' : action === 'restart' ? 'restart' : 'stop'}`);
     if (btn) {
         btn.classList.add('loading');
+        btn.disabled = true;
         btn.style.opacity = '0.6';
-        btn.style.pointerEvents = 'none';
     }
     
     isServerActionInProgress = true;
@@ -81,8 +86,7 @@ async function controlServer(action, event) {
     // Восстанавливаем кнопку
     if (btn) {
         btn.classList.remove('loading');
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
+        // Не снимаем disabled — оно будет снято при обновлении статуса
     }
     
     isServerActionInProgress = false;
@@ -106,16 +110,19 @@ async function updateServerStatus() {
             const restartBtn = document.querySelector('.control-btn.control-restart');
             
             if (status.running) {
-                // Сервер запущен
+                // Сервер запущен — БЛОКИРУЕМ кнопки запуска и перезапуска
                 if (startBtn) {
+                    startBtn.disabled = true;
                     startBtn.style.opacity = '0.5';
                     startBtn.title = 'Сервер уже запущен';
                 }
                 if (stopBtn) {
+                    stopBtn.disabled = false;
                     stopBtn.style.opacity = '1';
                     stopBtn.title = 'Остановить сервер';
                 }
                 if (restartBtn) {
+                    restartBtn.disabled = false;
                     restartBtn.style.opacity = '1';
                     restartBtn.title = 'Перезапустить сервер';
                 }
@@ -124,16 +131,19 @@ async function updateServerStatus() {
                 updateStatusIndicator(true, status);
                 
             } else {
-                // Сервер остановлен
+                // Сервер остановлен — БЛОКИРУЕМ кнопку остановки
                 if (startBtn) {
+                    startBtn.disabled = false;
                     startBtn.style.opacity = '1';
                     startBtn.title = 'Запустить сервер';
                 }
                 if (stopBtn) {
+                    stopBtn.disabled = true;
                     stopBtn.style.opacity = '0.5';
                     stopBtn.title = 'Сервер не запущен';
                 }
                 if (restartBtn) {
+                    restartBtn.disabled = true;
                     restartBtn.style.opacity = '0.5';
                     restartBtn.title = 'Сервер не запущен';
                 }
@@ -214,6 +224,12 @@ async function controlGame(action, event) {
         event.preventDefault();
     }
     
+    // Проверяем, не заблокирована ли кнопка
+    const btn = document.querySelector(`.control-btn.control-game-${action === 'start' ? 'start' : 'stop'}`);
+    if (btn && btn.disabled) {
+        return; // Кнопка заблокирована — ничего не делаем
+    }
+    
     if (isGameActionInProgress) {
         if (typeof notifications !== 'undefined') {
             notifications.warning('Подождите, выполняется предыдущая операция...');
@@ -234,11 +250,10 @@ async function controlGame(action, event) {
     console.log(`${actionIcons[action]} ${actionNames[action]}`);
     
     // Находим кнопку
-    const btn = document.querySelector(`.control-btn.control-game-${action === 'start' ? 'start' : 'stop'}`);
     if (btn) {
         btn.classList.add('loading');
+        btn.disabled = true;
         btn.style.opacity = '0.6';
-        btn.style.pointerEvents = 'none';
     }
     
     isGameActionInProgress = true;
@@ -277,8 +292,7 @@ async function controlGame(action, event) {
     // Восстанавливаем кнопку
     if (btn) {
         btn.classList.remove('loading');
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
+        // Не снимаем disabled — оно будет снято при обновлении статуса
     }
     
     isGameActionInProgress = false;
@@ -300,20 +314,26 @@ async function updateGameStatus() {
             const stopBtn = document.querySelector('.control-btn.control-game-stop');
             
             if (status.running) {
+                // Игра запущена — БЛОКИРУЕМ кнопку запуска
                 if (startBtn) {
+                    startBtn.disabled = true;
                     startBtn.style.opacity = '0.5';
                     startBtn.title = 'Игра уже запущена';
                 }
                 if (stopBtn) {
+                    stopBtn.disabled = false;
                     stopBtn.style.opacity = '1';
                     stopBtn.title = 'Остановить игру';
                 }
             } else {
+                // Игра остановлена — БЛОКИРУЕМ кнопку остановки
                 if (startBtn) {
+                    startBtn.disabled = false;
                     startBtn.style.opacity = '1';
                     startBtn.title = 'Запустить игру';
                 }
                 if (stopBtn) {
+                    stopBtn.disabled = true;
                     stopBtn.style.opacity = '0.5';
                     stopBtn.title = 'Игра не запущена';
                 }
@@ -358,29 +378,29 @@ document.addEventListener('DOMContentLoaded', function() {
             66% { content: '..'; }
             100% { content: '...'; }
         }
+        
+        /* Стиль для заблокированных кнопок */
+        .control-btn:disabled {
+            cursor: not-allowed !important;
+            pointer-events: none !important;
+        }
+        
+        .control-btn:disabled .nav-text {
+            opacity: 0.6;
+        }
     `;
     document.head.appendChild(style);
     
     // Проверяем статус сервера при загрузке
     setTimeout(() => {
         updateServerStatus();
+        updateGameStatus();
     }, 1000);
     
     // Обновляем статус каждые 10 секунд
     setInterval(() => {
         updateServerStatus();
-    }, 10000);
-
-    // Проверяем статус сервера при загрузке
-    setTimeout(() => {
-        updateServerStatus();
-        updateGameStatus();  // ← ДОБАВЛЯЕМ
-    }, 1000);
-    
-    // Обновляем статус каждые 10 секунд
-    setInterval(() => {
-        updateServerStatus();
-        updateGameStatus();  // ← ДОБАВЛЯЕМ
+        updateGameStatus();
     }, 10000);
 });
 
