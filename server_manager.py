@@ -6,7 +6,8 @@ import threading
 import time
 import queue
 import sys
-from rpt_monitor import RPTMonitor  # ← ДОБАВЛЯЕМ
+from rpt_monitor import RPTMonitor
+from pid_manager import save_pid, load_pid, clear_pid, is_process_running
 
 class DayZServer:
     def __init__(self, server_path, executable="DayZServer_x64.exe", config="serverDZ.cfg"):
@@ -14,21 +15,41 @@ class DayZServer:
         self.executable = executable
         self.config = config
         self.process = None
+        self._using_pid = False
+        self._pid = None
         self.log_queue = queue.Queue()
         self.reader_thread = None
         self.should_read = False
         
-        # ← ДОБАВЛЯЕМ RPT монитор
+        # RPT монитор
         self.rpt_monitor = None
         self.rpt_monitor_thread = None
         self.should_monitor_rpt = False
         self.rpt_log_queue = queue.Queue()
         
-        # Путь к папке profiles (для RPT логов)
+        # Путь к папке profiles
         self.profiles_dir = os.path.join(server_path, "profiles") if server_path else ""
         
-        # ← ЗАПУСКАЕМ RPT МОНИТОР СРАЗУ ПРИ СОЗДАНИИ ОБЪЕКТА
+        # Пытаемся восстановить PID
+        self._restore_pid()
+        
+        # Запускаем RPT монитор
         self._init_rpt_monitor()
+
+    def _restore_pid(self):
+        """Восстанавливает PID сервера из файла"""
+        pid = load_pid('server')
+        if pid and is_process_running(pid):
+            print(f'🔄 Восстановлен PID сервера: {pid}')
+            self._pid = pid
+            self._using_pid = True
+            self.process = None  # Не используем Popen
+            return True
+        
+        if pid:
+            print(f'⚠️ PID сервера {pid} не активен, очищаем')
+            clear_pid('server')
+        return False
 
     def _init_rpt_monitor(self):
         """Инициализирует и запускает RPT монитор."""
@@ -82,8 +103,17 @@ class DayZServer:
         if self.rpt_monitor:
             self.rpt_monitor.stop()
 
+    def is_running(self):
+        """Проверяет, жив ли процесс сервера."""
+        if self._using_pid and self._pid:
+            return is_process_running(self._pid)
+        if self.process is None:
+            return False
+        return self.process.poll() is None
+
     def start(self, mods_config=None):
         """Запускает сервер, если он еще не запущен."""
+        # Проверяем, не запущен ли уже
         if self.is_running():
             return False, "Сервер уже запущен."
 
@@ -164,6 +194,13 @@ class DayZServer:
                 errors='replace',
                 creationflags=creationflags
             )
+            
+            # Сохраняем PID в файл
+            if self.process.pid:
+                save_pid('server', self.process.pid)
+                self._pid = self.process.pid
+                self._using_pid = False  # Используем Popen
+            
             self.should_read = True
             self.reader_thread = threading.Thread(target=self._read_output, daemon=True)
             self.reader_thread.start()
@@ -173,10 +210,12 @@ class DayZServer:
             if self.is_running():
                 return True, f"Сервер запущен (PID: {self.process.pid})"
             else:
+                clear_pid('server')
                 return False, "Сервер не запустился, проверьте логи"
                 
         except Exception as e:
             self.process = None
+            clear_pid('server')
             return False, f"Ошибка запуска: {str(e)}"
 
     def stop(self):
@@ -187,50 +226,82 @@ class DayZServer:
         self.should_read = False
         
         try:
-            parent = psutil.Process(self.process.pid)
-            children = parent.children(recursive=True)
-            for child in children:
-                child.terminate()
+            if self._using_pid and self._pid:
+                # Останавливаем по PID
+                try:
+                    p = psutil.Process(self._pid)
+                    children = p.children(recursive=True)
+                    for child in children:
+                        try:
+                            child.terminate()
+                        except:
+                            pass
+                    p.terminate()
+                    gone, alive = psutil.wait_procs(children + [p], timeout=5)
+                    for proc in alive:
+                        try:
+                            proc.kill()
+                        except:
+                            pass
+                except psutil.NoSuchProcess:
+                    pass
+            else:
+                # Останавливаем через Popen
+                try:
+                    parent = psutil.Process(self.process.pid)
+                    children = parent.children(recursive=True)
+                    for child in children:
+                        try:
+                            child.terminate()
+                        except:
+                            pass
+                    gone, alive = psutil.wait_procs(children + [parent], timeout=5)
+                    for proc in alive:
+                        try:
+                            proc.kill()
+                        except:
+                            pass
+                except psutil.NoSuchProcess:
+                    pass
             
-            gone, alive = psutil.wait_procs(children + [parent], timeout=5)
-            for p in alive:
-                p.kill()
-                
+            # Очищаем PID файл
+            clear_pid('server')
+            self._pid = None
+            self._using_pid = False
             self.process = None
+            
             return True, "Сервер остановлен."
         except Exception as e:
             return False, f"Ошибка остановки: {str(e)}"
-
-    def is_running(self):
-        """Проверяет, жив ли процесс сервера."""
-        if self.process is None:
-            return False
-        return self.process.poll() is None
 
     def status(self):
         """Возвращает статус сервера."""
         if self.is_running():
             try:
-                p = psutil.Process(self.process.pid)
+                pid = self._pid if self._using_pid else self.process.pid
+                p = psutil.Process(pid)
                 mem_mb = p.memory_info().rss / 1024 / 1024
                 cpu = p.cpu_percent(interval=0.1)
                 return {
                     "running": True,
-                    "pid": self.process.pid,
+                    "pid": pid,
                     "memory_mb": f"{mem_mb:.1f}",
                     "cpu_percent": f"{cpu:.1f}"
                 }
             except:
-                return {"running": True, "pid": self.process.pid}
+                return {"running": True, "pid": pid}
         return {"running": False}
 
     def _read_output(self):
         """Читает вывод сервера в отдельном потоке и кладет строки в очередь."""
         while self.should_read and self.process and self.process.stdout:
-            line = self.process.stdout.readline()
-            if not line:
+            try:
+                line = self.process.stdout.readline()
+                if not line:
+                    break
+                self.log_queue.put(line.strip())
+            except:
                 break
-            self.log_queue.put(line.strip())
         self.log_queue.put(None)
 
     def get_logs(self):

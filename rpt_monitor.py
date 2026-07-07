@@ -6,7 +6,6 @@ import threading
 import queue
 import re
 from datetime import datetime
-from player_tracker import PlayerTracker  # ← НОВЫЙ ИМПОРТ
 
 class RPTMonitor:
     def __init__(self, profiles_dir):
@@ -26,9 +25,8 @@ class RPTMonitor:
         self.db_monitor_started = False
         self.initial_db_mtime = None
         
-        # ===== НОВОЕ: Трекер игроков =====
-        self.player_tracker = PlayerTracker()
-        self.player_tracker.set_log_queue(self.log_queue)
+        # ===== Простой счётчик онлайн =====
+        self.online_count = 0
         
         # Пытаемся найти папку storage_1
         self._find_storage_path()
@@ -201,22 +199,8 @@ class RPTMonitor:
         message = None
         raw_time = stripped[:8] if len(stripped) > 8 else ""
         
-        # ===== НОВОЕ: Проверяем вход/выход игроков =====
-        player_event = self.player_tracker.process_line(stripped)
-        if player_event:
-            # Возвращаем событие игрока как есть
-            return {
-                'type': player_event['type'],
-                'message': player_event['message'],
-                'raw': stripped,
-                'timestamp': datetime.now().isoformat(),
-                'server_ready': self.server_ready,
-                'player': player_event.get('player'),
-                'steam_id': player_event.get('steam_id')
-            }
-        
         # ============================================
-        # ОСТАЛЬНЫЕ СОБЫТИЯ (без изменений)
+        # ОСТАЛЬНЫЕ СОБЫТИЯ
         # ============================================
         
         if "Создан выделенный сервер" in stripped:
@@ -296,6 +280,18 @@ class RPTMonitor:
                 message = f"📦 Загружено предметов: {count}"
             else:
                 message = f"📦 Загрузка предметов завершена"
+            
+        # ===== СЧЁТЧИК ОНЛАЙН =====
+        elif "Подключился игрок" in stripped or "Player" in stripped and "is connected" in stripped:
+            # Просто увеличиваем счётчик
+            self.online_count += 1
+            # Не выводим сообщение
+            
+        elif "[Disconnect]: Client" in stripped or "[Disconnect]: Player destroy" in stripped:
+            # Уменьшаем счётчик
+            if self.online_count > 0:
+                self.online_count -= 1
+            # Не выводим сообщение
             
         if msg_type is None:
             return None
@@ -388,6 +384,7 @@ class RPTMonitor:
                     self.server_ready = False
                     self.last_db_mtime = None
                     self.db_monitor_started = False
+                    self.online_count = 0  # Сбрасываем счётчик при перезапуске
                     f.close()
                     f = open(self.current_rpt, "r", encoding="utf-8", errors="ignore")
                     f.seek(0, os.SEEK_END)
@@ -456,19 +453,6 @@ class RPTMonitor:
         """Возвращает статус готовности сервера."""
         return self.server_ready
     
-    # ===== НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С ИГРОКАМИ =====
-    def get_player_history(self, limit=50):
-        """Возвращает историю игроков."""
-        return self.player_tracker.get_history(limit)
-    
-    def get_current_players(self):
-        """Возвращает список текущих игроков."""
-        return self.player_tracker.get_current_players()
-    
     def get_online_count(self):
         """Возвращает количество игроков онлайн."""
-        return self.player_tracker.get_online_count()
-    
-    def get_players_json(self):
-        """Возвращает полную информацию об игроках в JSON."""
-        return self.player_tracker.get_history_json()
+        return self.online_count

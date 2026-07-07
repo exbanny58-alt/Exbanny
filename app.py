@@ -3,14 +3,15 @@ from routes import register_routes
 import logging
 import sys
 from server_manager import DayZServer
-from game_manager import DayZGame  # ← НОВЫЙ ИМПОРТ
+from game_manager import DayZGame
 import os
+from pid_manager import load_pid, is_process_running, clear_pid  # Добавляем
 
 app = Flask(__name__)
 
 # Глобальные экземпляры
 server_instance = None
-game_instance = None  # ← НОВЫЙ ЭКЗЕМПЛЯР
+game_instance = None
 
 def get_server():
     """Возвращает экземпляр сервера, создавая его при необходимости"""
@@ -26,7 +27,7 @@ def get_server():
             server_instance = DayZServer('')
     return server_instance
 
-def get_game():  # ← НОВАЯ ФУНКЦИЯ
+def get_game():
     """Возвращает экземпляр игры, создавая его при необходимости"""
     global game_instance
     if game_instance is None:
@@ -44,7 +45,14 @@ def get_game():  # ← НОВАЯ ФУНКЦИЯ
 register_routes(app)
 
 if __name__ == '__main__':
-    # Проверяем аргументы командной строки
+    # Проверяем наличие старых PID файлов при старте
+    # Если процесс не запущен - очищаем
+    for pid_type in ['server', 'game']:
+        pid = load_pid(pid_type)
+        if pid and not is_process_running(pid):
+            clear_pid(pid_type)
+            print(f'🧹 Очищен неактивный PID {pid_type}: {pid}')
+    
     if '--gui' in sys.argv:
         # Запуск в GUI режиме
         from flaskwebgui import FlaskUI
@@ -53,7 +61,6 @@ if __name__ == '__main__':
         flaskwebgui_logger.setLevel(logging.ERROR)
         
         # Инициализируем сервер до запуска GUI
-        # (RPT монитор запустится автоматически)
         get_server()
         
         FlaskUI(
@@ -65,7 +72,6 @@ if __name__ == '__main__':
         ).run()
     else:
         # Запуск в браузере (по умолчанию)
-        # Инициализируем сервер до запуска
         get_server()
         
         app.run(

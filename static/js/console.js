@@ -7,6 +7,7 @@ let consoleLines = [];
 let rptPollingInterval = null;
 let isRptPolling = false;
 let isRptEnabled = true;
+let processedLogs = new Set();
 
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ КОНСОЛИ
@@ -14,19 +15,12 @@ let isRptEnabled = true;
 function initConsole() {
     console.log('📟 Инициализация консоли с RPT поддержкой');
     
-    // Создаём кнопку
     createConsoleButton();
-    
-    // Создаём окно консоли (скрытое)
     createConsoleWindow();
-    
-    // Добавляем кнопку RPT
     addRptToggleButton();
     
-    // ЗАПУСКАЕМ ОПРОС СРАЗУ (RPT монитор уже активен)
     startRptPolling();
     
-    // Проверяем статус RPT через 2 секунды
     setTimeout(() => {
         checkRptStatus();
     }, 2000);
@@ -72,6 +66,7 @@ function createConsoleWindow() {
                 </svg>
                 Консоль
                 <span class="rpt-badge" id="rptStatusBadge">RPT ●</span>
+                <span class="rpt-badge" id="playersOnlineBadge" style="background:rgba(96,165,250,0.08);border-color:rgba(96,165,250,0.15);color:rgba(96,165,250,0.6);">👤 0</span>
             </span>
             <div class="console-window-actions">
                 <button class="console-clear-btn" onclick="clearConsoleWindow()" title="Очистить">
@@ -112,8 +107,8 @@ function toggleConsole() {
         window.classList.remove('hidden');
         window.classList.add('show');
         btn.classList.add('active');
-        // При открытии подгружаем свежие RPT логи
         fetchRPTLogs();
+        updateOnlineCount();
     } else {
         window.classList.remove('show');
         window.classList.add('hidden');
@@ -129,19 +124,38 @@ function addConsoleLine(type, message) {
     if (!body) return;
     
     const line = document.createElement('div');
-    line.className = `console-line console-${type}`;
-    
     const timestamp = new Date().toLocaleTimeString();
+    
+    line.className = `console-line console-${type}`;
     line.textContent = `[${timestamp}] ${message}`;
     
     body.appendChild(line);
     
-    // Автоскролл вниз
     body.scrollTop = body.scrollHeight;
     
-    // Ограничиваем количество строк
-    while (body.children.length > 1000) {
+    while (body.children.length > 500) {
         body.removeChild(body.firstChild);
+    }
+}
+
+// ============================================
+// ОБНОВЛЕНИЕ СЧЁТЧИКА ОНЛАЙН
+// ============================================
+async function updateOnlineCount() {
+    try {
+        const response = await fetch('/api/players/current');
+        const data = await response.json();
+        
+        if (data.success) {
+            const badge = document.getElementById('playersOnlineBadge');
+            if (badge) {
+                const count = data.online_count || 0;
+                badge.textContent = `👤 ${count}`;
+                badge.style.color = count > 0 ? 'rgba(74,222,128,0.7)' : 'rgba(96,165,250,0.6)';
+            }
+        }
+    } catch (e) {
+        // Игнорируем
     }
 }
 
@@ -153,7 +167,19 @@ function clearConsoleWindow() {
     if (!body) return;
     
     body.innerHTML = '';
+    processedLogs.clear();
     addConsoleLine('system', '📟 Консоль очищена');
+}
+
+// ============================================
+// ГЕНЕРАЦИЯ УНИКАЛЬНОГО КЛЮЧА ДЛЯ ЛОГА
+// ============================================
+function getLogKey(log) {
+    const raw = log.raw || log.message || '';
+    const time = log.timestamp || '';
+    const msgPart = raw.substring(0, 50);
+    const timePart = time.substring(0, 19);
+    return `${msgPart}_${timePart}`;
 }
 
 // ============================================
@@ -167,14 +193,24 @@ async function fetchRPTLogs() {
         const data = await response.json();
         
         if (data.success && data.logs && data.logs.length > 0) {
-            data.logs.forEach(log => {
+            const logs = data.logs;
+            
+            logs.forEach(log => {
+                const logKey = getLogKey(log);
+                
+                if (processedLogs.has(logKey)) return;
+                processedLogs.add(logKey);
+                
                 let type = log.type || 'info';
                 let message = log.message || log.raw || '';
                 
-                // Пропускаем пустые сообщения
                 if (!message || !message.trim()) return;
                 
-                // Обрезаем слишком длинные строки
+                // Пропускаем события игроков (player_join и player_leave)
+                if (type === 'player_join' || type === 'player_leave') {
+                    return;
+                }
+                
                 if (message.length > 500) {
                     message = message.substring(0, 500) + '...';
                 }
@@ -182,11 +218,13 @@ async function fetchRPTLogs() {
                 addConsoleLine(type, message);
             });
             
-            // Обновляем статус RPT (он активен)
             updateRptStatus(true);
+            
+            if (logs.length > 0) {
+                updateOnlineCount();
+            }
         }
     } catch (e) {
-        // Не выводим ошибку в консоль, чтобы не спамить
         console.debug('⚠️ Ошибка получения RPT логов:', e.message);
     }
 }
@@ -220,10 +258,11 @@ function startRptPolling() {
     isRptPolling = true;
     console.log('📟 Запуск опроса RPT логов...');
     
-    // Первый запрос сразу
-    setTimeout(() => fetchRPTLogs(), 300);
+    setTimeout(() => {
+        fetchRPTLogs();
+        updateOnlineCount();
+    }, 300);
     
-    // Затем каждые 2 секунды
     rptPollingInterval = setInterval(() => {
         fetchRPTLogs();
     }, 2000);
@@ -290,7 +329,6 @@ function toggleRptLogs() {
     const isActive = btn.dataset.active === 'true';
     
     if (isActive) {
-        // Выключаем RPT
         btn.dataset.active = 'false';
         btn.style.background = 'rgba(255, 255, 255, 0.02)';
         btn.style.borderColor = 'rgba(255, 255, 255, 0.05)';
@@ -301,7 +339,6 @@ function toggleRptLogs() {
         addConsoleLine('system', '📟 RPT логи отключены');
         updateRptStatus(false);
     } else {
-        // Включаем RPT
         btn.dataset.active = 'true';
         btn.style.background = 'rgba(74, 222, 128, 0.06)';
         btn.style.borderColor = 'rgba(74, 222, 128, 0.12)';
@@ -310,7 +347,6 @@ function toggleRptLogs() {
         isRptEnabled = true;
         addConsoleLine('system', '📟 RPT логи включены');
         startRptPolling();
-        // Сразу подгружаем логи
         setTimeout(() => fetchRPTLogs(), 300);
     }
 }
@@ -326,17 +362,13 @@ async function checkRptStatus() {
         if (data.success) {
             const isMonitoring = data.monitoring || false;
             
-            // Обновляем статус
             updateRptStatus(isMonitoring && isRptEnabled);
             
-            // Если монитор не активен - пробуем перезапустить
             if (!isMonitoring && isRptEnabled) {
                 console.log('⚠️ RPT монитор не активен, пробуем перезапустить...');
-                // Перезапускаем опрос
                 stopRptPolling();
                 setTimeout(() => {
                     startRptPolling();
-                    // Проверяем статус через 3 секунды
                     setTimeout(() => checkRptStatus(), 3000);
                 }, 1000);
             }
@@ -359,5 +391,6 @@ window.stopRptPolling = stopRptPolling;
 window.toggleRptLogs = toggleRptLogs;
 window.checkRptStatus = checkRptStatus;
 window.updateRptStatus = updateRptStatus;
+window.updateOnlineCount = updateOnlineCount;
 
-console.log('📟 console.js загружен с RPT поддержкой');
+console.log('📟 console.js загружен (только счётчик онлайн)');
