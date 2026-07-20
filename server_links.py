@@ -1,13 +1,16 @@
+# server_links.py
 import os
 import json
 import subprocess
 import platform
 import shutil
 import tempfile
+import re
 from datetime import datetime
 
 # Файл для хранения конфига подключённых модов
 SERVER_LINKS_FILE = os.path.join(os.path.dirname(__file__), 'server_links.json')
+
 
 def load_server_links():
     """Загружает список подключённых модов"""
@@ -19,6 +22,7 @@ def load_server_links():
             return {}
     return {}
 
+
 def save_server_links(links):
     """Сохраняет список подключённых модов"""
     try:
@@ -29,9 +33,11 @@ def save_server_links(links):
         print(f'❌ Ошибка сохранения server_links: {e}')
         return False
 
+
 def is_symlink(path):
     """Проверяет, является ли путь символической ссылкой"""
     return os.path.islink(path)
+
 
 def force_delete_path(path):
     """
@@ -104,10 +110,62 @@ def force_delete_path(path):
         print(f'❌ Ошибка удаления {path}: {e}')
         return False
 
+
+def clean_mod_name_for_path(name):
+    """
+    Очищает имя мода для использования в пути и аргументах командной строки
+    Заменяет пробелы на _, удаляет недопустимые символы
+    """
+    if not name:
+        return 'mod'
+    
+    # Убираем префикс @ если есть
+    clean = name.lstrip('@')
+    
+    # Заменяем пробелы на _
+    clean = clean.replace(' ', '_')
+    
+    # Удаляем недопустимые символы для имени папки/аргумента
+    clean = re.sub(r'[<>:"/\\|?*]', '', clean)
+    
+    # Убираем множественные подчёркивания
+    clean = re.sub(r'_+', '_', clean)
+    
+    # Убираем подчёркивания в начале и конце
+    clean = clean.strip('_')
+    
+    # Если имя стало пустым, возвращаем "mod"
+    if not clean:
+        return 'mod'
+    
+    # Добавляем префикс @
+    return f'@{clean}'
+
+
+def get_mod_link_name(mod_folder, mod_name=None):
+    """
+    Генерирует человеческое имя для ссылки
+    Приоритет: mod_name -> mod_folder -> @имя_папки
+    Заменяет пробелы на _ для совместимости с командной строкой
+    """
+    # Если есть имя мода - используем его
+    if mod_name and mod_name.strip():
+        # Очищаем имя
+        clean_name = clean_mod_name_for_path(mod_name)
+        # Убираем префикс @ если был добавлен
+        clean_name = clean_name.lstrip('@')
+        if clean_name:
+            return f'@{clean_name}'
+    
+    # Если нет имени, используем папку
+    clean_folder = clean_mod_name_for_path(mod_folder)
+    clean_folder = clean_folder.lstrip('@')
+    return f'@{clean_folder}'
+
+
 def create_symlink_windows(source_path, link_path):
     """
     Создаёт символическую ссылку на Windows через os.symlink
-    (требует права администратора или включённый режим разработчика)
     """
     try:
         # Удаляем всё что есть по пути
@@ -116,15 +174,14 @@ def create_symlink_windows(source_path, link_path):
             force_delete_path(link_path)
         
         # Создаём символическую ссылку через os.symlink
-        # На Windows нужно указать target_is_directory=True для папок
         os.symlink(source_path, link_path, target_is_directory=True)
         print(f'✅ Создана симлинк: {link_path} -> {source_path}')
         return True, 'Символическая ссылка создана'
             
     except Exception as e:
         print(f'❌ Ошибка создания симлинка: {e}')
-        # Если os.symlink не работает, пробуем через mklink
         return create_symlink_mklink(source_path, link_path)
+
 
 def create_symlink_mklink(source_path, link_path):
     """
@@ -155,6 +212,7 @@ def create_symlink_mklink(source_path, link_path):
         print(f'❌ Ошибка создания ссылки: {e}')
         return False, str(e)
 
+
 def create_symlink(source_path, link_path):
     """
     Создаёт символическую ссылку
@@ -162,16 +220,12 @@ def create_symlink(source_path, link_path):
     system = platform.system()
     
     if system == 'Windows':
-        # Сначала пробуем os.symlink
         success, message = create_symlink_windows(source_path, link_path)
         if success:
             return success, message
-        
-        # Если не вышло - пробуем mklink
         print('⚠️ os.symlink не сработал, пробуем mklink...')
         return create_symlink_mklink(source_path, link_path)
     else:
-        # Linux/Mac
         try:
             if os.path.exists(link_path) or os.path.islink(link_path):
                 force_delete_path(link_path)
@@ -181,10 +235,6 @@ def create_symlink(source_path, link_path):
         except Exception as e:
             return False, str(e)
 
-def get_mod_link_name(mod_folder):
-    """Генерирует имя для ссылки (с префиксом @)"""
-    clean_name = mod_folder.lstrip('@')
-    return f'@{clean_name}'
 
 def _copy_keys_from_mod(mod_name, mod_source_path, server_keys_dir):
     """Копирует все .bikey файлы из папки мода в папку Keys сервера."""
@@ -214,6 +264,7 @@ def _copy_keys_from_mod(mod_name, mod_source_path, server_keys_dir):
     
     return copied_count
 
+
 def _remove_keys_from_mod(mod_name, mod_source_path, server_keys_dir):
     """Удаляет ключи конкретного мода из папки Keys сервера."""
     if not os.path.exists(server_keys_dir):
@@ -240,9 +291,11 @@ def _remove_keys_from_mod(mod_name, mod_source_path, server_keys_dir):
             except Exception as e:
                 print(f'⚠️ Ошибка удаления ключа {key_name}: {e}')
 
+
 def rebuild_all_keys(server_dir, connected_mods_list):
     """
     Полностью пересобирает папку Keys для всех подключённых модов
+    connected_mods_list: список кортежей (mod_name, mod_path)
     """
     server_keys_dir = os.path.join(server_dir, 'Keys')
     os.makedirs(server_keys_dir, exist_ok=True)
@@ -288,6 +341,7 @@ def rebuild_all_keys(server_dir, connected_mods_list):
     
     print(f'✅ Папка Keys пересобрана. Подключено модов: {len(connected_mods_list)}')
 
+
 def connect_mod_to_server(mod_id, mod_path, mod_name, mod_folder, server_dir):
     """
     Подключает мод к серверу - создаёт ссылку и копирует ключи
@@ -301,9 +355,25 @@ def connect_mod_to_server(mod_id, mod_path, mod_name, mod_folder, server_dir):
     if not os.path.exists(server_dir):
         return {'success': False, 'message': f'Папка сервера не найдена: {server_dir}'}
     
-    # Генерируем имя для ссылки
-    link_name = get_mod_link_name(mod_folder)
+    # Генерируем человеческое имя для ссылки
+    link_name = get_mod_link_name(mod_folder, mod_name)
     link_path = os.path.join(server_dir, link_name)
+    
+    # Проверяем, не существует ли уже такой ссылки с другим названием
+    links = load_server_links()
+    for existing_id, info in links.items():
+        if existing_id == mod_id:
+            continue
+        if info.get('mod_path') == mod_path:
+            old_link = info.get('link_path')
+            if old_link and (os.path.exists(old_link) or os.path.islink(old_link)):
+                print(f'🗑️ Удаляем старую ссылку: {old_link}')
+                force_delete_path(old_link)
+            # Обновляем запись
+            links[existing_id]['link_path'] = link_path
+            links[existing_id]['link_name'] = link_name
+            save_server_links(links)
+            break
     
     # Создаём ссылку
     success, message = create_symlink(mod_path, link_path)
@@ -326,14 +396,16 @@ def connect_mod_to_server(mod_id, mod_path, mod_name, mod_folder, server_dir):
     save_server_links(links)
     
     # Пересобираем ключи для всех подключённых модов
-    connected = [(info['mod_folder'], info['mod_path']) for info in links.values()]
+    connected = [(info.get('mod_name') or info.get('mod_folder'), info['mod_path']) for info in links.values()]
     rebuild_all_keys(server_dir, connected)
     
     return {
         'success': True,
         'message': f'Мод "{mod_name}" подключён к серверу',
-        'link_path': link_path
+        'link_path': link_path,
+        'link_name': link_name
     }
+
 
 def disconnect_mod_from_server(mod_id):
     """
@@ -349,11 +421,12 @@ def disconnect_mod_from_server(mod_id):
     mod_path = link_info.get('mod_path')
     server_dir = link_info.get('server_dir')
     mod_folder = link_info.get('mod_folder')
+    mod_name = link_info.get('mod_name', mod_folder)
     
     # Удаляем ключи этого мода
     if server_dir and mod_path:
         server_keys_dir = os.path.join(server_dir, 'Keys')
-        _remove_keys_from_mod(mod_folder, mod_path, server_keys_dir)
+        _remove_keys_from_mod(mod_name, mod_path, server_keys_dir)
     
     # Удаляем ссылку/папку
     if link_path:
@@ -366,22 +439,25 @@ def disconnect_mod_from_server(mod_id):
     
     # Пересобираем ключи для оставшихся модов
     if server_dir:
-        connected = [(info['mod_folder'], info['mod_path']) for info in links.values()]
+        connected = [(info.get('mod_name') or info.get('mod_folder'), info['mod_path']) for info in links.values()]
         rebuild_all_keys(server_dir, connected)
     
     return {
         'success': True,
-        'message': f'Мод отключён от сервера'
+        'message': f'Мод "{mod_name}" отключён от сервера'
     }
+
 
 def get_connected_mods():
     """Возвращает список подключённых модов"""
     links = load_server_links()
     return links
 
+
 def get_connected_mods_list(settings):
     """
     Возвращает список подключённых модов с путями для пересборки ключей
+    Возвращает список кортежей (mod_name, mod_path)
     """
     links = load_server_links()
     workshop = settings.get('workshop', '')
@@ -389,8 +465,12 @@ def get_connected_mods_list(settings):
     
     connected = []
     for mod_id, info in links.items():
+        if not info.get('enabled', True):
+            continue
+        
         mod_folder = info.get('mod_folder')
         if not mod_folder:
+            print(f'⚠️ Папка мода не найдена: {mod_id}')
             continue
         
         # Ищем папку мода
@@ -403,8 +483,9 @@ def get_connected_mods_list(settings):
                     break
         
         if mod_path:
-            connected.append((mod_folder, mod_path))
+            mod_name = info.get('mod_name', mod_folder)
+            connected.append((mod_name, mod_path))
         else:
-            print(f'⚠️ Папка мода не найдена: {mod_folder}')
+            print(f'⚠️ Папка мода не найдена: {mod_folder} (mod_id: {mod_id})')
     
     return connected

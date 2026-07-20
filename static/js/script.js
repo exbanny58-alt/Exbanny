@@ -15,26 +15,8 @@ const pages = {
                     </svg>
                     Управление сервером
                 </h1>
-                <p class="server-subtitle">Список модов, отмеченных как "СерверМод"</p>
+                <p class="server-subtitle">Список модов, отмеченных как "СерверМод" или "Серверный"</p>
             </div>
-
-            <!-- ❌ УДАЛЯЕМ ВЕСЬ БЛОК server-stats -->
-            <!--
-            <div class="server-stats" id="serverStats">
-                <div class="stat-card">
-                    <span class="stat-number" id="serverModsCount">0</span>
-                    <span class="stat-label">Серверных модов</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="serverWorkshopCount">0</span>
-                    <span class="stat-label">Из Workshop</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number" id="serverCustomCount">0</span>
-                    <span class="stat-label">Кастомных</span>
-                </div>
-            </div>
-            -->
 
             <!-- Панель управления -->
             <div class="server-toolbar">
@@ -47,6 +29,15 @@ const pages = {
                     </svg>
                     Обновить список
                 </button>
+                
+                <button class="btn btn-danger" id="clearServerLinksBtn" onclick="clearServerLinks()" title="Очистить все подключения и удалить симлинки">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                    </svg>
+                    Очистить подключения
+                </button>
+                
                 <div class="server-filter">
                     <input type="text" id="serverModsSearchInput" placeholder="🔍 Поиск модов..." class="server-search">
                 </div>
@@ -61,7 +52,6 @@ const pages = {
             </div>
         </div>
     `,
-// В pages.game - добавляем кнопку
     game: `
         <div class="game-content-wrapper">
             <div class="game-header">
@@ -86,7 +76,6 @@ const pages = {
                     Обновить список
                 </button>
                 
-                <!-- НОВАЯ КНОПКА СМЕНЫ НИКА -->
                 <button class="btn btn-nickname" id="changeNicknameBtn" title="Изменить ник в игре">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -95,7 +84,6 @@ const pages = {
                     Ник: <span id="currentNicknameDisplay">player</span>
                 </button>
                 
-                <!-- Кнопка подключения всех модов -->
                 <button class="btn btn-game-connect-all" id="connectAllGameModsBtn" title="Подключить все моды, которые используются на сервере">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 5v14"/>
@@ -183,6 +171,36 @@ const pages = {
                 </div>
             </div>
         </div>
+    `,
+    editors: `
+        <div class="editors-content-wrapper">
+            <div class="editors-header">
+                <h1>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12,2 2,7 12,12 22,7 12,2"/>
+                        <polyline points="2,17 12,22 22,17"/>
+                        <polyline points="2,12 12,17 22,12"/>
+                    </svg>
+                    Редакторы
+                </h1>
+                <p class="editors-subtitle">Выберите редактор для работы с файлами DayZ</p>
+            </div>
+
+            <!-- Панель выбора редактора -->
+            <div class="editors-toolbar">
+                <div class="editor-select-wrapper">
+                    <label for="editorSelect" class="editor-select-label">Выберите редактор:</label>
+                    <select id="editorSelect" class="editor-select">
+                        <option value="">— Выберите редактор —</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Место для контента редактора -->
+            <div class="editor-content-area" id="editorContentArea">
+                <!-- Сюда будет подгружаться контент выбранного редактора -->
+            </div>
+        </div>
     `
 };
 
@@ -193,7 +211,7 @@ let currentPage = null;
 let isFirstClick = true;
 
 // Массив пунктов меню в порядке сверху вниз
-const menuOrder = ['server', 'game', 'mods', 'settings'];
+const menuOrder = ['server', 'game', 'mods', 'editors', 'settings'];
 
 // Получить HTML стартовой страницы
 function getStartPageHTML() {
@@ -327,20 +345,16 @@ function initPageAfterLoad(page) {
             const container = document.getElementById('serverModsContainer');
             
             if (container) {
-                // Инициализируем страницу сервера
                 if (typeof initServerPage === 'function') {
                     initServerPage();
                 }
                 
-                // Настраиваем поиск
                 if (typeof setupServerModsSearch === 'function') {
                     setupServerModsSearch();
                 }
                 
-                // Обработчик кнопки обновления
                 const refreshBtn = document.getElementById('refreshServerModsBtn');
                 if (refreshBtn) {
-                    // Удаляем старые обработчики, чтобы не дублировать
                     const newRefreshBtn = refreshBtn.cloneNode(true);
                     refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
                     
@@ -366,7 +380,6 @@ function initPageAfterLoad(page) {
     // ============================================
     // СТРАНИЦА КЛИЕНТА
     // ============================================   
-    // В функции initPageAfterLoad - для страницы game:
     if (page === 'game') {
         let attempts = 0;
         const maxAttempts = 10;
@@ -408,33 +421,32 @@ function initPageAfterLoad(page) {
         setTimeout(tryInitGame, 100);
     }
 
-
     // ============================================
-    // СТРАНИЦА STEAMCMD
+    // СТРАНИЦА РЕДАКТОРОВ
     // ============================================   
-    if (page === 'steamcmd') {
+    if (page === 'editors') {
         let attempts = 0;
         const maxAttempts = 10;
         
-        function tryInitSteamCMD() {
+        function tryInitEditors() {
             attempts++;
-            const container = document.getElementById('installServerBtn');
+            const select = document.getElementById('editorSelect');
             
-            if (container) {
-                if (typeof initSteamCMD === 'function') {
-                    initSteamCMD();
+            if (select) {
+                if (typeof initEditorsPage === 'function') {
+                    initEditorsPage();
                 }
                 return;
             }
             
             if (attempts < maxAttempts) {
-                setTimeout(tryInitSteamCMD, 200);
+                setTimeout(tryInitEditors, 200);
             } else {
-                console.warn('Не удалось инициализировать SteamCMD');
+                console.warn('Не удалось инициализировать страницу редакторов');
             }
         }
         
-        setTimeout(tryInitSteamCMD, 100);
+        setTimeout(tryInitEditors, 100);
     }
 }
 
@@ -719,13 +731,11 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof loadModsState === 'function') {
         loadModsState().then(() => {
-            // Пытаемся загрузить кеш (мгновенно)
             if (typeof loadModsFromCache === 'function') {
                 console.log('⚡ Загрузка кеша модов...');
                 loadModsFromCache().then((loaded) => {
                     if (loaded) {
                         console.log('✅ Кеш модов загружен');
-                        // В фоне проверяем обновления через 3 секунды
                         setTimeout(() => {
                             if (typeof backgroundScanAndCache === 'function') {
                                 console.log('🔄 Фоновая проверка обновлений...');
@@ -733,7 +743,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }, 3000);
                     } else {
-                        // Кеша нет — запускаем сканирование в фоне
                         console.log('🚀 Кеша нет, запуск фонового сканирования...');
                         if (typeof scanMods === 'function') {
                             scanMods(false);
@@ -749,7 +758,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // ИНИЦИАЛИЗАЦИЯ КОНСОЛИ ПРИ СТАРТЕ
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Инициализируем консоль после загрузки страницы
     setTimeout(() => {
         if (typeof initConsole === 'function') {
             initConsole();

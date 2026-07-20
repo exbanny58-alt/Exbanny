@@ -1,7 +1,5 @@
 {
-  "custom_mods": "E:/Dayz/DayZ_Mods",
-  "game_exe": "E:/SteamLibrary/steamapps/common/DayZ/DayZ_x64.exe",
-  "server_exe": "E:/SteamLibrary/steamapps/common/DayZServer/DayZServer_x64.exe",
-  "workshop": "E:/SteamLibrary/steamapps/workshop/content/221100",
-  "game_nickname": "Exbanny"
+  "game_exe": "C:/Program Files (x86)/Steam/steamapps/common/DayZ/DayZ_x64.exe",
+  "server_exe": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer/DayZServer_x64.exe",
+  "workshop": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100"
 }

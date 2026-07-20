@@ -1195,3 +1195,158 @@ def register_routes(app):
                 }), 404
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+
+
+    # ============================================
+    # API ДЛЯ РАБОТЫ С ФАЙЛАМИ (EDITORS)
+    # ============================================
+
+    @app.route('/api/file/exists', methods=['POST'])
+    def file_exists():
+        """Проверяет существование файла"""
+        try:
+            data = request.get_json()
+            path = data.get('path', '').strip()
+            
+            if not path:
+                return jsonify({'exists': False, 'message': 'Путь не указан'})
+            
+            exists = os.path.exists(path) and os.path.isfile(path)
+            return jsonify({'exists': exists})
+            
+        except Exception as e:
+            return jsonify({'exists': False, 'message': str(e)})
+
+    @app.route('/api/file/read', methods=['POST'])
+    def file_read():
+        """Читает содержимое файла"""
+        try:
+            data = request.get_json()
+            path = data.get('path', '').strip()
+            
+            if not path:
+                return jsonify({'success': False, 'message': 'Путь не указан'})
+            
+            if not os.path.exists(path):
+                return jsonify({'success': False, 'message': f'Файл не найден: {path}'})
+            
+            with open(path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            
+            return jsonify({'success': True, 'content': content})
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)})
+
+    @app.route('/api/file/write', methods=['POST'])
+    def file_write():
+        """Записывает содержимое в файл"""
+        try:
+            data = request.get_json()
+            path = data.get('path', '').strip()
+            content = data.get('content', '')
+            
+            if not path:
+                return jsonify({'success': False, 'message': 'Путь не указан'})
+            
+            # Создаём резервную копию
+            if os.path.exists(path):
+                backup_path = path + '.bak'
+                import shutil
+                shutil.copy2(path, backup_path)
+            
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            
+            return jsonify({'success': True, 'message': 'Файл сохранён'})
+            
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)})
+        
+        # routes.py - добавьте этот маршрут
+
+    # ============================================
+    # API ДЛЯ ОЧИСТКИ КОНФИГА ПОДКЛЮЧЕНИЙ
+    # ============================================
+
+    @app.route('/api/server/links/clear', methods=['POST'])
+    def clear_server_links():
+        """Очищает файл server_links.json и удаляет все симлинки"""
+        try:
+            from server_links import load_server_links, save_server_links, force_delete_path
+            
+            links = load_server_links()
+            
+            if not links:
+                return jsonify({
+                    'success': True,
+                    'message': 'Конфиг уже пуст',
+                    'cleared': 0
+                })
+            
+            # Удаляем все симлинки
+            deleted_count = 0
+            for mod_id, info in links.items():
+                link_path = info.get('link_path')
+                if link_path:
+                    try:
+                        force_delete_path(link_path)
+                        deleted_count += 1
+                        print(f'🗑️ Удалена ссылка: {link_path}')
+                    except Exception as e:
+                        print(f'⚠️ Ошибка удаления {link_path}: {e}')
+            
+            # Очищаем конфиг
+            save_server_links({})
+            
+            return jsonify({
+                'success': True,
+                'message': f'Конфиг очищен, удалено {deleted_count} ссылок',
+                'cleared': deleted_count
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка очистки конфига: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+        
+    # ============================================
+    # API ДЛЯ MPG SPAWNER EDITOR
+    # ============================================
+
+    @app.route('/api/mpg/points/list', methods=['POST'])
+    def mpg_list_points():
+        """Возвращает список файлов в папке Points"""
+        try:
+            data = request.get_json()
+            path = data.get('path', '').strip()
+            
+            if not path:
+                return jsonify({'success': False, 'message': 'Путь не указан'}), 400
+            
+            if not os.path.exists(path):
+                return jsonify({
+                    'success': True,
+                    'files': [],
+                    'message': 'Папка не существует'
+                })
+            
+            files = []
+            for f in os.listdir(path):
+                full_path = os.path.join(path, f)
+                if os.path.isfile(full_path) and f.endswith('.json'):
+                    files.append(f)
+            
+            return jsonify({
+                'success': True,
+                'files': sorted(files)
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения списка точек: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500

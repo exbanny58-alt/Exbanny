@@ -6,8 +6,11 @@ import threading
 import time
 import queue
 import sys
+import json
 from rpt_monitor import RPTMonitor
 from pid_manager import save_pid, load_pid, clear_pid, is_process_running
+import server_links  # Импортируем весь модуль
+
 
 class DayZServer:
     def __init__(self, server_path, executable="DayZServer_x64.exe", config="serverDZ.cfg"):
@@ -43,7 +46,7 @@ class DayZServer:
             print(f'🔄 Восстановлен PID сервера: {pid}')
             self._pid = pid
             self._using_pid = True
-            self.process = None  # Не используем Popen
+            self.process = None
             return True
         
         if pid:
@@ -54,15 +57,12 @@ class DayZServer:
     def _init_rpt_monitor(self):
         """Инициализирует и запускает RPT монитор."""
         if not self.profiles_dir or not os.path.exists(self.profiles_dir):
-            print(f"⚠️ Папка profiles не найдена: {self.profiles_dir}")
-            # Пробуем найти profiles относительно server_path
             if self.server_path:
                 alt_profiles = os.path.join(self.server_path, "profiles")
                 if os.path.exists(alt_profiles):
                     self.profiles_dir = alt_profiles
                     print(f"✅ Найдена папка profiles: {self.profiles_dir}")
                 else:
-                    # Создаём папку profiles если её нет
                     try:
                         os.makedirs(alt_profiles, exist_ok=True)
                         self.profiles_dir = alt_profiles
@@ -71,7 +71,6 @@ class DayZServer:
                         print(f"❌ Не удалось создать папку profiles")
                         return
         
-        # Создаём и запускаем RPT монитор
         try:
             self.rpt_monitor = RPTMonitor(self.profiles_dir)
             self.should_monitor_rpt = True
@@ -86,10 +85,8 @@ class DayZServer:
         if not self.rpt_monitor:
             return
         
-        # Запускаем монитор
         self.rpt_monitor.start()
         
-        # Передаём логи из монитора в очередь
         while self.should_monitor_rpt and self.rpt_monitor:
             try:
                 logs = self.rpt_monitor.get_logs()
@@ -111,9 +108,22 @@ class DayZServer:
             return False
         return self.process.poll() is None
 
+    def _get_mod_folder_from_cache(self, mod_id):
+        """Получает папку мода из кеша"""
+        try:
+            cache_file = os.path.join(os.path.dirname(__file__), 'mods_cache.json')
+            if os.path.exists(cache_file):
+                with open(cache_file, 'r', encoding='utf-8') as f:
+                    cache = json.load(f)
+                    for mod in cache.get('mods', []):
+                        if mod.get('id') == mod_id:
+                            return mod.get('folder', '')
+        except:
+            pass
+        return ''
+
     def start(self, mods_config=None):
         """Запускает сервер, если он еще не запущен."""
-        # Проверяем, не запущен ли уже
         if self.is_running():
             return False, "Сервер уже запущен."
 
@@ -138,38 +148,77 @@ class DayZServer:
         ]
         
         # ============ ФОРМИРУЕМ АРГУМЕНТЫ МОДОВ ============
-        if mods_config:
-            mod_list = []
+        from settings_manager import load_mods_config
+        
+        server_links_data = server_links.load_server_links()
+        mods_config_from_settings = load_mods_config()
+        
+        # Списки для аргументов
+        mod_list = []           # для -mod= (server_mod)
+        servermod_list = []     # для -servermod= (server)
+        
+        print("\n" + "="*80)
+        print("📋 ФОРМИРОВАНИЕ -mod= и -servermod=")
+        print("="*80)
+        
+        # Проходим по всем подключённым модам
+        for mod_id, link_info in server_links_data.items():
+            if not link_info.get('enabled', True):
+                continue
             
-            print("\n" + "="*80)
-            print("📋 ФОРМИРОВАНИЕ -mod=")
-            print("="*80)
+            # Получаем человеческое имя ссылки
+            link_name = link_info.get('link_name', '')
             
-            for mod_name, types in mods_config.items():
-                if not types.get("connected", False):
-                    print(f"  ⚠️ {mod_name}: НЕ добавлен")
-                    continue
-                
-                from server_links import load_server_links
-                server_links = load_server_links()
-                
-                link_info = server_links.get(mod_name, {})
+            # Если link_name нет, генерируем из mod_folder
+            if not link_name:
                 mod_folder = link_info.get('mod_folder', '')
-                
-                if mod_folder:
-                    mod_list.append('@' + mod_folder)
-                    print(f"  ✅ {mod_name}: добавлен как @{mod_folder}")
-                else:
-                    print(f"  ⚠️ {mod_name}: НЕ найден mod_folder в server_links")
+                mod_name = link_info.get('mod_name', mod_folder)
+                # Генерируем человеческое имя
+                link_name = server_links.get_mod_link_name(mod_folder, mod_name)
+                # Сохраняем обратно
+                link_info['link_name'] = link_name
+                server_links.save_server_links(server_links_data)
             
+            # Очищаем имя от пробелов и недопустимых символов
+            clean_link_name = server_links.clean_mod_name_for_path(link_name)
+            
+            # Проверяем тип мода в конфиге
+            is_server = False
+            is_server_mod = False
+            
+            if mod_id in mods_config_from_settings:
+                is_server = mods_config_from_settings[mod_id].get('server', False)
+                is_server_mod = mods_config_from_settings[mod_id].get('server_mod', False)
+            
+            # Если мод отмечен как server — добавляем в -servermod=
+            if is_server:
+                servermod_list.append(clean_link_name)
+                print(f"  🟡 {mod_id}: добавлен в -servermod= как {clean_link_name}")
+            
+            # Если мод отмечен как server_mod — добавляем в -mod=
+            if is_server_mod:
+                mod_list.append(clean_link_name)
+                print(f"  🔵 {mod_id}: добавлен в -mod= как {clean_link_name}")
+        
+        # Формируем строки команд
+        if mod_list:
+            mod_string = ';'.join(mod_list)
+            command.insert(1, f"-mod={mod_string}")
+            print(f"\n📋 -mod: {mod_string}")
+        else:
+            print("\n⚠️ НЕТ модов для -mod=")
+        
+        if servermod_list:
+            servermod_string = ';'.join(servermod_list)
             if mod_list:
-                mod_string = ';'.join(mod_list)
-                command.insert(1, f"-mod={mod_string}")
-                print(f"\n📋 Итоговый -mod: {mod_string}")
+                command.insert(2, f"-servermod={servermod_string}")
             else:
-                print("\n⚠️ НЕТ МОДОВ для добавления")
-            
-            print("="*80 + "\n")
+                command.insert(1, f"-servermod={servermod_string}")
+            print(f"📋 -servermod: {servermod_string}")
+        else:
+            print("\n⚠️ НЕТ модов для -servermod=")
+        
+        print("="*80 + "\n")
         
         # ============ ВЫВОДИМ КОМАНДУ ============
         print("\n" + "="*80)
@@ -195,11 +244,10 @@ class DayZServer:
                 creationflags=creationflags
             )
             
-            # Сохраняем PID в файл
             if self.process.pid:
                 save_pid('server', self.process.pid)
                 self._pid = self.process.pid
-                self._using_pid = False  # Используем Popen
+                self._using_pid = False
             
             self.should_read = True
             self.reader_thread = threading.Thread(target=self._read_output, daemon=True)
@@ -227,7 +275,6 @@ class DayZServer:
         
         try:
             if self._using_pid and self._pid:
-                # Останавливаем по PID
                 try:
                     p = psutil.Process(self._pid)
                     children = p.children(recursive=True)
@@ -246,7 +293,6 @@ class DayZServer:
                 except psutil.NoSuchProcess:
                     pass
             else:
-                # Останавливаем через Popen
                 try:
                     parent = psutil.Process(self.process.pid)
                     children = parent.children(recursive=True)
@@ -264,7 +310,6 @@ class DayZServer:
                 except psutil.NoSuchProcess:
                     pass
             
-            # Очищаем PID файл
             clear_pid('server')
             self._pid = None
             self._using_pid = False

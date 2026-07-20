@@ -46,19 +46,19 @@
                                 <span class="nav-text">Управление модами</span>
                             </a>
                         </li>
-                        <!-- НОВЫЙ ПУНКТ: STEAMCMD -->
+                        <!-- НОВЫЙ ПУНКТ: РЕДАКТОРЫ -->
                         <li class="nav-item">
-                            <a href="#" onclick="showContent('steamcmd', event)">
-                                <!-- Иконка Steam -->
+                            <a href="#" onclick="showContent('editors', event)">
+                                <!-- Иконка редакторов (куб) -->
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <path d="M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0z"/>
-                                    <path d="M12 8v4l2 2"/>
+                                    <polygon points="12,2 2,7 12,12 22,7 12,2"/>
+                                    <polyline points="2,17 12,22 22,17"/>
+                                    <polyline points="2,12 12,17 22,12"/>
                                 </svg>
-                                <span class="nav-text">SteamCMD</span>
+                                <span class="nav-text">Редакторы</span>
                             </a>
-                        </li>
-                    </ul>
+                        </li> 
+                   </ul>
                 </div>
             </div>
 
@@ -162,6 +162,8 @@
         </section>
     </main>
     
+    
+
 <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
 <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 <script src="{{ url_for('static', filename='js/mods.js') }}"></script>
@@ -170,4 +172,6 @@
 <script src="{{ url_for('static', filename='js/controls.js') }}"></script>
 <script src="{{ url_for('static', filename='js/console.js') }}"></script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script src="{{ url_for('static', filename='js/editors.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mpg_editor.js') }}"></script>
 </html>
