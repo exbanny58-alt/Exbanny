@@ -440,6 +440,320 @@ async function mpgSaveConfig() {
 }
 
 // ============================================
+// КАСТОМНЫЙ SELECT - ОКНО ПО ЦЕНТРУ
+// ============================================
+
+let activeCustomSelectModal = null;
+
+function createMpgCustomSelect(selectElement) {
+    if (!selectElement || selectElement.dataset.customized === 'true') return;
+    
+    const selectId = selectElement.id;
+    console.log(`🔧 Создание кастомного селекта: ${selectId}`);
+    selectElement.dataset.customized = 'true';
+    
+    const options = Array.from(selectElement.options).map(opt => ({
+        value: opt.value,
+        text: opt.textContent
+    }));
+    
+    // Создаем обертку
+    const wrapper = document.createElement('div');
+    wrapper.className = 'mpg-custom-select-wrapper';
+    
+    // Создаем кнопку-триггер
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'mpg-custom-select-trigger';
+    
+    const currentText = selectElement.value ? 
+        (selectElement.options[selectElement.selectedIndex]?.text || 'Выберите...') : 
+        'Выберите...';
+    
+    trigger.innerHTML = `
+        <span class="mpg-custom-select-text">${currentText}</span>
+        <span class="mpg-custom-select-arrow">▼</span>
+    `;
+    
+    // ============================================
+    // СОЗДАЕМ МОДАЛЬНОЕ ОКНО (по центру)
+    // ============================================
+    
+    // Создаем overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'mpg-select-overlay';
+    overlay.style.cssText = `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 999998 !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease !important;
+    `;
+    document.body.appendChild(overlay);
+    
+    // Создаем модальное окно
+    const modal = document.createElement('div');
+    modal.className = 'mpg-select-modal';
+    modal.style.cssText = `
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) scale(0.9) !important;
+        z-index: 999999 !important;
+        min-width: 400px !important;
+        max-width: 550px !important;
+        max-height: 70vh !important;
+        background: rgba(16, 21, 61, 0.65) !important;
+        backdrop-filter: blur(24px) saturate(1.5) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 12px 60px rgba(0, 0, 0, 0.6) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    `;
+    
+    // Заголовок
+    const header = document.createElement('div');
+    header.className = 'mpg-select-modal-header';
+    header.style.cssText = `
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 16px 20px 12px 20px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        flex-shrink: 0 !important;
+    `;
+    header.innerHTML = `
+        <span class="modal-title" style="font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;">Выберите значение</span>
+        <button class="modal-close-btn" style="background:rgba(255,255,255,0.04);border:none;color:rgba(255,255,255,0.25);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;font-size:1.2rem;padding:0;font-family:'Nunito',sans-serif;">✕</button>
+    `;
+    modal.appendChild(header);
+    
+    // Поиск
+    const searchWrap = document.createElement('div');
+    searchWrap.className = 'mpg-select-modal-search';
+    searchWrap.style.cssText = `
+        padding: 12px 16px 14px 16px !important;
+        flex-shrink: 0 !important;
+    `;
+    searchWrap.innerHTML = `
+        <div style="position:relative;">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:0.85rem;opacity:0.3;">🔍</span>
+            <input type="text" placeholder="Поиск..." class="mpg-select-modal-search-input" style="width:100%;padding:10px 12px 10px 38px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e5e5e5;font-size:0.85rem;font-family:'Nunito',sans-serif;outline:none;transition:all 0.3s ease;box-sizing:border-box;">
+        </div>
+    `;
+    modal.appendChild(searchWrap);
+    
+    // Список опций
+    const optionsContainer = document.createElement('div');
+    optionsContainer.className = 'mpg-select-modal-list';
+    optionsContainer.style.cssText = `
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding: 6px 12px 16px 12px !important;
+    `;
+    modal.appendChild(optionsContainer);
+    
+    document.body.appendChild(modal);
+    
+    // Функция рендеринга опций
+    function renderOptions(filter = '') {
+        const searchTerm = filter.toLowerCase().trim();
+        const filtered = searchTerm ? 
+            options.filter(opt => 
+                opt.text.toLowerCase().includes(searchTerm) || 
+                opt.value.toLowerCase().includes(searchTerm)
+            ) : 
+            options;
+        
+        if (filtered.length === 0) {
+            optionsContainer.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:rgba(255,255,255,0.15);text-align:center;">
+                    <span style="font-size:2rem;margin-bottom:8px;">🔍</span>
+                    <span style="font-size:0.85rem;">Ничего не найдено</span>
+                </div>
+            `;
+            return;
+        }
+        
+        optionsContainer.innerHTML = filtered.map(opt => {
+            const isSelected = opt.value === selectElement.value;
+            return `
+                <div class="mpg-select-option ${isSelected ? 'selected' : ''}" data-value="${opt.value}" style="display:flex;align-items:center;padding:10px 14px;border-radius:8px;cursor:pointer;color:${isSelected ? '#a78bfa' : 'rgba(255,255,255,0.5)'};font-size:0.85rem;font-family:'Nunito',sans-serif;transition:all 0.2s ease;border:1px solid ${isSelected ? 'rgba(167,139,250,0.15)' : 'transparent'};margin:2px 0;gap:10px;background:${isSelected ? 'rgba(167,139,250,0.12)' : 'transparent'};font-weight:${isSelected ? '600' : '400'};">
+                    <span style="width:22px;flex-shrink:0;color:${isSelected ? '#a78bfa' : 'rgba(167,139,250,0.2)'};font-size:0.9rem;text-align:center;">${isSelected ? '✓' : ''}</span>
+                    ${opt.text}
+                </div>
+            `;
+        }).join('');
+        
+        // Добавляем обработчики кликов
+        optionsContainer.querySelectorAll('.mpg-select-option').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const value = el.dataset.value;
+                selectElement.value = value;
+                
+                // Обновляем текст на триггере
+                const text = options.find(o => o.value === value)?.text || 'Выберите...';
+                trigger.querySelector('.mpg-custom-select-text').textContent = text;
+                
+                // Закрываем модал
+                closeModal();
+                
+                // Вызываем событие change
+                const event = new Event('change', { bubbles: true });
+                selectElement.dispatchEvent(event);
+                
+                console.log(`✅ Выбрано: ${value}`);
+            });
+            
+            el.addEventListener('mouseenter', () => {
+                if (el.dataset.value !== selectElement.value) {
+                    el.style.background = 'rgba(167,139,250,0.05)';
+                }
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                if (el.dataset.value !== selectElement.value) {
+                    el.style.background = 'transparent';
+                }
+            });
+        });
+    }
+    
+    // Начальный рендер
+    renderOptions();
+    
+    // Функции открытия/закрытия модала
+    function openModal() {
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+        modal.style.opacity = '1';
+        modal.style.pointerEvents = 'auto';
+        modal.style.transform = 'translate(-50%, -50%) scale(1)';
+        
+        // Фокус на поиск
+        const searchInput = modal.querySelector('.mpg-select-modal-search-input');
+        if (searchInput) {
+            setTimeout(() => {
+                searchInput.value = '';
+                searchInput.focus();
+                renderOptions();
+            }, 100);
+        }
+    }
+    
+    function closeModal() {
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+        modal.style.opacity = '0';
+        modal.style.pointerEvents = 'none';
+        modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        trigger.classList.remove('active');
+    }
+    
+    // Обработчик клика по триггеру
+    trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Закрываем все другие модалы
+        document.querySelectorAll('.mpg-select-modal').forEach(m => {
+            m.style.opacity = '0';
+            m.style.pointerEvents = 'none';
+            m.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        });
+        document.querySelectorAll('.mpg-select-overlay').forEach(o => {
+            o.style.opacity = '0';
+            o.style.pointerEvents = 'none';
+        });
+        
+        trigger.classList.add('active');
+        openModal();
+    });
+    
+    // Закрытие при клике на overlay
+    overlay.addEventListener('click', closeModal);
+    
+    // Закрытие по крестику
+    const closeBtn = header.querySelector('.modal-close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeModal);
+    }
+    
+    // Закрытие по Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.style.opacity === '1') {
+            closeModal();
+        }
+    });
+    
+    // Поиск
+    const searchInput = modal.querySelector('.mpg-select-modal-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            renderOptions(searchInput.value);
+        });
+    }
+    
+    // Обновление при программном изменении select
+    selectElement.addEventListener('change', () => {
+        const text = selectElement.value ? 
+            selectElement.options[selectElement.selectedIndex]?.text || 'Выберите...' : 
+            'Выберите...';
+        trigger.querySelector('.mpg-custom-select-text').textContent = text;
+    });
+    
+    // Собираем и заменяем
+    const parent = selectElement.parentNode;
+    if (parent) {
+        parent.insertBefore(wrapper, selectElement);
+        selectElement.style.display = 'none';
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(selectElement);
+        
+        console.log(`✅ Кастомный селект ${selectId} создан (${options.length} опций)`);
+    }
+}
+function initAllMpgCustomSelects(container) {
+    if (!container) return;
+    
+    console.log('🔍 Инициализация кастомных селектов...');
+    
+    const selectIds = [
+        'mpgAnimalSelect',
+        'mpgZombieSelect', 
+        'mpgItemSelect',
+        'mpgGroupAnimalSelect',
+        'mpgGroupZombieSelect'
+    ];
+    
+    // Ждем немного, чтобы DOM точно был готов
+    setTimeout(() => {
+        selectIds.forEach(id => {
+            const select = document.getElementById(id);
+            if (select) {
+                createMpgCustomSelect(select);
+            } else {
+                console.log(`⚠️ Селект ${id} не найден`);
+            }
+        });
+    }, 50);
+}
+
+// ============================================
 // ОТРИСОВКА ГЛАВНОГО ИНТЕРФЕЙСА
 // ============================================
 
@@ -1123,6 +1437,9 @@ function renderGroupEditor(index) {
     `;
     
     setTimeout(createMpgScrollTopButton, 300);
+    
+    // ✅ Инициализация кастомных селектов для групп
+    setTimeout(() => initAllMpgCustomSelects(container), 100);
 }
 
 // ============================================
@@ -1459,6 +1776,9 @@ function renderPointEditor(index) {
     `;
     
     setTimeout(createMpgScrollTopButton, 300);
+    
+    // ✅ Инициализация кастомных селектов для точек
+    setTimeout(() => initAllMpgCustomSelects(container), 100);
 }
 
 // ============================================
@@ -2097,352 +2417,6 @@ function destroyMpgScrollTopButton() {
         btn.remove();
         mpgScrollTopBtn = null;
     }
-}
-
-// ============================================
-// КАСТОМНЫЙ SELECT - ОКНО ВЫБОРА
-// ============================================
-
-let activeSelectModal = null;
-
-function initCustomSelects(container) {
-    console.log('🔍 [initCustomSelects] Вызвана');
-    
-    if (!container) return;
-    
-    // Находим только селекты для добавления сущностей
-    const selectIds = ['mpgAnimalSelect', 'mpgZombieSelect', 'mpgItemSelect', 'mpgGroupAnimalSelect', 'mpgGroupZombieSelect'];
-    
-    selectIds.forEach(id => {
-        const select = document.getElementById(id);
-        if (!select) return;
-        if (select.dataset.customized === 'true') return;
-        
-        console.log(`✅ Обрабатываю селект: ${id}`);
-        select.dataset.customized = 'true';
-        
-        const parent = select.parentNode;
-        if (!parent) return;
-        
-        const options = Array.from(select.options).map(opt => ({
-            value: opt.value,
-            text: opt.textContent
-        }));
-        
-        // Создаём кнопку-триггер
-        const trigger = document.createElement('button');
-        trigger.type = 'button';
-        trigger.className = 'mpg-custom-select-trigger';
-        trigger.innerHTML = `
-            <span class="mpg-custom-select-text">${select.value ? select.options[select.selectedIndex]?.text || 'Выберите...' : 'Выберите...'}</span>
-            <span class="mpg-custom-select-arrow">▼</span>
-        `;
-        trigger.style.cssText = `
-            flex: 1;
-            min-width: 0;
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 6px;
-            color: #e5e5e5;
-            font-size: 0.8rem;
-            font-family: "Nunito", sans-serif;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            width: 100%;
-        `;
-        
-        trigger.addEventListener('mouseenter', () => {
-            trigger.style.background = 'rgba(255,255,255,0.07)';
-            trigger.style.borderColor = 'rgba(255,255,255,0.12)';
-        });
-        
-        trigger.addEventListener('mouseleave', () => {
-            trigger.style.background = 'rgba(255,255,255,0.04)';
-            trigger.style.borderColor = 'rgba(255,255,255,0.08)';
-        });
-        
-        // Создаём выпадающий список
-        const dropdown = document.createElement('div');
-        dropdown.className = 'mpg-custom-select-dropdown';
-        dropdown.style.cssText = `
-            display: none;
-            position: absolute;
-            top: calc(100% + 4px);
-            left: 0;
-            right: 0;
-            background: #1a1a2e;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-        `;
-        
-        // Поле поиска
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.placeholder = 'Поиск...';
-        searchInput.style.cssText = `
-            width: 100%;
-            padding: 8px 12px;
-            background: rgba(255,255,255,0.05);
-            border: none;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            color: #e5e5e5;
-            font-size: 0.8rem;
-            font-family: "Nunito", sans-serif;
-            outline: none;
-            box-sizing: border-box;
-        `;
-        dropdown.appendChild(searchInput);
-        
-        // Список опций
-        const optionsList = document.createElement('div');
-        optionsList.className = 'mpg-custom-select-options';
-        optionsList.style.cssText = `
-            padding: 4px 0;
-        `;
-        dropdown.appendChild(optionsList);
-        
-        function renderOptions(filter = '') {
-            const filtered = options.filter(opt => 
-                opt.text.toLowerCase().includes(filter.toLowerCase()) ||
-                opt.value.toLowerCase().includes(filter.toLowerCase())
-            );
-            
-            optionsList.innerHTML = filtered.map(opt => `
-                <div class="mpg-custom-select-option" data-value="${opt.value}" style="
-                    padding: 8px 12px;
-                    cursor: pointer;
-                    color: #e5e5e5;
-                    font-size: 0.8rem;
-                    transition: background 0.2s;
-                    ${opt.value === select.value ? 'background: rgba(59,130,246,0.2);' : ''}
-                ">
-                    ${opt.text}
-                </div>
-            `).join('');
-            
-            optionsList.querySelectorAll('.mpg-custom-select-option').forEach(el => {
-                el.addEventListener('click', () => {
-                    const value = el.dataset.value;
-                    select.value = value;
-                    const text = options.find(o => o.value === value)?.text || 'Выберите...';
-                    trigger.querySelector('.mpg-custom-select-text').textContent = text;
-                    dropdown.style.display = 'none';
-                    
-                    // Триггерим событие change
-                    const event = new Event('change', { bubbles: true });
-                    select.dispatchEvent(event);
-                });
-                
-                el.addEventListener('mouseenter', () => {
-                    el.style.background = 'rgba(255,255,255,0.05)';
-                });
-                
-                el.addEventListener('mouseleave', () => {
-                    el.style.background = el.dataset.value === select.value ? 'rgba(59,130,246,0.2)' : '';
-                });
-            });
-        }
-        
-        renderOptions();
-        
-        searchInput.addEventListener('input', () => {
-            renderOptions(searchInput.value);
-        });
-        
-        // Позиционируем dropdown
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = `
-            position: relative;
-            flex: 1;
-            min-width: 0;
-        `;
-        
-        wrapper.appendChild(trigger);
-        wrapper.appendChild(dropdown);
-        
-        // Заменяем select на wrapper
-        select.style.display = 'none';
-        parent.replaceChild(wrapper, select);
-        wrapper.prepend(select);
-        
-        // Открытие/закрытие
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const isOpen = dropdown.style.display === 'block';
-            dropdown.style.display = isOpen ? 'none' : 'block';
-            
-            if (!isOpen) {
-                setTimeout(() => searchInput.focus(), 100);
-                renderOptions(searchInput.value || '');
-            }
-        });
-        
-        // Закрытие при клике вне
-        document.addEventListener('click', (e) => {
-            if (!wrapper.contains(e.target)) {
-                dropdown.style.display = 'none';
-            }
-        });
-        
-        // Обновление текста при изменении select
-        select.addEventListener('change', () => {
-            const text = select.value ? select.options[select.selectedIndex]?.text || 'Выберите...' : 'Выберите...';
-            trigger.querySelector('.mpg-custom-select-text').textContent = text;
-        });
-        
-        console.log(`✅ Селект ${id} успешно заменён на кастомный`);
-    });
-}
-function openSelectModal(select, trigger, options) {
-    if (activeSelectModal) {
-        closeSelectModal();
-    }
-    
-    const selectedValue = select.value || options[0]?.value || '';
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'select-modal-overlay';
-    document.body.appendChild(overlay);
-    
-    const modal = document.createElement('div');
-    modal.className = 'select-modal-window';
-    modal.innerHTML = `
-        <div class="select-modal-header">
-            <span class="modal-title">Выберите значение</span>
-            <button class="modal-close-btn">✕</button>
-        </div>
-        <div class="select-modal-search">
-            <div class="search-wrap">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="Поиск..." autofocus>
-            </div>
-        </div>
-        <div class="select-modal-list">
-            ${renderModalOptions(options, selectedValue)}
-        </div>
-    `;
-    document.body.appendChild(modal);
-    
-    activeSelectModal = {
-        select: select,
-        trigger: trigger,
-        modal: modal,
-        overlay: overlay,
-        options: options
-    };
-    
-    requestAnimationFrame(() => {
-        overlay.classList.add('show');
-        modal.classList.add('show');
-        const search = modal.querySelector('input');
-        if (search) {
-            setTimeout(() => search.focus(), 150);
-        }
-    });
-    
-    const closeBtn = modal.querySelector('.modal-close-btn');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeSelectModal);
-    }
-    
-    overlay.addEventListener('click', closeSelectModal);
-    
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeSelectModal();
-        }
-    });
-    
-    const searchInput = modal.querySelector('input');
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            const list = modal.querySelector('.select-modal-list');
-            if (!list) return;
-            const searchValue = this.value.toLowerCase().trim();
-            const filtered = options.filter(opt => 
-                opt.text.toLowerCase().includes(searchValue) || 
-                opt.value.toLowerCase().includes(searchValue)
-            );
-            list.innerHTML = renderModalOptions(filtered, selectedValue);
-            list.querySelectorAll('.select-modal-option').forEach(el => {
-                el.addEventListener('click', function() {
-                    selectOption(this.dataset.value);
-                });
-            });
-        });
-    }
-    
-    modal.querySelectorAll('.select-modal-option').forEach(el => {
-        el.addEventListener('click', function() {
-            selectOption(this.dataset.value);
-        });
-    });
-    
-    function selectOption(value) {
-        select.value = value;
-        const newText = options.find(opt => opt.value === value)?.text || 'Выберите...';
-        const textSpan = trigger.querySelector('.trigger-text');
-        if (textSpan) textSpan.textContent = newText;
-        const event = new Event('change', { bubbles: true });
-        select.dispatchEvent(event);
-        closeSelectModal();
-    }
-}
-
-function renderModalOptions(options, selectedValue) {
-    if (!options || options.length === 0) {
-        return `
-            <div class="select-modal-empty">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">Нет доступных опций</span>
-            </div>
-        `;
-    }
-    
-    return options.map(opt => `
-        <div class="select-modal-option ${opt.value === selectedValue ? 'selected' : ''}" data-value="${opt.value}">
-            <span class="option-check">${opt.value === selectedValue ? '✓' : ''}</span>
-            ${opt.text}
-        </div>
-    `).join('');
-}
-
-function closeSelectModal() {
-    if (!activeSelectModal) return;
-    
-    const { modal, overlay } = activeSelectModal;
-    
-    if (modal) {
-        modal.classList.remove('show');
-        setTimeout(() => {
-            if (modal.parentElement) {
-                modal.remove();
-            }
-        }, 300);
-    }
-    
-    if (overlay) {
-        overlay.classList.remove('show');
-        setTimeout(() => {
-            if (overlay.parentElement) {
-                overlay.remove();
-            }
-        }, 300);
-    }
-    
-    activeSelectModal = null;
 }
 
 // ============================================
