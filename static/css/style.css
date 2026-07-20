@@ -4216,6 +4216,62 @@ main {
     opacity: 1;
 }
 
+/* ============================================
+   ПЛИТКИ РЕДАКТОРА - 2 В РЯД
+   ============================================ */
+
+.editor-tiles-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+    padding: 20px 0;
+}
+
+.editor-tiles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+}
+
+.editor-tiles-grid .editor-tile-wrapper {
+    padding: 0;
+    height: auto;
+}
+
+.editor-tiles-grid .editor-tile {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 24px;
+    gap: 16px;
+    max-width: 100%;
+    height: 100%;
+    min-height: 180px;
+}
+
+.editor-tiles-grid .editor-tile-icon {
+    font-size: 2.8rem;
+}
+
+.editor-tiles-grid .editor-tile-title {
+    font-size: 1.1rem;
+}
+
+.editor-tiles-grid .editor-tile-description {
+    font-size: 0.8rem;
+}
+
+.editor-tiles-grid .editor-tile-arrow {
+    display: none;
+}
+
+.editor-tiles-grid .editor-tile-badge {
+    font-size: 0.55rem;
+    padding: 2px 10px;
+}
+
 /* Адаптив плитки */
 @media (max-width: 768px) {
     .editor-tile {
@@ -4227,6 +4283,22 @@ main {
     .editor-tile-icon { font-size: 2.8rem; }
     .editor-tile-title { font-size: 1.1rem; }
     .editor-tile-arrow { display: none; }
+    
+    /* Сетка на 1 колонку */
+    .editor-tiles-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        max-width: 500px;
+    }
+    
+    .editor-tiles-grid .editor-tile {
+        min-height: 140px;
+        padding: 24px 20px;
+    }
+    
+    .editor-tiles-grid .editor-tile-icon {
+        font-size: 2.4rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -4234,8 +4306,24 @@ main {
     .editor-tile-icon { font-size: 2.2rem; }
     .editor-tile-title { font-size: 1rem; }
     .editor-tile-description { font-size: 0.75rem; }
+    
+    .editor-tiles-grid .editor-tile {
+        min-height: 120px;
+        padding: 18px 16px;
+    }
+    
+    .editor-tiles-grid .editor-tile-icon {
+        font-size: 2rem;
+    }
+    
+    .editor-tiles-grid .editor-tile-title {
+        font-size: 1rem;
+    }
+    
+    .editor-tiles-grid .editor-tile-description {
+        font-size: 0.7rem;
+    }
 }
-
 /* --------------------------------------------
    2. ПЛАВАЮЩАЯ КНОПКА "НАЗАД"
    -------------------------------------------- */
@@ -5769,4 +5857,253 @@ main {
         height: 40px !important;
         font-size: 18px !important;
     }
+}
+
+/* ============================================
+   ПЛАВАЮЩАЯ КНОПКА "НАВЕРХ" ДЛЯ MPG EDITOR
+   ============================================ */
+
+#mpgScrollTopBtn {
+    position: fixed !important;
+    bottom: 100px !important;    /* ← Теперь как в луте */
+    right: 30px !important;      /* ← Теперь как в луте */
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    background: rgba(167, 139, 250, 0.12) !important;
+    border: 1px solid rgba(167, 139, 250, 0.2) !important;
+    color: #a78bfa !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    z-index: 9997 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    font-family: "Nunito", sans-serif !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(0.9) !important;
+}
+
+#mpgScrollTopBtn.visible {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+#mpgScrollTopBtn:hover {
+    background: rgba(167, 139, 250, 0.25) !important;
+    border-color: rgba(167, 139, 250, 0.5) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 30px rgba(167, 139, 250, 0.2) !important;
+}
+
+#mpgScrollTopBtn:active {
+    transform: scale(0.95) !important;
+}
+
+@media (max-width: 768px) {
+    #mpgScrollTopBtn {
+        bottom: 80px !important;   /* ← Как в луте */
+        right: 20px !important;    /* ← Как в луте */
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #mpgScrollTopBtn {
+        bottom: 70px !important;   /* ← Как в луте */
+        right: 16px !important;    /* ← Как в луте */
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+}
+/* ============================================
+   MPG EDITOR - SELECT MULTIPLE (ПОГОДА)
+   ============================================ */
+
+.mpg-select-multiple {
+    background-image: none !important;
+    padding: 10px 14px !important;
+    padding-right: 14px !important;
+    min-height: 60px !important;
+    max-height: 120px !important;
+    overflow-y: auto !important;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 8px !important;
+    color: #e5e5e5 !important;
+    font-family: "Nunito", sans-serif !important;
+    font-size: 0.85rem !important;
+    outline: none !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
+}
+
+.mpg-select-multiple:hover {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.mpg-select-multiple:focus {
+    border-color: rgba(167, 139, 250, 0.4) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.05) !important;
+}
+
+/* Каждая опция — как отдельная строка */
+.mpg-select-multiple option {
+    display: block !important;
+    padding: 8px 12px !important;
+    margin: 2px 0 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-family: "Nunito", sans-serif !important;
+    font-size: 0.85rem !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    background: transparent !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid transparent !important;
+}
+
+/* При наведении на опцию */
+.mpg-select-multiple option:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.06) !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Выбранные опции */
+.mpg-select-multiple option:checked {
+    background: rgba(167, 139, 250, 0.12) !important;
+    border-color: rgba(167, 139, 250, 0.15) !important;
+    color: #a78bfa !important;
+    font-weight: 600 !important;
+}
+
+/* Добавляем галочку для выбранных */
+.mpg-select-multiple option:checked::before {
+    content: '✓ ';
+    color: #a78bfa;
+}
+
+/* Стилизация скроллбара — как везде */
+.mpg-select-multiple::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.mpg-select-multiple::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-radius: 10px !important;
+}
+
+.mpg-select-multiple::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.25) !important;
+    border-radius: 10px !important;
+}
+
+.mpg-select-multiple::-webkit-scrollbar-thumb:hover {
+    background: rgba(167, 139, 250, 0.4) !important;
+}
+
+/* Для Firefox */
+.mpg-select-multiple {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(167, 139, 250, 0.25) rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+    .mpg-select-multiple {
+        max-height: 100px !important;
+        min-height: 50px !important;
+        padding: 8px 12px !important;
+    }
+    
+    .mpg-select-multiple option {
+        padding: 6px 10px !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .mpg-select-multiple {
+        max-height: 80px !important;
+        min-height: 40px !important;
+        padding: 6px 10px !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .mpg-select-multiple option {
+        padding: 5px 8px !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+/* Стили для селектов в MPG редакторе */
+.mpg-add-entity {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.mpg-add-entity select.mpg-select {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    color: #e5e5e5;
+    font-size: 0.8rem;
+    font-family: "Nunito", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 36px;
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+.mpg-add-entity select.mpg-select:hover {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.12);
+}
+
+.mpg-add-entity select.mpg-select:focus {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.mpg-add-entity select.mpg-select option {
+    background: #1a1a2e;
+    color: #e5e5e5;
+    padding: 8px;
+}
+
+.mpg-add-entity .btn-primary.btn-sm {
+    flex-shrink: 0;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    min-height: 36px;
+    border-radius: 6px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mpg-add-entity .btn-primary.btn-sm:hover {
+    background: rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
 }

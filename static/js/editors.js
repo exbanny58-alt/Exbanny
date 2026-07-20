@@ -109,6 +109,7 @@ function openEditor(editorId) {
 // ============================================
 // ОТРИСОВКА ПЛИТОК РЕДАКТОРА
 // ============================================
+
 function renderTiles(container, config) {
     if (!config.tiles || config.tiles.length === 0) {
         container.innerHTML = `
@@ -123,31 +124,32 @@ function renderTiles(container, config) {
     let tilesHtml = '';
     config.tiles.forEach(tile => {
         tilesHtml += `
-            <div class="editor-tile" onclick="openTile('${tile.id}', '${tile.init}')">
-                <div class="editor-tile-icon">${tile.icon}</div>
-                <div class="editor-tile-content">
-                    <h3 class="editor-tile-title">${tile.title}</h3>
-                    <p class="editor-tile-description">${tile.description}</p>
-                    <div class="editor-tile-badge">${tile.badge || 'Нажмите для открытия'}</div>
-                </div>
-                <div class="editor-tile-arrow">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="9,18 15,12 9,6"/>
-                    </svg>
+            <div class="editor-tile-wrapper">
+                <div class="editor-tile" onclick="openTile('${tile.id}', '${tile.init}')">
+                    <div class="editor-tile-icon">${tile.icon}</div>
+                    <div class="editor-tile-content">
+                        <h3 class="editor-tile-title">${tile.title}</h3>
+                        <p class="editor-tile-description">${tile.description}</p>
+                        <div class="editor-tile-badge">${tile.badge || 'Нажмите для открытия'}</div>
+                    </div>
+                    <div class="editor-tile-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9,18 15,12 9,6"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
         `;
     });
     
     container.innerHTML = `
-        <div class="editors-tiles-wrapper">
-            <div class="editors-tiles-grid">
+        <div class="editor-tiles-wrapper">
+            <div class="editor-tiles-grid">
                 ${tilesHtml}
             </div>
         </div>
     `;
 }
-
 // ============================================
 // ОТКРЫТЬ КОНКРЕТНУЮ ПЛИТКУ
 // ============================================

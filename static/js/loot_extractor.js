@@ -583,7 +583,7 @@ function detectCategory(key, name) {
 }
 
 // ============================================
-// ЗАГРУЗКА ДАННЫХ (Loot.json)
+// ЗАГРУЗКА ДАННЫХ (Loot.json) С СОХРАНЕНИЕМ КАТЕГОРИЙ
 // ============================================
 
 async function loadLootData() {
@@ -605,16 +605,52 @@ async function loadLootData() {
             const data = JSON.parse(result.content);
             
             const categorized = {};
+            // Собираем категории для сохранения
+            const categories = {
+                animals: [],
+                zombies: [],
+                weapons: [],
+                magazines: [],
+                ammo: [],
+                attachments: [],
+                clothing: [],
+                vests: [],
+                bags: [],
+                food: [],
+                drinks: [],
+                medical: [],
+                tools: [],
+                materials: [],
+                vehicles: [],
+                vehicle_parts: [],
+                boats: [],
+                books: [],
+                fish: [],
+                other: []
+            };
+            
             for (const [key, value] of Object.entries(data)) {
+                const category = detectCategory(key, value);
                 categorized[key] = {
                     name: value,
-                    category: detectCategory(key, value)
+                    category: category
                 };
+                // Добавляем в список категорий
+                if (categories[category]) {
+                    categories[category].push(key);
+                }
             }
+            
             lootState.data = categorized;
             lootState.filtered = Object.keys(categorized);
             
+            // ============================================
+            // СОХРАНЯЕМ КАТЕГОРИИ В JSON ФАЙЛ
+            // ============================================
+            await saveLootCategories(categories);
+            
             console.log(`📚 Загружено ${Object.keys(categorized).length} предметов из Loot.json`);
+            console.log(`📊 Категории сохранены в Loot_Categories.json`);
         } else {
             console.warn('⚠️ Файл Loot.json не найден');
             if (typeof notifications !== 'undefined') {
@@ -633,6 +669,46 @@ async function loadLootData() {
     }
     
     lootState.isLoading = false;
+}
+
+// ============================================
+// СОХРАНЕНИЕ КАТЕГОРИЙ В JSON
+// ============================================
+
+async function saveLootCategories(categories) {
+    try {
+        // Удаляем пустые категории
+        const filtered = {};
+        for (const [key, items] of Object.entries(categories)) {
+            if (items.length > 0) {
+                filtered[key] = items.sort((a, b) => a.localeCompare(b));
+            }
+        }
+        
+        const categoriesPath = lootState.profilesPath + '/MPG_LootExtractor/Loot_Categories.json';
+        
+        const response = await fetch('/api/file/write', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                path: categoriesPath,
+                content: JSON.stringify(filtered, null, 2)
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log(`✅ Loot_Categories.json сохранён (${Object.keys(filtered).length} категорий)`);
+            return true;
+        } else {
+            console.warn('⚠️ Ошибка сохранения Loot_Categories.json:', result.message);
+            return false;
+        }
+    } catch (e) {
+        console.warn('⚠️ Не удалось сохранить Loot_Categories.json:', e);
+        return false;
+    }
 }
 
 // ============================================
@@ -737,6 +813,7 @@ function destroyScrollTopButton() {
     }
     isScrolling = false;
 }
+
 // ============================================
 // ОТРИСОВКА
 // ============================================
