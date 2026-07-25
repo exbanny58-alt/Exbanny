@@ -2,14 +2,15 @@
 // РЕДАКТОРЫ - ПОЛНАЯ ЛОГИКА
 // ============================================
 
-// Конфигурация редакторов (только один пункт в выпадающем меню)
+// Конфигурация редакторов (теперь два редактора в выпадающем списке)
 const EDITORS_CONFIG = {
     mpg: {
         id: 'mpg',
         name: 'MPG Spawner Editor',
-        icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>',
+        icon: '📍',
+        description: 'Редактор точек спавна для мода MPG Spawner',
         type: 'custom',
-        // Внутри этого редактора будет несколько плиток
+        init: 'initMpgEditor',
         tiles: [
             {
                 id: 'mpg_spawner',
@@ -28,7 +29,18 @@ const EDITORS_CONFIG = {
                 init: 'initLootExtractor'
             }
         ]
+    },
+    // ============ НОВЫЙ РЕДАКТОР FC FISH ============
+    fc_fish: {
+        id: 'fc_fish',
+        name: 'FC Fish Config Editor',
+        icon: '🐟',
+        description: 'Редактор конфига рыболовного мода FC Fish',
+        type: 'custom',
+        init: 'initFcFishEditor',
+        tiles: [] // У FC Fish нет плиток, сразу открывается редактор
     }
+    // ================================================
 };
 
 // Текущее состояние
@@ -76,15 +88,21 @@ function populateEditorSelect(select) {
     emptyOption.textContent = '— Выберите редактор —';
     select.appendChild(emptyOption);
     
-    // Только один пункт - MPG Spawner Editor
-    const option = document.createElement('option');
-    option.value = 'mpg';
-    option.textContent = 'MPG Spawner Editor';
-    select.appendChild(option);
+    // MPG Spawner Editor
+    const mpgOption = document.createElement('option');
+    mpgOption.value = 'mpg';
+    mpgOption.textContent = '📍 MPG Spawner Editor';
+    select.appendChild(mpgOption);
+    
+    // FC Fish Config Editor (НОВЫЙ)
+    const fcFishOption = document.createElement('option');
+    fcFishOption.value = 'fc_fish';
+    fcFishOption.textContent = '🐟 FC Fish Config Editor';
+    select.appendChild(fcFishOption);
 }
 
 // ============================================
-// ОТКРЫТЬ РЕДАКТОР (показывает плитки)
+// ОТКРЫТЬ РЕДАКТОР
 // ============================================
 function openEditor(editorId) {
     const config = EDITORS_CONFIG[editorId];
@@ -98,8 +116,18 @@ function openEditor(editorId) {
     const contentArea = document.getElementById('editorContentArea');
     if (!contentArea) return;
     
-    // Показываем плитки редактора
-    renderTiles(contentArea, config);
+    // Если у редактора есть плитки - показываем их
+    if (config.tiles && config.tiles.length > 0) {
+        renderTiles(contentArea, config);
+    } else {
+        // Иначе сразу загружаем редактор
+        if (config.init && typeof window[config.init] === 'function') {
+            window[config.init]();
+        } else {
+            // Если функция не загружена - подгружаем скрипт
+            loadEditorScript(editorId, config);
+        }
+    }
     
     if (typeof notifications !== 'undefined') {
         notifications.info(`📂 Открыт: ${config.name}`);
@@ -107,9 +135,68 @@ function openEditor(editorId) {
 }
 
 // ============================================
+// ЗАГРУЗКА СКРИПТА РЕДАКТОРА
+// ============================================
+function loadEditorScript(editorId, config) {
+    const contentArea = document.getElementById('editorContentArea');
+    if (!contentArea) return;
+    
+    contentArea.innerHTML = `
+        <div class="editor-placeholder">
+            <div class="editor-placeholder-icon">⏳</div>
+            <p>Загрузка ${config.name}...</p>
+        </div>
+    `;
+    
+    let scriptSrc = '';
+    if (editorId === 'mpg') {
+        scriptSrc = '/static/js/mpg_editor.js';
+    } else if (editorId === 'fc_fish') {
+        scriptSrc = '/static/js/fc_fish_editor.js';
+    } else {
+        contentArea.innerHTML = `
+            <div class="editor-placeholder">
+                <div class="editor-placeholder-icon">❌</div>
+                <p>Неизвестный редактор</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Проверяем, не загружен ли уже скрипт
+    if (typeof window[config.init] === 'function') {
+        window[config.init]();
+        return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = scriptSrc;
+    script.onload = function() {
+        if (typeof window[config.init] === 'function') {
+            window[config.init]();
+        } else {
+            contentArea.innerHTML = `
+                <div class="editor-placeholder">
+                    <div class="editor-placeholder-icon">❌</div>
+                    <p>Ошибка загрузки ${config.name}</p>
+                </div>
+            `;
+        }
+    };
+    script.onerror = function() {
+        contentArea.innerHTML = `
+            <div class="editor-placeholder">
+                <div class="editor-placeholder-icon">❌</div>
+                <p>Не удалось загрузить ${config.name}</p>
+            </div>
+        `;
+    };
+    document.head.appendChild(script);
+}
+
+// ============================================
 // ОТРИСОВКА ПЛИТОК РЕДАКТОРА
 // ============================================
-
 function renderTiles(container, config) {
     if (!config.tiles || config.tiles.length === 0) {
         container.innerHTML = `
@@ -150,6 +237,7 @@ function renderTiles(container, config) {
         </div>
     `;
 }
+
 // ============================================
 // ОТКРЫТЬ КОНКРЕТНУЮ ПЛИТКУ
 // ============================================
@@ -240,6 +328,37 @@ function backToTiles() {
 }
 
 // ============================================
+// ВОЗВРАТ К ВЫБОРУ РЕДАКТОРА (для fc_fish_editor.js)
+// ============================================
+function backToEditorSelect() {
+    const container = document.getElementById('editorContentArea');
+    if (!container) return;
+    
+    // Удаляем кнопку "Назад" если она есть
+    const backBtn = document.querySelector('.fc-fish-back-btn');
+    if (backBtn) {
+        backBtn.remove();
+    }
+    
+    // Показываем пустое состояние
+    container.innerHTML = `
+        <div class="editor-placeholder">
+            <div class="editor-placeholder-icon">📂</div>
+            <p class="editor-placeholder-title">Выберите редактор</p>
+            <p class="editor-placeholder-text">Выберите редактор из выпадающего списка выше</p>
+        </div>
+    `;
+    
+    // Сбрасываем выпадающий список
+    const select = document.getElementById('editorSelect');
+    if (select) {
+        select.value = '';
+    }
+    
+    currentEditor = null;
+}
+
+// ============================================
 // ЭКСПОРТ ГЛОБАЛЬНЫХ ФУНКЦИЙ
 // ============================================
 window.initEditorsPage = initEditorsPage;
@@ -247,6 +366,7 @@ window.openEditor = openEditor;
 window.renderTiles = renderTiles;
 window.openTile = openTile;
 window.backToTiles = backToTiles;
+window.backToEditorSelect = backToEditorSelect;
 window.populateEditorSelect = populateEditorSelect;
 
-console.log('📝 editors.js загружен (с двумя плитками)');
+console.log('📝 editors.js загружен (с FC Fish редактором)');
