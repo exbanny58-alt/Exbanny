@@ -3,7 +3,7 @@
 // ============================================
 
 // ============================================
-// СОСТОЯНИЕ РЕДАКТОРА
+// СОСТОЯНИЕ РЕДАКТОРА (ТОЛЬКО TEMPLATE)
 // ============================================
 
 let serverConfigState = {
@@ -12,7 +12,9 @@ let serverConfigState = {
     isLoading: false,
     isDirty: false,
     rawContent: '',
-    originalContent: ''
+    originalContent: '',
+    configPath: '',
+    template: 'dayzOffline.chernarusplus'  // Только template в состоянии
 };
 
 // ============================================
@@ -28,10 +30,24 @@ function initServerConfigEditor() {
         return;
     }
     
-    loadServerPath()
+    // Сначала рендерим интерфейс
+    renderServerConfigEditor(container);
+    
+    // Показываем статус загрузки
+    updateServerConfigStatus('⏳ Загрузка пути к серверу...');
+    
+    // Загружаем путь, потом конфиг
+    loadServerConfigPath()
         .then(() => {
             console.log('✅ Путь к серверу загружен:', serverConfigState.serverPath);
-            renderServerConfigEditor(container);
+            
+            // Обновляем путь в интерфейсе
+            const pathEl = document.querySelector('.server-config-path');
+            if (pathEl) {
+                pathEl.textContent = '📁 ' + serverConfigState.serverPath;
+            }
+            
+            // Теперь загружаем конфиг
             return loadServerConfig();
         })
         .catch((e) => {
@@ -39,30 +55,60 @@ function initServerConfigEditor() {
             if (typeof notifications !== 'undefined') {
                 notifications.error('Ошибка загрузки: ' + e.message);
             }
-            renderServerConfigEditor(container);
-            serverConfigState.config = getDefaultServerConfig();
+            serverConfigState.template = 'dayzOffline.chernarusplus';
+            updateServerConfigStatus('❌ Ошибка: ' + e.message);
             renderServerConfigForm();
         });
 }
 
-function loadServerPath() {
+// ============================================
+// ЗАГРУЗКА ПУТИ К СЕРВЕРУ
+// ============================================
+
+function loadServerConfigPath() {
     return new Promise((resolve, reject) => {
+        console.log('📁 server_config: Загружаем путь к серверу из настроек...');
+        
         fetch('/api/settings')
-            .then(response => response.json())
-            .then(settings => {
-                console.log('📁 Настройки:', settings);
-                
-                if (settings.server_exe) {
-                    const serverDir = settings.server_exe.replace(/\\/g, '/').replace(/\/[^/]*$/, '');
-                    serverConfigState.serverPath = serverDir;
-                    console.log(`📁 Путь к серверу: ${serverConfigState.serverPath}`);
-                    resolve(serverConfigState.serverPath);
-                } else {
-                    reject(new Error('Путь к серверу не указан в настройках'));
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+                return response.json();
+            })
+            .then(settings => {
+                console.log('📁 server_config: Получены настройки:', settings);
+                
+                if (!settings.server_exe) {
+                    reject(new Error('Путь к server.exe не указан в настройках'));
+                    return;
+                }
+                
+                // Нормализуем путь: заменяем \ на / и убираем имя файла server.exe
+                let serverDir = settings.server_exe.replace(/\\/g, '/');
+                
+                // Убираем имя файла (server.exe) - получаем путь к папке сервера
+                const lastSlash = serverDir.lastIndexOf('/');
+                if (lastSlash !== -1) {
+                    serverDir = serverDir.substring(0, lastSlash);
+                }
+                
+                // Убираем лишний / в конце если есть
+                if (serverDir.endsWith('/')) {
+                    serverDir = serverDir.slice(0, -1);
+                }
+                
+                // Устанавливаем путь
+                serverConfigState.serverPath = serverDir;
+                serverConfigState.configPath = serverDir + '/serverDZ.cfg';
+                
+                console.log(`📁 server_config: Путь к папке сервера: "${serverConfigState.serverPath}"`);
+                console.log(`📁 server_config: Путь к конфигу: "${serverConfigState.configPath}"`);
+                
+                resolve(serverConfigState.serverPath);
             })
             .catch(e => {
-                console.warn('⚠️ Не удалось загрузить путь к серверу:', e);
+                console.error('📁 server_config: Ошибка загрузки настроек:', e);
                 reject(e);
             });
     });
@@ -73,17 +119,23 @@ function loadServerPath() {
 // ============================================
 
 async function loadServerConfig() {
+    console.log('📂 loadServerConfig вызвана');
+    console.log('📂 serverConfigState.serverPath =', serverConfigState.serverPath);
+    
     if (!serverConfigState.serverPath) {
-        console.warn('⚠️ Путь к серверу не загружен');
-        await loadServerPath();
+        console.error('❌ Путь к серверу не загружен');
+        updateServerConfigStatus('❌ Путь к серверу не загружен');
+        serverConfigState.template = 'dayzOffline.chernarusplus';
+        renderServerConfigForm();
+        return;
     }
     
     serverConfigState.isLoading = true;
     updateServerConfigStatus('⏳ Загрузка serverDZ.cfg...');
     
     try {
-        const configPath = serverConfigState.serverPath + '/serverDZ.cfg';
-        console.log(`📂 Загрузка конфига: ${configPath}`);
+        const configPath = serverConfigState.configPath;
+        console.log(`📂 Загрузка конфига: "${configPath}"`);
         
         const response = await fetch('/api/file/read', {
             method: 'POST',
@@ -94,59 +146,42 @@ async function loadServerConfig() {
         
         console.log('📄 Ответ сервера:', data);
         
-        // Сначала загружаем сохранённое состояние из server_config.json
-        let savedState = {};
-        try {
-            const stateResponse = await fetch('/api/server/config/state');
-            const stateData = await stateResponse.json();
-            if (stateData.success && stateData.state) {
-                savedState = stateData.state.serverDZ || {};
-                console.log('📋 Загружено сохранённое состояние:', savedState);
-            }
-        } catch (e) {
-            console.warn('⚠️ Не удалось загрузить сохранённое состояние:', e);
-        }
-        
         if (data.success && data.content) {
             serverConfigState.rawContent = data.content;
             serverConfigState.originalContent = data.content;
             
-            // Парсим конфиг из файла
-            const parsedConfig = parseServerConfig(data.content);
+            // Парсим конфиг чтобы получить template
+            const parsed = parseServerConfig(data.content);
+            serverConfigState.config = parsed;
+            serverConfigState.template = parsed.template || 'dayzOffline.chernarusplus';
             
-            // Применяем сохранённое состояние поверх (если есть)
-            // Это гарантирует, что template и другие настройки сохранятся
-            for (const [key, value] of Object.entries(savedState)) {
-                if (parsedConfig[key] !== undefined) {
-                    parsedConfig[key] = value;
-                }
-            }
-            
-            serverConfigState.config = parsedConfig;
-            console.log('✅ serverDZ.cfg загружен');
-            console.log('📋 Итоговый конфиг:', serverConfigState.config);
+            console.log('✅ serverDZ.cfg загружен, template:', serverConfigState.template);
             updateServerConfigStatus('✅ Конфиг загружен');
+            
+            const pathEl = document.querySelector('.server-config-path');
+            if (pathEl) {
+                pathEl.textContent = '📄 ' + configPath;
+            }
             
             if (typeof notifications !== 'undefined') {
                 notifications.success('serverDZ.cfg загружен');
             }
             
             renderServerConfigForm();
+            serverConfigState.isLoading = false;
             return;
         }
         
-        console.warn('⚠️ serverDZ.cfg не найден');
+        // Файл не найден
+        console.warn(`⚠️ Файл не найден по пути: "${configPath}"`);
+        serverConfigState.template = 'dayzOffline.chernarusplus';
+        serverConfigState.config = getDefaultServerConfig();
+        updateServerConfigStatus(`⚠️ Файл не найден: ${configPath}`);
         
-        // Если файла нет, используем сохранённое состояние или дефолт
-        if (Object.keys(savedState).length > 0) {
-            serverConfigState.config = savedState;
-            console.log('📋 Используем сохранённое состояние:', savedState);
-        } else {
-            serverConfigState.config = getDefaultServerConfig();
-            console.log('📋 Используем дефолтный конфиг');
+        const pathEl = document.querySelector('.server-config-path');
+        if (pathEl) {
+            pathEl.textContent = `❌ ${configPath} (не найден)`;
         }
-        
-        updateServerConfigStatus('⚠️ Файл не найден, используется сохранённое состояние');
         
         if (typeof notifications !== 'undefined') {
             notifications.warning('serverDZ.cfg не найден');
@@ -156,27 +191,27 @@ async function loadServerConfig() {
         
     } catch (e) {
         console.error('❌ Ошибка загрузки:', e);
+        serverConfigState.template = 'dayzOffline.chernarusplus';
         serverConfigState.config = getDefaultServerConfig();
-        updateServerConfigStatus('❌ Ошибка загрузки');
+        updateServerConfigStatus('❌ Ошибка: ' + e.message);
         if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка загрузки serverDZ.cfg');
+            notifications.error('Ошибка загрузки: ' + e.message);
         }
         renderServerConfigForm();
     }
     
     serverConfigState.isLoading = false;
 }
+
 // ============================================
-// ПАРСИНГ КОНФИГА (ИСПРАВЛЕННЫЙ)
+// ПАРСИНГ КОНФИГА
 // ============================================
 
 function parseServerConfig(content) {
     console.log('🔍 Начинаем парсинг...');
     
-    const config = getDefaultServerConfig();
-    
+    const config = {};
     const lines = content.split('\n');
-    let inMissions = false;
     
     for (const line of lines) {
         let trimmed = line.trim();
@@ -184,27 +219,7 @@ function parseServerConfig(content) {
         if (!trimmed) continue;
         if (trimmed.startsWith('//')) continue;
         
-        if (trimmed.includes('class Missions')) {
-            inMissions = true;
-            continue;
-        }
-        
-        if (inMissions && trimmed.includes('template')) {
-            const match = trimmed.match(/template\s*=\s*"([^"]+)"/);
-            if (match) {
-                config.template = match[1];
-                console.log(`📁 Найден template: ${config.template}`);
-            }
-            continue;
-        }
-        
-        if (inMissions && trimmed === '};') {
-            inMissions = false;
-            continue;
-        }
-        
-        // Убираем комментарии в конце строки
-        const commentIndex = trimmed.indexOf('//');
+        let commentIndex = trimmed.indexOf('//');
         if (commentIndex !== -1) {
             trimmed = trimmed.substring(0, commentIndex).trim();
         }
@@ -226,7 +241,7 @@ function parseServerConfig(content) {
             
             if (value === '0' || value === '1') {
                 config[key] = parseInt(value);
-            } else if (!isNaN(value) && value !== '') {
+            } else if (!isNaN(value) && value !== '' && !value.includes('"')) {
                 if (value.includes('.')) {
                     config[key] = parseFloat(value);
                 } else {
@@ -240,8 +255,15 @@ function parseServerConfig(content) {
         }
     }
     
+    // Добавляем дефолтные значения если чего-то нет
+    const defaults = getDefaultServerConfig();
+    for (const [key, value] of Object.entries(defaults)) {
+        if (config[key] === undefined) {
+            config[key] = value;
+        }
+    }
+    
     console.log('✅ Парсинг завершён');
-    console.log('📋 Итоговый конфиг:', config);
     return config;
 }
 
@@ -251,10 +273,9 @@ function parseServerConfig(content) {
 
 function getDefaultServerConfig() {
     return {
-        hostname: 'DayZ Server',
+        hostname: 'EXAMPLE NAME',
         password: '',
         passwordAdmin: '',
-        description: '',
         enableWhitelist: 0,
         maxPlayers: 60,
         verifySignatures: 2,
@@ -280,37 +301,65 @@ function getDefaultServerConfig() {
 }
 
 // ============================================
-// ГЕНЕРАЦИЯ КОНФИГА
+// ГЕНЕРАЦИЯ ПОЛНОГО КОНФИГА ДЛЯ ФАЙЛА serverDZ.cfg
 // ============================================
 
 function generateServerConfig(config) {
-    let lines = [];
-    
-    lines.push('// ============================================');
-    lines.push('// DayZ Server Configuration');
-    lines.push('// ============================================');
-    lines.push('');
-    lines.push('// ----- Основные настройки -----');
-    
-    const skipKeys = ['template'];
-    
-    for (const [key, value] of Object.entries(config)) {
-        if (skipKeys.includes(key)) continue;
-        
-        let formattedValue = value;
-        if (typeof value === 'string') {
-            formattedValue = `"${value}"`;
-        }
-        lines.push(`${key} = ${formattedValue};`);
+    if (!config) {
+        config = getDefaultServerConfig();
     }
     
+    const lines = [];
+    
+    lines.push('hostname = "' + (config.hostname || 'EXAMPLE NAME') + '";  // Server name');
+    lines.push('password = "' + (config.password || '') + '";              // Password to connect to the server');
+    lines.push('passwordAdmin = "' + (config.passwordAdmin || '') + '";         // Password to become a server admin');
     lines.push('');
-    lines.push('// ----- Миссия -----');
+    lines.push('enableWhitelist = ' + (config.enableWhitelist || 0) + ';        // Enable/disable whitelist (value 0-1)');
+    lines.push(' ');
+    lines.push('maxPlayers = ' + (config.maxPlayers || 60) + ';            // Maximum amount of players');
+    lines.push(' ');
+    lines.push('verifySignatures = ' + (config.verifySignatures || 2) + ';       // Verifies .pbos against .bisign files. (only 2 is supported)');
+    lines.push('forceSameBuild = ' + (config.forceSameBuild || 1) + ';         // When enabled, the server will allow the connection only to clients with same the .exe revision as the server (value 0-1)');
+    lines.push(' ');
+    lines.push('disableVoN = ' + (config.disableVoN || 0) + ';             // Enable/disable voice over network (value 0-1)');
+    lines.push('vonCodecQuality = ' + (config.vonCodecQuality || 20) + ';       // Voice over network codec quality, the higher the better (values 0-30)');
+    lines.push(' ');
+    lines.push('shardId = "' + (config.shardId || '123abc') + '";\t\t\t// Six alphanumeric characters for Private server');
+    lines.push(' ');
+    lines.push('disable3rdPerson=' + (config.disable3rdPerson || 0) + ';         // Toggles the 3rd person view for players (value 0-1)');
+    lines.push('disableCrosshair=' + (config.disableCrosshair || 0) + ';         // Toggles the cross-hair (value 0-1)');
+    lines.push('');
+    lines.push('disablePersonalLight = ' + (config.disablePersonalLight || 1) + ';   // Disables personal light for all clients connected to server');
+    lines.push('lightingConfig = ' + (config.lightingConfig || 0) + ';         // 0 for brighter night setup, 1 for darker night setup');
+    lines.push(' ');
+    lines.push('serverTime="' + (config.serverTime || 'SystemTime') + '";    // Initial in-game time of the server. "SystemTime" means the local time of the machine. Another possibility is to set the time to some value in "YYYY/MM/DD/HH/MM" format, f.e. "2015/4/8/17/23" .');
+    lines.push('serverTimeAcceleration=' + (config.serverTimeAcceleration || 12) + ';  // Accelerated Time (value 0-24)// This is a time multiplier for in-game time. In this case, the time would move 24 times faster than normal, so an entire day would pass in one hour.');
+    lines.push('serverNightTimeAcceleration=' + (config.serverNightTimeAcceleration || 1) + ';  // Accelerated Nigh Time - The numerical value being a multiplier (0.1-64) and also multiplied by serverTimeAcceleration value. Thus, in case it is set to 4 and serverTimeAcceleration is set to 2, night time would move 8 times faster than normal. An entire night would pass in 3 hours.');
+    lines.push('serverTimePersistent=' + (config.serverTimePersistent || 0) + ';     // Persistent Time (value 0-1)// The actual server time is saved to storage, so when active, the next server start will use the saved time value.');
+    lines.push(' ');
+    lines.push('guaranteedUpdates=' + (config.guaranteedUpdates || 1) + ';        // Communication protocol used with game server (use only number 1)');
+    lines.push(' ');
+    lines.push('loginQueueConcurrentPlayers=' + (config.loginQueueConcurrentPlayers || 5) + ';  // The number of players concurrently processed during the login process. Should prevent massive performance drop during connection when a lot of people are connecting at the same time.');
+    lines.push('loginQueueMaxPlayers=' + (config.loginQueueMaxPlayers || 500) + ';       // The maximum number of players that can wait in login queue');
+    lines.push(' ');
+    lines.push('instanceId = ' + (config.instanceId || 1) + ';             // DayZ server instance id, to identify the number of instances per box and their storage folders with persistence files');
+    lines.push('');
+    lines.push('storageAutoFix = ' + (config.storageAutoFix || 1) + ';         // Checks if the persistence files are corrupted and replaces corrupted ones with empty ones (value 0-1)');
+    lines.push('');
+    lines.push(' ');
     lines.push('class Missions');
     lines.push('{');
     lines.push('    class DayZ');
     lines.push('    {');
-    lines.push(`        template="${config.template}";`);
+    
+    // Получаем значение template
+    const templateValue = serverConfigState.template || config.template || 'dayzOffline.chernarusplus';
+    
+    // Основная запись для сервера
+    lines.push('        template="' + templateValue + '"; // Mission to load on server startup. <MissionName>.<TerrainName>');
+    lines.push('        // Vanilla mission: dayzOffline.chernarusplus');
+    lines.push('        // DLC mission: dayzOffline.enoch');
     lines.push('    };');
     lines.push('};');
     
@@ -318,10 +367,128 @@ function generateServerConfig(config) {
 }
 
 // ============================================
-// СОХРАНЕНИЕ КОНФИГА
+// СОХРАНЕНИЕ НАЗВАНИЯ МИССИИ В server_config.json (в папке с app.py)
+// ============================================
+
+async function saveMissionToServerConfig() {
+    try {
+        // Получаем значение template
+        const templateValue = serverConfigState.template || 
+                             serverConfigState.config?.template || 
+                             'dayzOffline.chernarusplus';
+        
+        // Путь к файлу в корневой папке проекта (там где app.py)
+        const configJsonPath = 'server_config.json';
+        
+        console.log('📝 Сохраняем миссию в server_config.json:', templateValue);
+        console.log('📁 Путь:', configJsonPath);
+        
+        // Читаем существующий server_config.json если есть
+        let existingData = {};
+        try {
+            const response = await fetch('/api/file/read', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: configJsonPath })
+            });
+            const data = await response.json();
+            
+            if (data.success && data.content) {
+                try {
+                    existingData = JSON.parse(data.content);
+                    console.log('📄 Существующий server_config.json загружен');
+                } catch (e) {
+                    console.warn('⚠️ Не удалось распарсить server_config.json, создаём новый');
+                    existingData = {};
+                }
+            }
+        } catch (e) {
+            console.log('📄 server_config.json не найден, создаём новый');
+        }
+        
+        // Обновляем запись с миссией
+        existingData.mission = templateValue;
+        existingData.lastUpdated = new Date().toISOString();
+        
+        // Сохраняем в server_config.json (без создания .bak)
+        const jsonContent = JSON.stringify(existingData, null, 2);
+        
+        const saveResponse = await fetch('/api/file/write', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: configJsonPath, content: jsonContent })
+        });
+        
+        const saveData = await saveResponse.json();
+        
+        if (saveData.success) {
+            console.log('✅ server_config.json сохранён в корне проекта с миссией:', templateValue);
+        } else {
+            console.error('❌ Ошибка сохранения server_config.json:', saveData.message);
+        }
+        
+        return saveData.success;
+        
+    } catch (e) {
+        console.error('❌ Ошибка сохранения server_config.json:', e);
+        return false;
+    }
+}
+// ============================================
+// АВТОСОХРАНЕНИЕ В ФАЙЛ (ПОЛНЫЙ КОНФИГ + ДУБЛИКАТ В server_config.json)
+// ============================================
+
+async function autoSaveServerConfig() {
+    if (!serverConfigState.config || !serverConfigState.serverPath) {
+        console.error('❌ Нет данных для сохранения');
+        return;
+    }
+    
+    try {
+        const configPath = serverConfigState.configPath;
+        
+        // Генерируем полный конфиг для файла serverDZ.cfg
+        const content = generateServerConfig(serverConfigState.config);
+        
+        console.log('💾 Автосохранение в файл:', configPath);
+        console.log('📝 Сохраняется полный конфиг');
+        
+        const response = await fetch('/api/file/write', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: configPath, content: content })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            // ✅ После успешного сохранения serverDZ.cfg - сохраняем дубликат в server_config.json
+            await saveMissionToServerConfig();
+            
+            serverConfigState.isDirty = false;
+            updateServerConfigStatus('✅ Сохранено');
+            console.log('✅ Автосохранение успешно');
+        } else {
+            throw new Error(data.message || 'Ошибка сохранения');
+        }
+    } catch (e) {
+        console.error('❌ Ошибка автосохранения:', e);
+        updateServerConfigStatus('❌ Ошибка: ' + e.message);
+    }
+}
+
+// ============================================
+// СОХРАНЕНИЕ КОНФИГА (РУЧНОЕ)
 // ============================================
 
 async function saveServerConfig() {
+    if (!serverConfigState.config) {
+        console.error('❌ Конфиг не загружен');
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Конфиг не загружен');
+        }
+        return false;
+    }
+    
     if (!serverConfigState.serverPath) {
         console.error('❌ Путь к серверу не загружен');
         if (typeof notifications !== 'undefined') {
@@ -333,13 +500,11 @@ async function saveServerConfig() {
     updateServerConfigStatus('⏳ Сохранение...');
     
     try {
-        const configPath = serverConfigState.serverPath + '/serverDZ.cfg';
+        const configPath = serverConfigState.configPath;
         const content = generateServerConfig(serverConfigState.config);
         
         console.log('💾 Сохранение в:', configPath);
-        console.log('📄 Сохраняемый конфиг:', serverConfigState.config);
         
-        // 1. Сохраняем serverDZ.cfg
         const response = await fetch('/api/file/write', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -351,43 +516,14 @@ async function saveServerConfig() {
             throw new Error(data.message || 'Ошибка сохранения файла');
         }
         
-        // 2. Сохраняем состояние в server_config.json (включая template)
-        try {
-            // Загружаем текущее состояние
-            const stateResponse = await fetch('/api/server/config/state');
-            const stateData = await stateResponse.json();
-            let currentState = stateData.success ? stateData.state : {};
-            
-            // Обновляем serverDZ часть
-            if (!currentState.serverDZ) {
-                currentState.serverDZ = {};
-            }
-            
-            // Копируем все настройки из конфига в состояние
-            for (const [key, value] of Object.entries(serverConfigState.config)) {
-                currentState.serverDZ[key] = value;
-            }
-            
-            console.log('💾 Сохраняем состояние:', currentState.serverDZ);
-            
-            // Сохраняем обновлённое состояние
-            await fetch('/api/server/config/state', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(currentState)
-            });
-            console.log('💾 Состояние сервера сохранено');
-            
-        } catch (e) {
-            console.warn('⚠️ Не удалось сохранить состояние:', e);
-        }
+        // ✅ После успешного сохранения serverDZ.cfg - сохраняем дубликат в server_config.json
+        await saveMissionToServerConfig();
         
         serverConfigState.isDirty = false;
-        serverConfigState.originalContent = content;
         updateServerConfigStatus('✅ Сохранено');
         
         if (typeof notifications !== 'undefined') {
-            notifications.success('serverDZ.cfg сохранён');
+            notifications.success('serverDZ.cfg и server_config.json сохранены');
         }
         return true;
         
@@ -400,6 +536,7 @@ async function saveServerConfig() {
         return false;
     }
 }
+
 // ============================================
 // ОБНОВЛЕНИЕ СТАТУСА
 // ============================================
@@ -422,6 +559,8 @@ function updateServerConfigStatus(message) {
 // ============================================
 
 function renderServerConfigEditor(container) {
+    const displayPath = serverConfigState.serverPath || 'Загрузка...';
+    
     container.innerHTML = `
         <div class="server-config-editor">
             <button class="server-config-back-btn" onclick="serverConfigBackToTiles()" title="Вернуться к выбору редакторов">
@@ -469,8 +608,8 @@ function renderServerConfigEditor(container) {
             </div>
 
             <div class="server-config-status-bar">
-                <span class="server-config-status" id="serverConfigStatus">✅ Готово</span>
-                <span class="server-config-path">${serverConfigState.serverPath || 'Путь не указан'}</span>
+                <span class="server-config-status" id="serverConfigStatus">⏳ Загрузка...</span>
+                <span class="server-config-path">📁 ${displayPath}</span>
             </div>
 
             <div class="server-config-tabs">
@@ -550,13 +689,6 @@ function renderBasicSettings() {
                            onchange="serverConfigUpdateField('passwordAdmin', this.value)">
                     <span class="server-config-hint">Пароль для доступа к админ-командам</span>
                 </div>
-            </div>
-            
-            <div class="server-config-form-group">
-                <label>Описание сервера</label>
-                <textarea class="server-config-textarea" rows="2" 
-                          onchange="serverConfigUpdateField('description', this.value)">${c.description || ''}</textarea>
-                <span class="server-config-hint">Отображается в браузере серверов</span>
             </div>
             
             <div class="server-config-form-row">
@@ -763,18 +895,19 @@ function renderNetworkSettings() {
 
 function renderMissionSettings() {
     const c = serverConfigState.config || getDefaultServerConfig();
+    const currentTemplate = serverConfigState.template || c.template || 'dayzOffline.chernarusplus';
     
     return `
         <div class="server-config-section">
             <h4>Настройки миссии</h4>
             
             <div class="server-config-form-group">
-                <label>Шаблон миссии</label>
-                <select class="server-config-select" onchange="serverConfigUpdateField('template', this.value)">
-                    <option value="dayzOffline.chernarusplus" ${c.template === 'dayzOffline.chernarusplus' ? 'selected' : ''}>
+                <label>Шаблон миссии (карта)</label>
+                <select class="server-config-select" onchange="serverConfigUpdateTemplate(this.value)">
+                    <option value="dayzOffline.chernarusplus" ${currentTemplate === 'dayzOffline.chernarusplus' ? 'selected' : ''}>
                         ChernarusPlus (Vanilla)
                     </option>
-                    <option value="dayzOffline.enoch" ${c.template === 'dayzOffline.enoch' ? 'selected' : ''}>
+                    <option value="dayzOffline.enoch" ${currentTemplate === 'dayzOffline.enoch' ? 'selected' : ''}>
                         Livonia (DLC)
                     </option>
                 </select>
@@ -783,8 +916,8 @@ function renderMissionSettings() {
             
             <div class="server-config-form-group" style="margin-top:12px;">
                 <label>Или введите свой шаблон</label>
-                <input type="text" class="server-config-input" value="${c.template || 'dayzOffline.chernarusplus'}" 
-                       onchange="serverConfigUpdateField('template', this.value)" 
+                <input type="text" class="server-config-input" value="${currentTemplate}" 
+                       onchange="serverConfigUpdateTemplate(this.value)" 
                        placeholder="dayzOffline.chernarusplus">
                 <span class="server-config-hint">Формат: MissionName.TerrainName</span>
             </div>
@@ -793,14 +926,36 @@ function renderMissionSettings() {
 }
 
 // ============================================
-// ОБНОВЛЕНИЕ ПОЛЯ
+// ОБНОВЛЕНИЕ ПОЛЯ (С АВТОСОХРАНЕНИЕМ)
 // ============================================
 
 function serverConfigUpdateField(field, value) {
-    if (!serverConfigState.config) return;
+    if (!serverConfigState.config) {
+        serverConfigState.config = getDefaultServerConfig();
+    }
+    
     serverConfigState.config[field] = value;
     serverConfigState.isDirty = true;
-    updateServerConfigStatus('⚠️ Есть несохранённые изменения');
+    updateServerConfigStatus('⏳ Автосохранение...');
+    
+    // Сразу сохраняем в файл
+    autoSaveServerConfig();
+}
+
+// ============================================
+// ОБНОВЛЕНИЕ TEMPLATE (С АВТОСОХРАНЕНИЕМ)
+// ============================================
+
+function serverConfigUpdateTemplate(value) {
+    serverConfigState.template = value;
+    if (serverConfigState.config) {
+        serverConfigState.config.template = value;
+    }
+    serverConfigState.isDirty = true;
+    updateServerConfigStatus('⏳ Автосохранение...');
+    
+    // Сразу сохраняем в файл
+    autoSaveServerConfig();
 }
 
 // ============================================
@@ -849,6 +1004,10 @@ function serverConfigSwitchTab(tab) {
 // ============================================
 
 function serverConfigOpenRaw() {
+    if (!serverConfigState.config) {
+        serverConfigState.config = getDefaultServerConfig();
+    }
+    
     const content = generateServerConfig(serverConfigState.config);
     
     const modal = document.createElement('div');
@@ -893,6 +1052,7 @@ function serverConfigApplyRaw() {
         const content = textarea.value;
         const parsed = parseServerConfig(content);
         serverConfigState.config = parsed;
+        serverConfigState.template = parsed.template || 'dayzOffline.chernarusplus';
         serverConfigState.isDirty = true;
         updateServerConfigStatus('⚠️ Есть несохранённые изменения');
         renderServerConfigForm();
@@ -928,6 +1088,65 @@ function renderServerConfigForm() {
             element.innerHTML = renderers[tab]();
         }
     });
+}
+
+// ============================================
+// ДИАГНОСТИКА ПУТИ
+// ============================================
+
+async function diagnoseServerPath() {
+    console.log('🔍 ДИАГНОСТИКА ПУТИ К СЕРВЕРУ');
+    console.log('📁 Текущий путь в state:', serverConfigState.serverPath);
+    
+    if (!serverConfigState.serverPath) {
+        console.log('📁 Путь пуст, загружаем из настроек...');
+        try {
+            await loadServerConfigPath();
+            console.log('✅ Путь загружен:', serverConfigState.serverPath);
+        } catch (e) {
+            console.error('❌ Не удалось загрузить путь:', e);
+            updateServerConfigStatus('❌ Не удалось загрузить путь к серверу');
+            alert('❌ Не удалось загрузить путь к серверу!\nПроверьте settings.json');
+            return;
+        }
+    }
+    
+    if (!serverConfigState.serverPath) {
+        console.error('❌ Путь к серверу не загружен');
+        alert('❌ Путь к серверу не загружен!\nПроверьте settings.json');
+        return;
+    }
+    
+    const configPath = serverConfigState.configPath;
+    console.log(`📂 Проверяем: "${configPath}"`);
+    
+    try {
+        const response = await fetch('/api/file/read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: configPath })
+        });
+        const data = await response.json();
+        
+        if (data.success && data.content) {
+            console.log(`✅ Файл существует! Размер: ${data.content.length} байт`);
+            alert(`✅ Файл найден!\n\nПуть: ${configPath}\nРазмер: ${data.content.length} байт`);
+            updateServerConfigStatus('✅ Файл найден!');
+            
+            const pathEl = document.querySelector('.server-config-path');
+            if (pathEl) {
+                pathEl.textContent = '📄 ' + configPath;
+            }
+        } else {
+            console.error(`❌ Файл НЕ СУЩЕСТВУЕТ: "${configPath}"`);
+            
+            alert(`❌ Файл не найден!\n\nПуть: ${configPath}\n\nПроверьте:\n1. Существует ли папка: ${serverConfigState.serverPath}\n2. Есть ли в ней serverDZ.cfg\n3. Правильно ли указан путь в settings.json`);
+            updateServerConfigStatus(`❌ Файл не найден: ${configPath}`);
+        }
+    } catch (e) {
+        console.error('❌ Ошибка диагностики:', e);
+        alert('❌ Ошибка диагностики: ' + e.message);
+    }
 }
 
 // ============================================
@@ -1063,6 +1282,7 @@ window.loadServerConfig = loadServerConfig;
 window.serverConfigSwitchTab = serverConfigSwitchTab;
 window.serverConfigBackToTiles = serverConfigBackToTiles;
 window.serverConfigUpdateField = serverConfigUpdateField;
+window.serverConfigUpdateTemplate = serverConfigUpdateTemplate;
 window.serverConfigOpenRaw = serverConfigOpenRaw;
 window.serverConfigCloseRaw = serverConfigCloseRaw;
 window.serverConfigApplyRaw = serverConfigApplyRaw;

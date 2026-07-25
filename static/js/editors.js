@@ -20,6 +20,14 @@ const EDITORS_CONFIG = {
                 description: 'Основной конфигурационный файл сервера DayZ',
                 badge: 'Основной',
                 init: 'initServerConfigEditor'
+            },
+            {
+                id: 'types_editor',
+                icon: '📦',
+                title: 'Редактор types.xml',
+                description: 'Настройка лута через файл types.xml',
+                badge: 'Лут',
+                init: 'initTypesEditor'
             }
             // Сюда можно будет добавить другие редакторы серверных файлов
         ]
