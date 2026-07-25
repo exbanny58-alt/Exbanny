@@ -2,8 +2,29 @@
 // РЕДАКТОРЫ - ПОЛНАЯ ЛОГИКА
 // ============================================
 
-// Конфигурация редакторов (теперь два редактора в выпадающем списке)
+// Конфигурация редакторов
 const EDITORS_CONFIG = {
+    // ============ НОВЫЙ РЕДАКТОР СЕРВЕРА ============
+    server: {
+        id: 'server',
+        name: 'Редакторы сервера',
+        icon: '⚙️',
+        description: 'Инструменты для редактирования файлов сервера DayZ',
+        type: 'custom',
+        init: 'initServerEditor',
+        tiles: [
+            {
+                id: 'server_config',
+                icon: '⚙️',
+                title: 'Редактор serverDZ.cfg',
+                description: 'Основной конфигурационный файл сервера DayZ',
+                badge: 'Основной',
+                init: 'initServerConfigEditor'
+            }
+            // Сюда можно будет добавить другие редакторы серверных файлов
+        ]
+    },
+    // ================================================
     mpg: {
         id: 'mpg',
         name: 'MPG Spawner Editor',
@@ -30,7 +51,6 @@ const EDITORS_CONFIG = {
             }
         ]
     },
-    // ============ НОВЫЙ РЕДАКТОР FC FISH ============
     fc_fish: {
         id: 'fc_fish',
         name: 'FC Fish Config Editor',
@@ -38,9 +58,8 @@ const EDITORS_CONFIG = {
         description: 'Редактор конфига рыболовного мода FC Fish',
         type: 'custom',
         init: 'initFcFishEditor',
-        tiles: [] // У FC Fish нет плиток, сразу открывается редактор
+        tiles: []
     }
-    // ================================================
 };
 
 // Текущее состояние
@@ -68,7 +87,13 @@ function initEditorsPage() {
         } else {
             const contentArea = document.getElementById('editorContentArea');
             if (contentArea) {
-                contentArea.innerHTML = '';
+                contentArea.innerHTML = `
+                    <div class="editor-placeholder">
+                        <div class="editor-placeholder-icon">📂</div>
+                        <p class="editor-placeholder-title">Выберите редактор</p>
+                        <p class="editor-placeholder-text">Выберите редактор из выпадающего списка выше</p>
+                    </div>
+                `;
             }
             currentEditor = null;
         }
@@ -88,13 +113,19 @@ function populateEditorSelect(select) {
     emptyOption.textContent = '— Выберите редактор —';
     select.appendChild(emptyOption);
     
-    // MPG Spawner Editor
+    // ПЕРВЫЙ: Редакторы сервера
+    const serverOption = document.createElement('option');
+    serverOption.value = 'server';
+    serverOption.textContent = '⚙️ Редакторы сервера';
+    select.appendChild(serverOption);
+    
+    // ВТОРОЙ: MPG Spawner Editor
     const mpgOption = document.createElement('option');
     mpgOption.value = 'mpg';
     mpgOption.textContent = '📍 MPG Spawner Editor';
     select.appendChild(mpgOption);
     
-    // FC Fish Config Editor (НОВЫЙ)
+    // ТРЕТИЙ: FC Fish Config Editor
     const fcFishOption = document.createElement('option');
     fcFishOption.value = 'fc_fish';
     fcFishOption.textContent = '🐟 FC Fish Config Editor';
@@ -149,7 +180,10 @@ function loadEditorScript(editorId, config) {
     `;
     
     let scriptSrc = '';
-    if (editorId === 'mpg') {
+    if (editorId === 'server') {
+        // Для серверных редакторов грузим server_editors.js
+        scriptSrc = '/static/js/server_editors.js';
+    } else if (editorId === 'mpg') {
         scriptSrc = '/static/js/mpg_editor.js';
     } else if (editorId === 'fc_fish') {
         scriptSrc = '/static/js/fc_fish_editor.js';
@@ -259,10 +293,14 @@ function openTile(tileId, initFunctionName) {
     if (typeof window[initFunctionName] !== 'function') {
         // Определяем какой скрипт грузить
         let scriptSrc = '';
-        if (tileId === 'mpg_spawner') {
+        if (tileId === 'server_config') {
+            scriptSrc = '/static/js/server_config_editor.js';
+        } else if (tileId === 'mpg_spawner') {
             scriptSrc = '/static/js/mpg_editor.js';
         } else if (tileId === 'loot_extractor') {
             scriptSrc = '/static/js/loot_extractor.js';
+        } else if (tileId === 'fc_fish') {
+            scriptSrc = '/static/js/fc_fish_editor.js';
         } else {
             container.innerHTML = `
                 <div class="editor-placeholder">
@@ -300,6 +338,30 @@ function openTile(tileId, initFunctionName) {
     }
     
     window[initFunctionName]();
+}
+
+// ============================================
+// ВОЗВРАТ К ПЛИТКАМ (для server_config_editor.js)
+// ============================================
+function backToServerTiles() {
+    const container = document.getElementById('editorContentArea');
+    if (!container) return;
+    
+    // Удаляем кнопку "Назад" если она есть
+    const backBtn = document.querySelector('.server-config-back-btn');
+    if (backBtn) {
+        backBtn.remove();
+    }
+    
+    // Переоткрываем редактор сервера
+    if (currentEditor && EDITORS_CONFIG[currentEditor]) {
+        renderTiles(container, EDITORS_CONFIG[currentEditor]);
+    } else {
+        const serverConfig = EDITORS_CONFIG['server'];
+        if (serverConfig) {
+            renderTiles(container, serverConfig);
+        }
+    }
 }
 
 // ============================================
@@ -366,7 +428,8 @@ window.openEditor = openEditor;
 window.renderTiles = renderTiles;
 window.openTile = openTile;
 window.backToTiles = backToTiles;
+window.backToServerTiles = backToServerTiles;
 window.backToEditorSelect = backToEditorSelect;
 window.populateEditorSelect = populateEditorSelect;
 
-console.log('📝 editors.js загружен (с FC Fish редактором)');
+console.log('📝 editors.js загружен');

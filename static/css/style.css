@@ -7789,3 +7789,665 @@ main {
 .fc-fish-confirm-modal.show .modal-content {
     transform: scale(1) translateY(0) rotate(0deg);
 }
+
+/* ============================================
+   SERVER CONFIG EDITOR - ПОЛНЫЙ СТИЛЬ
+   ============================================ */
+
+/* ----- Основной контейнер ----- */
+.server-config-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 4px 0;
+}
+
+/* ----- Кнопка "Назад" ----- */
+.server-config-back-btn {
+    position: fixed;
+    bottom: 18px;
+    left: 290px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: rgba(16, 21, 61, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: "Nunito", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    user-select: none;
+}
+
+.server-config-back-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    background: rgba(16, 21, 61, 0.95);
+    border-color: rgba(251, 191, 36, 0.3);
+    box-shadow: 0 8px 40px rgba(251, 191, 36, 0.15);
+    color: #fff;
+}
+
+.server-config-back-btn:active {
+    transform: scale(0.97);
+}
+
+.server-config-back-btn svg {
+    stroke: #fbbf24;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.server-config-back-btn:hover svg {
+    transform: translateX(-4px);
+}
+
+/* ----- Заголовок ----- */
+.server-config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.server-config-header-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.server-config-header-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.server-config-header-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.server-config-header-subtitle {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
+.server-config-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.server-config-header-actions .btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+}
+
+/* ----- Статус бар ----- */
+.server-config-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.server-config-status {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.server-config-status.warning {
+    color: #fbbf24;
+}
+.server-config-status.loading {
+    color: #60a5fa;
+}
+.server-config-status.success {
+    color: #4ade80;
+}
+.server-config-status.error {
+    color: #f87171;
+}
+
+.server-config-path {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    max-width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ----- Вкладки ----- */
+.server-config-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+}
+
+.server-config-tab {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: "Nunito", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.server-config-tab:hover {
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.server-config-tab.active {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+/* ----- Контент вкладок ----- */
+.server-config-tab-content {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.server-config-tab-content.active {
+    display: block;
+}
+
+.server-config-tab-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+.server-config-tab-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.server-config-tab-content::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.3);
+    border-radius: 10px;
+}
+
+.server-config-tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(251, 191, 36, 0.5);
+}
+
+/* ----- Секции ----- */
+.server-config-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+}
+
+.server-config-section:last-child {
+    margin-bottom: 0;
+}
+
+.server-config-section h4 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 14px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ----- Форма ----- */
+.server-config-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.server-config-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.server-config-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.server-config-form-group label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.server-config-input,
+.server-config-select,
+.server-config-textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #e5e5e5;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.server-config-input:hover,
+.server-config-select:hover,
+.server-config-textarea:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.server-config-input:focus,
+.server-config-select:focus,
+.server-config-textarea:focus {
+    border-color: rgba(251, 191, 36, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.05);
+}
+
+.server-config-input::placeholder,
+.server-config-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+.server-config-textarea {
+    min-height: 60px;
+    resize: vertical;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.server-config-select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+}
+
+.server-config-select option {
+    background: rgba(16, 21, 61, 0.95);
+    color: #e5e5e5;
+    padding: 8px;
+}
+
+.server-config-hint {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.2);
+    margin-top: 2px;
+}
+
+/* ----- RAW модал ----- */
+.server-config-raw-modal .modal-content {
+    max-width: 800px;
+    width: 90%;
+}
+
+.server-config-raw-modal .modal-confirm-header {
+    border-bottom: 1px solid rgba(251, 191, 36, 0.1);
+    background: rgba(251, 191, 36, 0.03);
+    padding: 16px 20px 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.server-config-raw-modal .modal-confirm-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.server-config-raw-modal .modal-confirm-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.server-config-raw-modal .modal-body {
+    padding: 16px 20px;
+}
+
+.server-config-raw-modal .modal-footer {
+    padding: 12px 20px 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .server-config-header-actions .btn {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .server-config-back-btn {
+        bottom: 20px;
+        left: 20px;
+        padding: 10px 16px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+        gap: 8px;
+    }
+
+    .server-config-back-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .server-config-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .server-config-header-actions {
+        width: 100%;
+        justify-content: stretch;
+        flex-wrap: wrap;
+    }
+
+    .server-config-header-actions .btn {
+        flex: 1;
+        justify-content: center;
+        min-width: 80px;
+        font-size: 0.7rem;
+    }
+
+    .server-config-tabs {
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 4px;
+        border-radius: 10px;
+    }
+
+    .server-config-tab {
+        flex: 1 1 calc(33.33% - 4px);
+        font-size: 0.7rem;
+        padding: 8px 10px;
+        gap: 4px;
+        border-radius: 6px;
+        min-width: 60px;
+    }
+
+    .server-config-status-bar {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+
+    .server-config-path {
+        max-width: 100%;
+        font-size: 0.65rem;
+    }
+
+    .server-config-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .server-config-section {
+        padding: 14px 16px;
+    }
+
+    .server-config-raw-modal .modal-content {
+        max-width: 95%;
+        width: 95%;
+        margin: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .server-config-back-btn {
+        bottom: 16px;
+        left: 16px;
+        padding: 8px 14px;
+        font-size: 0.7rem;
+        border-radius: 8px;
+        gap: 6px;
+    }
+
+    .server-config-back-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    .server-config-back-btn span {
+        font-size: 0.7rem;
+    }
+
+    .server-config-header-title {
+        font-size: 1rem;
+    }
+
+    .server-config-header-icon {
+        font-size: 1.5rem;
+    }
+
+    .server-config-header-subtitle {
+        font-size: 0.7rem;
+    }
+
+    .server-config-tab {
+        font-size: 0.6rem;
+        padding: 6px 6px;
+        gap: 2px;
+        min-width: 50px;
+    }
+
+    .server-config-tabs {
+        gap: 2px;
+        padding: 3px;
+        border-radius: 8px;
+    }
+
+    .server-config-section {
+        padding: 12px 14px;
+    }
+
+    .server-config-input,
+    .server-config-select {
+        font-size: 0.75rem;
+        padding: 8px 12px;
+    }
+
+    .server-config-textarea {
+        font-size: 0.7rem;
+        min-height: 50px;
+    }
+
+    .server-config-header-actions .btn {
+        font-size: 0.65rem;
+        padding: 6px 10px;
+        min-width: 60px;
+    }
+
+    .server-config-raw-modal .modal-confirm-header {
+        padding: 12px 16px 10px 16px;
+    }
+
+    .server-config-raw-modal .modal-confirm-header h3 {
+        font-size: 0.95rem;
+    }
+
+    .server-config-raw-modal .modal-body {
+        padding: 12px 14px;
+    }
+
+    .server-config-raw-modal .modal-footer {
+        padding: 10px 14px 14px 14px;
+        flex-wrap: wrap;
+    }
+
+    .server-config-raw-modal .modal-footer .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.75rem;
+        padding: 8px 12px;
+    }
+}
+
+/* ============================================
+   КНОПКА "НАВЕРХ" ДЛЯ SERVER CONFIG
+   ============================================ */
+
+#serverConfigScrollTopBtn {
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 30px !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    background: rgba(251, 191, 36, 0.12) !important;
+    border: 1px solid rgba(251, 191, 36, 0.2) !important;
+    color: #fbbf24 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    z-index: 9997 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    font-family: "Nunito", sans-serif !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(0.9) !important;
+}
+
+#serverConfigScrollTopBtn.visible {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+#serverConfigScrollTopBtn:hover {
+    background: rgba(251, 191, 36, 0.25) !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 30px rgba(251, 191, 36, 0.2) !important;
+}
+
+#serverConfigScrollTopBtn:active {
+    transform: scale(0.95) !important;
+}
+
+@media (max-width: 768px) {
+    #serverConfigScrollTopBtn {
+        bottom: 80px !important;
+        right: 20px !important;
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #serverConfigScrollTopBtn {
+        bottom: 70px !important;
+        right: 16px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+}
+
+/* ============================================
+   ПЛИТКА РЕДАКТОРА serverDZ.cfg (в списке плиток)
+   ============================================ */
+
+/* Используем существующие стили .editor-tile,
+   но добавляем специфичный цвет для этой плитки */
+
+.editor-tile[data-tile="server_config"] .editor-tile-icon {
+    color: #fbbf24;
+}
+
+.editor-tile[data-tile="server_config"] .editor-tile-badge {
+    background: rgba(251, 191, 36, 0.12);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.15);
+}
+
+.editor-tile[data-tile="server_config"]:hover {
+    border-color: rgba(251, 191, 36, 0.25);
+}
+
+.editor-tile[data-tile="server_config"]:hover .editor-tile-arrow {
+    color: rgba(251, 191, 36, 0.4);
+}
+
+/* ============================================
+   СКОРОЛЛ ДЛЯ ВСЕГО КОНТЕЙНЕРА
+   ============================================ */
+
+.server-config-body {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Убираем двойной скролл */
+.server-config-tab-content.active {
+    overflow-y: auto;
+    flex: 1;
+}

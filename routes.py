@@ -1350,3 +1350,65 @@ def register_routes(app):
                 'success': False,
                 'message': str(e)
             }), 500
+
+    # ============================================
+    # API ДЛЯ РАБОТЫ С СОСТОЯНИЕМ КОНФИГА СЕРВЕРА
+    # ============================================
+
+    @app.route('/api/server/config/state', methods=['GET'])
+    def get_server_config_state():
+        """Возвращает сохранённое состояние настроек сервера"""
+        try:
+            from settings_manager import load_server_config_state
+            state = load_server_config_state()
+            return jsonify({
+                'success': True,
+                'state': state
+            })
+        except Exception as e:
+            print(f'❌ Ошибка получения состояния: {e}')
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/config/state', methods=['POST'])
+    def save_server_config_state():
+        """Сохраняет состояние настроек сервера"""
+        try:
+            from settings_manager import save_server_config_state
+            data = request.get_json()
+            if data is None:
+                return jsonify({'success': False, 'message': 'Нет данных'}), 400
+            
+            if save_server_config_state(data):
+                return jsonify({'success': True, 'message': 'Состояние сохранено'})
+            return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
+        except Exception as e:
+            print(f'❌ Ошибка сохранения состояния: {e}')
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/config/template', methods=['GET'])
+    def get_server_template():
+        """Возвращает сохранённый шаблон миссии"""
+        try:
+            from settings_manager import get_server_template
+            template = get_server_template()
+            return jsonify({
+                'success': True,
+                'template': template
+            })
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    @app.route('/api/server/config/template', methods=['POST'])
+    def set_server_template():
+        """Сохраняет шаблон миссии"""
+        try:
+            from settings_manager import set_server_template
+            data = request.get_json()
+            if data is None or 'template' not in data:
+                return jsonify({'success': False, 'message': 'Не указан шаблон'}), 400
+            
+            if set_server_template(data['template']):
+                return jsonify({'success': True, 'message': 'Шаблон сохранён'})
+            return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
