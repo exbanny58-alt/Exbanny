@@ -839,6 +839,134 @@ async function saveNickname() {
 }
 
 // ============================================
+// ОЧИСТКА ПОДКЛЮЧЕНИЙ ИГРЫ
+// ============================================
+async function clearGameLinks() {
+    showGameClearConfirmModal();
+}
+
+// ============================================
+// МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ДЛЯ ИГРЫ
+// ============================================
+function showGameClearConfirmModal() {
+    const oldModal = document.getElementById('gameClearConfirmModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'gameClearConfirmModal';
+    modal.className = 'modal-overlay clear-confirm-modal';
+    modal.innerHTML = `
+        <div class="modal-content modal-confirm">
+            <div class="modal-header modal-confirm-header">
+                <div class="modal-confirm-icon">⚠️</div>
+                <h3>Очистка подключений игры</h3>
+            </div>
+            <div class="modal-body modal-confirm-body">
+                <p class="modal-confirm-text">
+                    Вы уверены, что хотите очистить все подключения модов к игре?
+                    <br><br>
+                    <span style="color: rgba(255,255,255,0.4); font-size:0.85rem;">
+                        Это удалит все символические ссылки из папки <strong>!Workshop</strong> игры.<br>
+                        Конфиг подключений будет очищен.
+                    </span>
+                </p>
+            </div>
+            <div class="modal-footer modal-confirm-footer">
+                <button class="btn btn-secondary" id="gameClearConfirmCancel">Отмена</button>
+                <button class="btn btn-danger" id="gameClearConfirmOk">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                    </svg>
+                    Да, очистить всё
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+
+    modal.querySelector('#gameClearConfirmCancel').addEventListener('click', closeGameClearConfirmModal);
+    modal.querySelector('#gameClearConfirmOk').addEventListener('click', () => {
+        closeGameClearConfirmModal();
+        executeClearGameLinks();
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) closeGameClearConfirmModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeGameClearConfirmModal();
+    });
+}
+
+function closeGameClearConfirmModal() {
+    const modal = document.getElementById('gameClearConfirmModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+async function executeClearGameLinks() {
+    const btn = document.getElementById('clearGameLinksBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = '⏳ Очистка...';
+    }
+    
+    try {
+        const response = await fetch('/api/game/links/clear', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            gameLinks = {};
+            clientModsList.forEach(mod => {
+                mod.is_connected = false;
+            });
+            renderClientMods(clientModsList);
+            
+            if (typeof notifications !== 'undefined') {
+                notifications.success(data.message || 'Подключения игры очищены');
+            }
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.error(data.message || 'Ошибка очистки');
+            }
+        }
+    } catch (e) {
+        console.error('❌ Ошибка очистки:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+    
+    if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+            </svg>
+            Очистить подключения
+        `;
+    }
+}
+
+// ============================================
 // ОСТАНОВКА АВТООБНОВЛЕНИЯ
 // ============================================
 function destroyGamePage() {
@@ -865,5 +993,6 @@ window.showNicknameModal = showNicknameModal;
 window.createNicknameModal = createNicknameModal;
 window.closeNicknameModal = closeNicknameModal;
 window.saveNickname = saveNickname;
+window.clearGameLinks = clearGameLinks;
 
 console.log('🎮 game.js загружен');

@@ -543,6 +543,143 @@ async function initModsPage() {
 }
 
 // ============================================
+// СБРОС НАСТРОЕК МОДОВ
+// ============================================
+async function resetModsConfig() {
+    showModsResetConfirmModal();
+}
+
+// ============================================
+// МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ДЛЯ МОДОВ
+// ============================================
+function showModsResetConfirmModal() {
+    const oldModal = document.getElementById('modsResetConfirmModal');
+    if (oldModal) {
+        oldModal.remove();
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'modsResetConfirmModal';
+    modal.className = 'modal-overlay clear-confirm-modal';
+    modal.innerHTML = `
+        <div class="modal-content modal-confirm">
+            <div class="modal-header modal-confirm-header">
+                <div class="modal-confirm-icon">⚠️</div>
+                <h3>Сброс настроек модов</h3>
+            </div>
+            <div class="modal-body modal-confirm-body">
+                <p class="modal-confirm-text">
+                    Вы уверены, что хотите сбросить все настройки модов?
+                    <br><br>
+                    <span style="color: rgba(255,255,255,0.4); font-size:0.85rem;">
+                        Все моды будут отмечены как <strong>выключенные</strong>.<br>
+                        Это не удаляет моды, только сбрасывает их настройки.
+                    </span>
+                </p>
+            </div>
+            <div class="modal-footer modal-confirm-footer">
+                <button class="btn btn-secondary" id="modsResetConfirmCancel">Отмена</button>
+                <button class="btn btn-danger" id="modsResetConfirmOk">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                    </svg>
+                    Да, сбросить всё
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+
+    modal.querySelector('#modsResetConfirmCancel').addEventListener('click', closeModsResetConfirmModal);
+    modal.querySelector('#modsResetConfirmOk').addEventListener('click', () => {
+        closeModsResetConfirmModal();
+        executeResetModsConfig();
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) closeModsResetConfirmModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModsResetConfirmModal();
+    });
+}
+
+function closeModsResetConfirmModal() {
+    const modal = document.getElementById('modsResetConfirmModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
+    }
+}
+
+async function executeResetModsConfig() {
+    const btn = document.getElementById('resetModsConfigBtn');
+    if (btn) {
+        btn.disabled = true;
+        btn.classList.add('loading');
+        btn.innerHTML = '⏳ Сброс...';
+    }
+    
+    try {
+        const response = await fetch('/api/mods/config/reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Обновляем локальные данные
+            modsConfig = {};
+            modsList.forEach(mod => {
+                modsConfig[mod.id] = {
+                    server: false,
+                    server_mod: false,
+                    client: false
+                };
+                mod.server = false;
+                mod.server_mod = false;
+                mod.client = false;
+            });
+            
+            renderMods(modsList);
+            
+            if (typeof notifications !== 'undefined') {
+                notifications.success(data.message || 'Настройки модов сброшены');
+            }
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.error(data.message || 'Ошибка сброса');
+            }
+        }
+    } catch (e) {
+        console.error('❌ Ошибка сброса:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+    
+    if (btn) {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+            </svg>
+            Сбросить настройки
+        `;
+    }
+}
+
+// ============================================
 // ЭКСПОРТ ФУНКЦИЙ В ГЛОБАЛЬНУЮ ОБЛАСТЬ
 // ============================================
 window.initModsPage = initModsPage;
@@ -557,6 +694,7 @@ window.renderMods = renderMods;
 window.updateStats = updateStats;
 window.attachModsButtonHandlers = attachModsButtonHandlers;
 window.setupModsSearch = setupModsSearch;
+window.resetModsConfig = resetModsConfig;
 
 console.log('📦 mods.js загружен, функции экспортированы');
 console.log('  - initModsPage:', typeof window.initModsPage);

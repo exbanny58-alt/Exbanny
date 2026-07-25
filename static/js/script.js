@@ -76,6 +76,14 @@ const pages = {
                     Обновить список
                 </button>
                 
+                <button class="btn btn-danger" id="clearGameLinksBtn" title="Очистить все подключения и удалить симлинки игры">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3,6 5,6 21,6"/>
+                        <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                    </svg>
+                    Очистить подключения
+                </button>
+                
                 <button class="btn btn-nickname" id="changeNicknameBtn" title="Изменить ник в игре">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -145,6 +153,15 @@ const pages = {
                         </svg>
                         Обновить список
                     </button>
+                    
+                    <button class="btn btn-danger" id="resetModsConfigBtn" title="Сбросить все настройки модов">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3,6 5,6 21,6"/>
+                            <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
+                        </svg>
+                        Сбросить настройки
+                    </button>
+                    
                     <button class="btn btn-secondary" id="openWorkshopBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
@@ -160,6 +177,22 @@ const pages = {
                     <div class="mods-filter">
                         <input type="text" id="modsSearchInput" placeholder="🔍 Поиск модов..." class="mods-search">
                     </div>
+                </div>
+
+                <!-- Легенда -->
+                <div class="mods-legend">
+                    <span class="legend-item">
+                        <span class="legend-dot server"></span>
+                        Серверный
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot server-mod"></span>
+                        СерверМод
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot client"></span>
+                        КлиентМод
+                    </span>
                 </div>
 
                 <!-- Список модов -->

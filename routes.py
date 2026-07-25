@@ -1412,3 +1412,47 @@ def register_routes(app):
             return jsonify({'success': False, 'message': 'Ошибка сохранения'}), 500
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ============================================
+    # API ДЛЯ ОЧИСТКИ ПОДКЛЮЧЕНИЙ ИГРЫ
+    # ============================================
+
+    @app.route('/api/game/links/clear', methods=['POST'])
+    def clear_game_links():
+        """Очищает все подключения игры"""
+        try:
+            from game_links import clear_game_links as clear_links
+            result = clear_links()
+            if result:
+                return jsonify({
+                    'success': True,
+                    'message': 'Подключения игры очищены'
+                })
+            return jsonify({
+                'success': False,
+                'message': 'Ошибка очистки подключений игры'
+            }), 500
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ============================================
+    # API ДЛЯ СБРОСА НАСТРОЕК МОДОВ
+    # ============================================
+
+    @app.route('/api/mods/config/reset', methods=['POST'])
+    def reset_mods_config():
+        """Сбрасывает все настройки модов"""
+        try:
+            from settings_manager import save_mods_config
+            # Сохраняем пустой конфиг
+            if save_mods_config({}):
+                return jsonify({
+                    'success': True,
+                    'message': 'Настройки модов сброшены'
+                })
+            return jsonify({
+                'success': False,
+                'message': 'Ошибка сброса настроек'
+            }), 500
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
