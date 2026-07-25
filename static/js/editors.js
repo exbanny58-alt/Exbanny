@@ -28,6 +28,22 @@ const EDITORS_CONFIG = {
                 description: 'Настройка лута через файл types.xml',
                 badge: 'Лут',
                 init: 'initTypesEditor'
+            },
+            {
+                id: 'globals_editor',
+                icon: '🌍',
+                title: 'Редактор globals.xml',
+                description: 'Глобальные переменные сервера (зомби, животные, лут и т.д.)',
+                badge: 'Глобальные',
+                init: 'initGlobalsEditor'
+            },
+            {
+                id: 'events_editor',
+                icon: '📋',
+                title: 'Редактор events.xml',
+                description: 'Настройка событий, животных, зомби и транспорта',
+                badge: 'События',
+                init: 'initEventsEditor'
             }
             // Сюда можно будет добавить другие редакторы серверных файлов
         ]
@@ -303,6 +319,12 @@ function openTile(tileId, initFunctionName) {
         let scriptSrc = '';
         if (tileId === 'server_config') {
             scriptSrc = '/static/js/server_config_editor.js';
+        } else if (tileId === 'types_editor') {
+            scriptSrc = '/static/js/types_editor.js';
+        } else if (tileId === 'globals_editor') {
+            scriptSrc = '/static/js/globals_editor.js';
+        } else if (tileId === 'events_editor') {
+            scriptSrc = '/static/js/events_editor.js';
         } else if (tileId === 'mpg_spawner') {
             scriptSrc = '/static/js/mpg_editor.js';
         } else if (tileId === 'loot_extractor') {

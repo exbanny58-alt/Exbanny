@@ -9265,3 +9265,2246 @@ main {
         padding: 5px 10px;
     }
 }
+
+/* ============================================
+   GLOBALS EDITOR - ПОЛНЫЙ СТИЛЬ
+   ============================================ */
+
+/* ----- Основной контейнер ----- */
+.globals-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 0;
+    overflow: hidden;
+}
+
+/* ----- Кнопка "Назад" ----- */
+.globals-back-btn {
+    position: fixed;
+    bottom: 18px;
+    left: 290px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(16, 21, 61, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: "Nunito", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    user-select: none;
+}
+
+.globals-back-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    background: rgba(16, 21, 61, 0.95);
+    border-color: rgba(167, 139, 250, 0.3);
+    box-shadow: 0 8px 40px rgba(167, 139, 250, 0.15);
+    color: #fff;
+}
+
+.globals-back-btn:active {
+    transform: scale(0.97);
+}
+
+.globals-back-btn svg {
+    stroke: #a78bfa;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.globals-back-btn:hover svg {
+    transform: translateX(-4px);
+}
+
+/* ----- Заголовок ----- */
+.globals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.globals-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.globals-header-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.globals-header-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.globals-header-subtitle {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
+.globals-header-subtitle strong {
+    color: #a78bfa;
+}
+
+.globals-header-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.globals-header-actions .btn {
+    padding: 5px 12px;
+    font-size: 0.7rem;
+}
+
+/* ----- Статус бар ----- */
+.globals-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.globals-status {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.globals-status.warning { color: #fbbf24; }
+.globals-status.loading { color: #60a5fa; }
+.globals-status.success { color: #4ade80; }
+.globals-status.error { color: #f87171; }
+
+.globals-path {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.6rem;
+    font-family: 'Courier New', monospace;
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ============================================
+   СПИСОК ПЕРЕМЕННЫХ - ПО ЦЕНТРУ
+   ============================================ */
+
+.globals-list-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 20px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.globals-list-container {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+}
+
+/* ----- Заголовок списка ----- */
+.globals-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.globals-list-header h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.globals-list-header .btn-sm {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+}
+
+.globals-list-header .btn-sm svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ----- Поиск и фильтр ----- */
+.globals-search {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    flex-shrink: 0;
+}
+
+.globals-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    color: #e5e5e5;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.globals-search-input:focus {
+    border-color: rgba(167, 139, 250, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.globals-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+.globals-filter-select {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    cursor: pointer;
+    min-width: 110px;
+}
+
+.globals-filter-select option {
+    background: rgba(16, 21, 61, 0.95);
+    color: #e5e5e5;
+}
+
+/* ===== СПИСОК - СКРОЛЛ ===== */
+.globals-variables-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px 12px 10px;
+    min-height: 0;
+}
+
+.globals-variables-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.globals-variables-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.globals-variables-list::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.25);
+    border-radius: 10px;
+}
+
+.globals-variables-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(167, 139, 250, 0.45);
+}
+
+/* ============================================
+   ЭЛЕМЕНТ СПИСКА - УВЕЛИЧЕННЫЙ
+   ============================================ */
+
+.globals-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 3px;
+    border: 1px solid transparent;
+    min-height: 52px;
+}
+
+.globals-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.globals-item:active {
+    transform: scale(0.99);
+}
+
+/* ----- Информация о предмете ----- */
+.globals-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ----- Название переменной (увеличенное) ----- */
+.globals-item-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 120px;
+}
+
+/* ----- Краткое описание (НОВОЕ) ----- */
+.globals-item-short-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+    padding: 2px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    border-left: 2px solid rgba(167, 139, 250, 0.2);
+}
+
+/* ----- Иконка "есть описание" ----- */
+.globals-item-has-info {
+    font-size: 0.75rem;
+    opacity: 0.35;
+    cursor: help;
+    flex-shrink: 0;
+}
+
+.globals-item-has-info:hover {
+    opacity: 0.8;
+}
+
+/* ----- Детали (категория, значение, тип) ----- */
+.globals-item-details {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+    margin: 0 8px;
+}
+
+/* ----- Категория (увеличенная) ----- */
+.globals-item-category {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.globals-item-category.spawn { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.globals-item-category.cleanup { background: rgba(251,146,60,0.15); color: #fb923c; }
+.globals-item-category.loot { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.globals-item-category.zombies { background: rgba(244,63,94,0.15); color: #f43f5e; }
+.globals-item-category.animals { background: rgba(74,222,128,0.15); color: #4ade80; }
+.globals-item-category.time { background: rgba(192,132,252,0.15); color: #c084fc; }
+.globals-item-category.flags { background: rgba(56,189,248,0.15); color: #38bdf8; }
+.globals-item-category.other { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+/* ----- Значение (увеличенное) ----- */
+.globals-item-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Courier New', monospace;
+    min-width: 36px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 10px;
+    border-radius: 4px;
+}
+
+/* ----- Тип (увеличенный) ----- */
+.globals-item-type {
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ----- Кнопка удаления (увеличенная) ----- */
+.globals-item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.globals-item-delete {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.globals-item-delete:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.12);
+}
+
+.globals-item-delete svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ----- Пустой список ----- */
+.globals-empty-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
+    height: 100%;
+}
+
+.globals-empty-list .globals-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.globals-empty-list p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ----- Загрузка ----- */
+.globals-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    gap: 12px;
+    height: 100%;
+}
+
+.globals-loading .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(167, 139, 250, 0.5);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   МОДАЛЬНОЕ ОКНО РЕДАКТОРА ПЕРЕМЕННОЙ
+   ============================================ */
+
+.globals-variable-modal .modal-content.globals-modal-content {
+    max-width: 580px;
+    width: 92%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(16, 21, 61, 0.92);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.globals-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.globals-modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+}
+
+.globals-modal-icon {
+    font-size: 1.4rem;
+}
+
+.globals-modal-header .modal-close {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.3);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    padding: 0;
+}
+
+.globals-modal-header .modal-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+.globals-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+}
+
+.globals-modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.globals-modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.globals-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.25);
+    border-radius: 10px;
+}
+
+.globals-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 20px 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.globals-modal-footer .btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+}
+
+/* ----- Стили внутри модала ----- */
+.globals-modal-body .globals-editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.globals-modal-body .globals-form-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.globals-modal-body .globals-form-section h4 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.globals-modal-body .globals-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.globals-modal-body .globals-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.globals-modal-body .globals-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.globals-modal-body .globals-form-group label {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.globals-modal-body .globals-input,
+.globals-modal-body .globals-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #e5e5e5;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.globals-modal-body .globals-input:hover,
+.globals-modal-body .globals-select:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.globals-modal-body .globals-input:focus,
+.globals-modal-body .globals-select:focus {
+    border-color: rgba(167, 139, 250, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.05);
+}
+
+.globals-modal-body .globals-select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+.globals-modal-body .globals-select option {
+    background: rgba(16, 21, 61, 0.95);
+    color: #e5e5e5;
+}
+
+/* ============================================
+   БЛОК ЗНАНИЙ В МОДАЛЬНОМ ОКНЕ
+   ============================================ */
+
+.globals-knowledge-wrapper {
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(167, 139, 250, 0.08);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.globals-knowledge-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.globals-knowledge-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.globals-knowledge-category {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.globals-knowledge-category.spawn { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.globals-knowledge-category.cleanup { background: rgba(251,146,60,0.15); color: #fb923c; }
+.globals-knowledge-category.loot { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.globals-knowledge-category.zombies { background: rgba(244,63,94,0.15); color: #f43f5e; }
+.globals-knowledge-category.animals { background: rgba(74,222,128,0.15); color: #4ade80; }
+.globals-knowledge-category.time { background: rgba(192,132,252,0.15); color: #c084fc; }
+.globals-knowledge-category.flags { background: rgba(56,189,248,0.15); color: #38bdf8; }
+.globals-knowledge-category.other { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+.globals-knowledge-type {
+    font-size: 0.6rem;
+    padding: 2px 10px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.04);
+    color: rgba(255,255,255,0.25);
+}
+
+.globals-knowledge-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.globals-knowledge-field label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.globals-knowledge-field p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.65);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.globals-knowledge-field p strong {
+    color: #a78bfa;
+}
+
+.globals-knowledge-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.globals-knowledge-field.half {
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.globals-knowledge-current {
+    background: rgba(167, 139, 250, 0.05);
+    border: 1px solid rgba(167, 139, 250, 0.08);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 4px;
+}
+
+.globals-knowledge-current label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.globals-knowledge-current p {
+    font-size: 0.95rem;
+    color: #a78bfa;
+    margin: 2px 0 0;
+    font-weight: 600;
+}
+
+.globals-knowledge-placeholder {
+    padding: 16px;
+    text-align: center;
+    color: rgba(255,255,255,0.3);
+}
+
+.globals-knowledge-placeholder p {
+    margin: 4px 0;
+    font-size: 0.85rem;
+}
+
+.globals-knowledge-hint {
+    font-size: 0.75rem !important;
+    color: rgba(255,255,255,0.15) !important;
+}
+
+/* ============================================
+   ПЛАВАЮЩАЯ КНОПКА "НАВЕРХ"
+   ============================================ */
+
+#globalsScrollTopBtn {
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 30px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(167, 139, 250, 0.12) !important;
+    border: 1px solid rgba(167, 139, 250, 0.2) !important;
+    color: #a78bfa !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    z-index: 9997 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    font-family: "Nunito", sans-serif !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(0.9) !important;
+}
+
+#globalsScrollTopBtn.visible {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+#globalsScrollTopBtn:hover {
+    background: rgba(167, 139, 250, 0.25) !important;
+    border-color: rgba(167, 139, 250, 0.5) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 30px rgba(167, 139, 250, 0.2) !important;
+}
+
+#globalsScrollTopBtn:active {
+    transform: scale(0.95) !important;
+}
+
+@media (max-width: 768px) {
+    #globalsScrollTopBtn {
+        bottom: 80px !important;
+        right: 20px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #globalsScrollTopBtn {
+        bottom: 70px !important;
+        right: 16px !important;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 16px !important;
+    }
+}
+
+/* ============================================
+   МОДАЛ ПОДТВЕРЖДЕНИЯ ДЛЯ GLOBALS
+   ============================================ */
+
+.globals-confirm-modal .modal-content.modal-confirm {
+    max-width: 480px;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.globals-confirm-modal .modal-confirm-header {
+    border-bottom: 1px solid rgba(248, 113, 113, 0.1);
+    background: rgba(248, 113, 113, 0.03);
+    padding: 20px 24px 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.globals-confirm-modal .modal-confirm-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.globals-confirm-modal .modal-confirm-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.globals-confirm-modal .modal-confirm-body {
+    padding: 24px;
+}
+
+.globals-confirm-modal .modal-confirm-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.globals-confirm-modal .modal-confirm-text strong {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.globals-confirm-modal .modal-confirm-footer {
+    padding: 16px 24px 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.globals-confirm-modal .modal-confirm-footer .btn {
+    padding: 10px 24px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.globals-confirm-modal .modal-confirm-footer .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.globals-confirm-modal .modal-confirm-footer .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.globals-confirm-modal .modal-confirm-footer .btn-danger {
+    background: rgba(248, 113, 113, 0.15);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    color: #f87171;
+}
+
+.globals-confirm-modal .modal-confirm-footer .btn-danger:hover {
+    background: rgba(248, 113, 113, 0.25);
+    border-color: rgba(248, 113, 113, 0.4);
+    color: #fca5a5;
+    transform: translateY(-1px);
+    box-shadow: 0 0 30px rgba(248, 113, 113, 0.1);
+}
+
+.globals-confirm-modal .modal-confirm-footer .btn-danger svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* Адаптив модала подтверждения */
+@media (max-width: 480px) {
+    .globals-confirm-modal .modal-content.modal-confirm {
+        max-width: 100%;
+        width: 95%;
+        margin: 10px;
+        border-radius: 12px;
+    }
+    .globals-confirm-modal .modal-confirm-header {
+        padding: 16px 18px;
+    }
+    .globals-confirm-modal .modal-confirm-header h3 {
+        font-size: 1rem;
+    }
+    .globals-confirm-modal .modal-confirm-icon {
+        font-size: 1.6rem;
+    }
+    .globals-confirm-modal .modal-confirm-body {
+        padding: 18px;
+    }
+    .globals-confirm-modal .modal-confirm-text {
+        font-size: 0.9rem;
+    }
+    .globals-confirm-modal .modal-confirm-footer {
+        padding: 12px 18px 16px 18px;
+        flex-direction: column-reverse;
+    }
+    .globals-confirm-modal .modal-confirm-footer .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px;
+    }
+}
+
+.globals-confirm-modal .modal-content {
+    transform: scale(0.9) translateY(30px) rotate(-2deg);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.globals-confirm-modal.show .modal-content {
+    transform: scale(1) translateY(0) rotate(0deg);
+}
+
+/* ============================================
+   АНИМАЦИЯ SPINNER
+   ============================================ */
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   АДАПТИВ ДЛЯ УВЕЛИЧЕННЫХ ЭЛЕМЕНТОВ
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .globals-back-btn {
+        bottom: 16px;
+        left: 16px;
+        padding: 8px 14px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+        gap: 6px;
+    }
+    .globals-back-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    .globals-list-wrapper {
+        padding: 0 10px;
+    }
+    .globals-list-container {
+        max-width: 100%;
+    }
+    .globals-item-short-desc {
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+    .globals-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .globals-header-actions {
+        width: 100%;
+        justify-content: stretch;
+        flex-wrap: wrap;
+    }
+    .globals-header-actions .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    .globals-status-bar {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+    .globals-path {
+        max-width: 100%;
+        font-size: 0.6rem;
+    }
+    .globals-search {
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+    .globals-search-input {
+        font-size: 0.8rem;
+    }
+    .globals-filter-select {
+        width: 100%;
+    }
+    .globals-list-wrapper {
+        padding: 0 5px;
+    }
+    .globals-item {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+        min-height: 44px;
+    }
+    .globals-item-info {
+        width: 100%;
+        gap: 6px;
+    }
+    .globals-item-name {
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+    .globals-item-short-desc {
+        max-width: 140px;
+        font-size: 0.7rem;
+    }
+    .globals-item-details {
+        gap: 6px;
+        margin: 0 4px;
+        flex-wrap: wrap;
+    }
+    .globals-item-category {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+    .globals-item-value {
+        font-size: 0.75rem;
+        min-width: 28px;
+        padding: 1px 6px;
+    }
+    .globals-item-type {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+    }
+    .globals-item-has-info {
+        font-size: 0.65rem;
+    }
+    .globals-item-delete {
+        padding: 4px;
+    }
+    .globals-item-delete svg {
+        width: 14px;
+        height: 14px;
+    }
+    /* Модал */
+    .globals-variable-modal .modal-content.globals-modal-content {
+        max-width: 95%;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    .globals-modal-body {
+        padding: 12px 14px;
+    }
+    .globals-modal-body .globals-form-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .globals-modal-header {
+        padding: 12px 16px 10px 16px;
+    }
+    .globals-modal-header h3 {
+        font-size: 0.95rem;
+    }
+    .globals-modal-footer {
+        padding: 10px 16px 14px 16px;
+        flex-wrap: wrap;
+    }
+    .globals-modal-footer .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.75rem;
+        padding: 8px 14px;
+    }
+    /* Блок знаний */
+    .globals-knowledge-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    .globals-knowledge-wrapper {
+        padding: 10px 12px;
+    }
+    .globals-knowledge-field p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .globals-back-btn {
+        bottom: 12px;
+        left: 12px;
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+        gap: 4px;
+    }
+    .globals-back-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+    .globals-header-title {
+        font-size: 0.9rem;
+    }
+    .globals-header-icon {
+        font-size: 1.3rem;
+    }
+    .globals-header-subtitle {
+        font-size: 0.65rem;
+    }
+    .globals-list-header h3 {
+        font-size: 0.7rem;
+    }
+    .globals-list-header .btn-sm {
+        padding: 3px 8px;
+        font-size: 0.6rem;
+    }
+    .globals-search-input {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    .globals-filter-select {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    .globals-item {
+        padding: 6px 10px;
+        gap: 4px;
+        min-height: 38px;
+        border-radius: 6px;
+    }
+    .globals-item-name {
+        font-size: 0.7rem;
+        min-width: 60px;
+    }
+    .globals-item-short-desc {
+        max-width: 100px;
+        font-size: 0.6rem;
+        padding: 1px 6px;
+    }
+    .globals-item-has-info {
+        font-size: 0.6rem;
+    }
+    .globals-item-category {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+        border-radius: 6px;
+    }
+    .globals-item-value {
+        font-size: 0.7rem;
+        min-width: 22px;
+        padding: 1px 6px;
+    }
+    .globals-item-type {
+        font-size: 0.45rem;
+        padding: 1px 5px;
+    }
+    .globals-item-delete {
+        padding: 4px;
+    }
+    .globals-item-delete svg {
+        width: 13px;
+        height: 13px;
+    }
+    /* Модал */
+    .globals-variable-modal .modal-content.globals-modal-content {
+        max-width: 98%;
+        max-height: 95vh;
+        border-radius: 10px;
+        margin: 5px;
+    }
+    .globals-modal-body {
+        padding: 10px 12px;
+    }
+    .globals-modal-body .globals-form-section {
+        padding: 10px 12px;
+    }
+    .globals-modal-body .globals-input,
+    .globals-modal-body .globals-select {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+    .globals-modal-header h3 {
+        font-size: 0.85rem;
+    }
+    .globals-modal-header .modal-close {
+        width: 28px;
+        height: 28px;
+    }
+    .globals-modal-footer {
+        padding: 8px 12px 12px 12px;
+    }
+    .globals-modal-footer .btn {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
+    /* Блок знаний */
+    .globals-knowledge-wrapper {
+        padding: 8px 10px;
+        border-radius: 8px;
+    }
+    .globals-knowledge-header {
+        gap: 6px;
+    }
+    .globals-knowledge-category {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+    .globals-knowledge-field p {
+        font-size: 0.75rem;
+    }
+    .globals-knowledge-current p {
+        font-size: 0.85rem;
+    }
+}
+
+/* ============================================
+   EVENTS EDITOR - ПОЛНЫЙ СТИЛЬ
+   ============================================ */
+
+/* ----- Основной контейнер ----- */
+.events-editor {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 0;
+    overflow: hidden;
+}
+
+/* ----- Кнопка "Назад" ----- */
+.events-back-btn {
+    position: fixed;
+    bottom: 18px;
+    left: 290px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: rgba(16, 21, 61, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: "Nunito", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    user-select: none;
+}
+
+.events-back-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    background: rgba(16, 21, 61, 0.95);
+    border-color: rgba(251, 191, 36, 0.3);
+    box-shadow: 0 8px 40px rgba(251, 191, 36, 0.15);
+    color: #fff;
+}
+
+.events-back-btn:active {
+    transform: scale(0.97);
+}
+
+.events-back-btn svg {
+    stroke: #fbbf24;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.events-back-btn:hover svg {
+    transform: translateX(-4px);
+}
+
+/* ----- Заголовок ----- */
+.events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.events-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.events-header-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.events-header-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.events-header-subtitle {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    margin: 0;
+}
+
+.events-header-subtitle strong {
+    color: #fbbf24;
+}
+
+.events-header-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.events-header-actions .btn {
+    padding: 5px 12px;
+    font-size: 0.7rem;
+}
+
+/* ----- Статус бар ----- */
+.events-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.events-status {
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+.events-status.warning { color: #fbbf24; }
+.events-status.loading { color: #60a5fa; }
+.events-status.success { color: #4ade80; }
+.events-status.error { color: #f87171; }
+
+.events-path {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.6rem;
+    font-family: 'Courier New', monospace;
+    max-width: 45%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ============================================
+   СПИСОК СОБЫТИЙ - ПО ЦЕНТРУ
+   ============================================ */
+
+.events-list-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 20px;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.events-list-container {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+}
+
+/* ----- Заголовок списка ----- */
+.events-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.events-list-header h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.events-list-header .btn-sm {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+}
+
+.events-list-header .btn-sm svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ----- Поиск и фильтр ----- */
+.events-search {
+    display: flex;
+    gap: 8px;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    flex-shrink: 0;
+}
+
+.events-search-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    color: #e5e5e5;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.events-search-input:focus {
+    border-color: rgba(251, 191, 36, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.events-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+.events-filter-select {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.8rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    cursor: pointer;
+    min-width: 110px;
+}
+
+.events-filter-select option {
+    background: rgba(16, 21, 61, 0.95);
+    color: #e5e5e5;
+}
+
+/* ===== СПИСОК - СКРОЛЛ ===== */
+.events-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 10px 12px 10px;
+    min-height: 0;
+}
+
+.events-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.events-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.events-list::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.25);
+    border-radius: 10px;
+}
+
+.events-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(251, 191, 36, 0.45);
+}
+
+/* ============================================
+   ЭЛЕМЕНТ СПИСКА
+   ============================================ */
+
+.events-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 3px;
+    border: 1px solid transparent;
+    min-height: 52px;
+}
+
+.events-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.events-item:active {
+    transform: scale(0.99);
+}
+
+.events-item-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.events-item-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 120px;
+}
+
+.events-item-short-desc {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    padding: 2px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+}
+
+.events-item-details {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+    margin: 0 8px;
+}
+
+.events-item-category {
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.events-item-category.animals { background: rgba(74,222,128,0.15); color: #4ade80; }
+.events-item-category.infected { background: rgba(244,63,94,0.15); color: #f43f5e; }
+.events-item-category.static { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.events-item-category.trajectory { background: rgba(52,211,153,0.15); color: #34d399; }
+.events-item-category.vehicles { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.events-item-category.loot { background: rgba(167,139,250,0.15); color: #a78bfa; }
+.events-item-category.other { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); }
+
+.events-item-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'Courier New', monospace;
+    min-width: 36px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2px 10px;
+    border-radius: 4px;
+}
+
+.events-item-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.events-item-delete {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.events-item-delete:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.12);
+}
+
+.events-item-delete svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ----- Пустой список ----- */
+.events-empty-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
+    height: 100%;
+}
+
+.events-empty-list .events-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.events-empty-list p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ----- Загрузка ----- */
+.events-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    gap: 12px;
+    height: 100%;
+}
+
+.events-loading .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-top-color: rgba(251, 191, 36, 0.5);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ============================================
+   МОДАЛЬНОЕ ОКНО РЕДАКТОРА
+   ============================================ */
+
+.events-event-modal .modal-content.events-modal-content {
+    max-width: 680px;
+    width: 92%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(16, 21, 61, 0.92);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.events-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+}
+
+.events-modal-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+}
+
+.events-modal-icon {
+    font-size: 1.4rem;
+}
+
+.events-modal-header .modal-close {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.3);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    padding: 0;
+}
+
+.events-modal-header .modal-close:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.2);
+}
+
+.events-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+}
+
+.events-modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.events-modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.events-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(251, 191, 36, 0.25);
+    border-radius: 10px;
+}
+
+.events-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 20px 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.events-modal-footer .btn {
+    padding: 8px 20px;
+    font-size: 0.85rem;
+}
+
+/* ----- Стили внутри модала ----- */
+.events-modal-body .events-editor-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.events-modal-body .events-form-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 14px 16px;
+}
+
+.events-modal-body .events-form-section h4 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.events-modal-body .events-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.events-modal-body .events-form-row:last-child {
+    margin-bottom: 0;
+}
+
+.events-modal-body .events-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.events-modal-body .events-form-group label {
+    font-size: 0.6rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.events-modal-body .events-input,
+.events-modal-body .events-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #e5e5e5;
+    font-size: 0.85rem;
+    font-family: "Nunito", sans-serif;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.events-modal-body .events-input:hover,
+.events-modal-body .events-select:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.events-modal-body .events-input:focus,
+.events-modal-body .events-select:focus {
+    border-color: rgba(251, 191, 36, 0.4);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.05);
+}
+
+.events-modal-body .events-select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+.events-modal-body .events-select option {
+    background: rgba(16, 21, 61, 0.95);
+    color: #e5e5e5;
+}
+
+/* ============================================
+   ПЛАВАЮЩАЯ КНОПКА "НАВЕРХ"
+   ============================================ */
+
+#eventsScrollTopBtn {
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 30px !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(251, 191, 36, 0.12) !important;
+    border: 1px solid rgba(251, 191, 36, 0.2) !important;
+    color: #fbbf24 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    z-index: 9997 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    font-family: "Nunito", sans-serif !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(0.9) !important;
+}
+
+#eventsScrollTopBtn.visible {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+#eventsScrollTopBtn:hover {
+    background: rgba(251, 191, 36, 0.25) !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 30px rgba(251, 191, 36, 0.2) !important;
+}
+
+#eventsScrollTopBtn:active {
+    transform: scale(0.95) !important;
+}
+
+@media (max-width: 768px) {
+    #eventsScrollTopBtn {
+        bottom: 80px !important;
+        right: 20px !important;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #eventsScrollTopBtn {
+        bottom: 70px !important;
+        right: 16px !important;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 16px !important;
+    }
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .events-back-btn {
+        bottom: 16px;
+        left: 16px;
+        padding: 8px 14px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+        gap: 6px;
+    }
+    .events-back-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+    .events-list-wrapper {
+        padding: 0 10px;
+    }
+    .events-list-container {
+        max-width: 100%;
+    }
+    .events-item-short-desc {
+        max-width: 160px;
+    }
+}
+
+@media (max-width: 768px) {
+    .events-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .events-header-actions {
+        width: 100%;
+        justify-content: stretch;
+        flex-wrap: wrap;
+    }
+    .events-header-actions .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    .events-status-bar {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+    }
+    .events-path {
+        max-width: 100%;
+        font-size: 0.6rem;
+    }
+    .events-search {
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+    .events-search-input {
+        font-size: 0.8rem;
+    }
+    .events-filter-select {
+        width: 100%;
+    }
+    .events-list-wrapper {
+        padding: 0 5px;
+    }
+    .events-item {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 6px;
+        min-height: 44px;
+    }
+    .events-item-info {
+        width: 100%;
+        gap: 6px;
+    }
+    .events-item-name {
+        font-size: 0.8rem;
+        min-width: 80px;
+    }
+    .events-item-short-desc {
+        max-width: 140px;
+        font-size: 0.65rem;
+    }
+    .events-item-details {
+        gap: 6px;
+        margin: 0 4px;
+        flex-wrap: wrap;
+    }
+    .events-item-category {
+        font-size: 0.55rem;
+        padding: 1px 8px;
+    }
+    .events-item-value {
+        font-size: 0.75rem;
+        min-width: 28px;
+        padding: 1px 6px;
+    }
+    .events-item-delete {
+        padding: 4px;
+    }
+    .events-item-delete svg {
+        width: 14px;
+        height: 14px;
+    }
+    /* Модал */
+    .events-event-modal .modal-content.events-modal-content {
+        max-width: 95%;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    .events-modal-body {
+        padding: 12px 14px;
+    }
+    .events-modal-body .events-form-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .events-modal-header {
+        padding: 12px 16px 10px 16px;
+    }
+    .events-modal-header h3 {
+        font-size: 0.95rem;
+    }
+    .events-modal-footer {
+        padding: 10px 16px 14px 16px;
+        flex-wrap: wrap;
+    }
+    .events-modal-footer .btn {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.75rem;
+        padding: 8px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .events-back-btn {
+        bottom: 12px;
+        left: 12px;
+        padding: 6px 10px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+        gap: 4px;
+    }
+    .events-back-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+    .events-header-title {
+        font-size: 0.9rem;
+    }
+    .events-header-icon {
+        font-size: 1.3rem;
+    }
+    .events-header-subtitle {
+        font-size: 0.65rem;
+    }
+    .events-list-header h3 {
+        font-size: 0.7rem;
+    }
+    .events-list-header .btn-sm {
+        padding: 3px 8px;
+        font-size: 0.6rem;
+    }
+    .events-search-input {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    .events-filter-select {
+        font-size: 0.7rem;
+        padding: 6px 10px;
+    }
+    .events-item {
+        padding: 6px 10px;
+        gap: 4px;
+        min-height: 38px;
+        border-radius: 6px;
+    }
+    .events-item-name {
+        font-size: 0.7rem;
+        min-width: 60px;
+    }
+    .events-item-short-desc {
+        max-width: 100px;
+        font-size: 0.55rem;
+        padding: 1px 6px;
+    }
+    .events-item-category {
+        font-size: 0.5rem;
+        padding: 1px 6px;
+        border-radius: 6px;
+    }
+    .events-item-value {
+        font-size: 0.7rem;
+        min-width: 22px;
+        padding: 1px 6px;
+    }
+    .events-item-delete {
+        padding: 4px;
+    }
+    .events-item-delete svg {
+        width: 13px;
+        height: 13px;
+    }
+    /* Модал */
+    .events-event-modal .modal-content.events-modal-content {
+        max-width: 98%;
+        max-height: 95vh;
+        border-radius: 10px;
+        margin: 5px;
+    }
+    .events-modal-body {
+        padding: 10px 12px;
+    }
+    .events-modal-body .events-form-section {
+        padding: 10px 12px;
+    }
+    .events-modal-body .events-form-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    .events-modal-body .events-input,
+    .events-modal-body .events-select {
+        font-size: 0.75rem;
+        padding: 6px 10px;
+    }
+    .events-modal-header h3 {
+        font-size: 0.85rem;
+    }
+    .events-modal-header .modal-close {
+        width: 28px;
+        height: 28px;
+    }
+    .events-modal-footer {
+        padding: 8px 12px 12px 12px;
+    }
+    .events-modal-footer .btn {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
+}
+
