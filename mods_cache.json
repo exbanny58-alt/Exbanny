@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-25T13:22:48.189144",
+  "timestamp": "2026-07-25T13:37:08.809989",
   "mods": [
     {
       "id": "workshop_3065185420",
@@ -11,7 +11,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": false,
+      "server_mod": true,
       "client": true
     },
     {
@@ -25,7 +25,7 @@
       "has_meta": true,
       "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "custom_Bonny_Cars_Pack",
@@ -37,7 +37,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": false,
+      "server_mod": true,
       "client": true
     },
     {
@@ -76,8 +76,8 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": true,
-      "client": false
+      "server_mod": false,
+      "client": true
     },
     {
       "id": "workshop_1646187754",
@@ -129,7 +129,7 @@
       "has_meta": true,
       "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_2276010135",
@@ -168,7 +168,7 @@
       "has_meta": true,
       "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_3471358849",
@@ -207,7 +207,7 @@
       "has_meta": true,
       "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_3069507753",
@@ -220,7 +220,7 @@
       "has_meta": true,
       "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_1962144102",
@@ -244,9 +244,9 @@
       "version": "Неизвестно",
       "enabled": true,
       "has_meta": true,
-      "server": true,
+      "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_3120779051",
@@ -257,9 +257,9 @@
       "version": "Неизвестно",
       "enabled": true,
       "has_meta": true,
-      "server": true,
+      "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_1734713776",
@@ -440,8 +440,8 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": true,
-      "client": false
+      "server_mod": false,
+      "client": true
     },
     {
       "id": "workshop_2968284194",
@@ -453,8 +453,8 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": true,
-      "client": false
+      "server_mod": false,
+      "client": true
     },
     {
       "id": "workshop_3739774497",
@@ -467,7 +467,7 @@
       "has_meta": true,
       "server": false,
       "server_mod": false,
-      "client": false
+      "client": true
     },
     {
       "id": "workshop_3770734718",
@@ -496,5 +496,5 @@
       "client": true
     }
   ],
-  "hash": "dd205b57db70151493b79f3a36b5bb2a"
+  "hash": "2433bd4dfdc2980a63e848b4223c8644"
 }

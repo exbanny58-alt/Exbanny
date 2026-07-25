@@ -405,6 +405,112 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// ОТКРЫТИЕ ПАПОК ИЗ НАСТРОЕК
+// ============================================
+
+// Открыть папку сервера
+async function openServerFolder() {
+    try {
+        const response = await fetch('/api/settings');
+        const settings = await response.json();
+        
+        if (settings.server_exe) {
+            const serverDir = settings.server_exe.replace(/\\/g, '/').replace(/\/[^/]*$/, '');
+            await openExplorer(serverDir);
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Путь к серверу не указан в настройках');
+            }
+        }
+    } catch (e) {
+        console.error('❌ Ошибка:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+}
+
+// Открыть папку игры
+async function openGameFolder() {
+    try {
+        const response = await fetch('/api/settings');
+        const settings = await response.json();
+        
+        if (settings.game_exe) {
+            const gameDir = settings.game_exe.replace(/\\/g, '/').replace(/\/[^/]*$/, '');
+            await openExplorer(gameDir);
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Путь к игре не указан в настройках');
+            }
+        }
+    } catch (e) {
+        console.error('❌ Ошибка:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+}
+
+// Открыть корневую папку модов (workshop + custom_mods)
+async function openModsRootFolder() {
+    try {
+        const response = await fetch('/api/settings');
+        const settings = await response.json();
+        
+        // Пробуем открыть workshop, если есть
+        if (settings.workshop) {
+            await openExplorer(settings.workshop);
+        } else if (settings.custom_mods) {
+            await openExplorer(settings.custom_mods);
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Пути к модам не указаны в настройках');
+            }
+        }
+    } catch (e) {
+        console.error('❌ Ошибка:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+}
+
+// Универсальная функция открытия проводника
+async function openExplorer(path) {
+    if (!path) {
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Путь не указан');
+        }
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/open/explorer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: path })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            if (typeof notifications !== 'undefined') {
+                notifications.success('Папка открыта');
+            }
+        } else {
+            if (typeof notifications !== 'undefined') {
+                notifications.error(data.message || 'Ошибка открытия папки');
+            }
+        }
+    } catch (e) {
+        console.error('❌ Ошибка открытия папки:', e);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка: ' + e.message);
+        }
+    }
+}
+
+// ============================================
 // ЭКСПОРТ ФУНКЦИЙ
 // ============================================
 
@@ -412,5 +518,9 @@ window.controlServer = controlServer;
 window.controlGame = controlGame;
 window.updateServerStatus = updateServerStatus;
 window.updateGameStatus = updateGameStatus;
+window.openServerFolder = openServerFolder;
+window.openGameFolder = openGameFolder;
+window.openModsRootFolder = openModsRootFolder;
+window.openExplorer = openExplorer;
 
 console.log('🎮 controls.js загружен (с реальным API)');

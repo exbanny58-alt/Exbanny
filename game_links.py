@@ -215,3 +215,35 @@ def get_connected_game_mods():
     """Возвращает список подключённых модов игры"""
     links = load_game_links()
     return links
+
+# ============================================
+# НОВАЯ ФУНКЦИЯ ДЛЯ ОЧИСТКИ
+# ============================================
+
+def clear_game_links():
+    """Очищает все подключения игры - удаляет ссылки и конфиг"""
+    try:
+        links = load_game_links()
+        
+        if not links:
+            print('✅ Конфиг game_links.json уже пуст')
+            return True
+        
+        # Удаляем все ссылки
+        deleted_count = 0
+        for mod_id, info in links.items():
+            link_path = info.get('link_path')
+            if link_path:
+                print(f'🗑️ Удаляем ссылку игры: {link_path}')
+                if force_delete_path(link_path):
+                    deleted_count += 1
+        
+        # Очищаем конфиг
+        save_game_links({})
+        
+        print(f'✅ Очищено {deleted_count} ссылок игры')
+        return True
+        
+    except Exception as e:
+        print(f'❌ Ошибка очистки связей игры: {e}')
+        return False
