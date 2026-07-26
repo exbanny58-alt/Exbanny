@@ -44,6 +44,14 @@ const EDITORS_CONFIG = {
                 description: 'Настройка событий, животных, зомби и транспорта',
                 badge: 'События',
                 init: 'initEventsEditor'
+            },
+            {
+                id: 'territories_editor',
+                icon: '🗺️',
+                title: 'Редактор территорий животных',
+                description: 'Редактирование зон обитания животных и зомби',
+                badge: 'Территории',
+                init: 'initTerritoriesEditor'
             }
             // Сюда можно будет добавить другие редакторы серверных файлов
         ]
@@ -325,6 +333,8 @@ function openTile(tileId, initFunctionName) {
             scriptSrc = '/static/js/globals_editor.js';
         } else if (tileId === 'events_editor') {
             scriptSrc = '/static/js/events_editor.js';
+        } else if (tileId === 'territories_editor') {
+            scriptSrc = '/static/js/territories_editor.js';
         } else if (tileId === 'mpg_spawner') {
             scriptSrc = '/static/js/mpg_editor.js';
         } else if (tileId === 'loot_extractor') {

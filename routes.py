@@ -1456,3 +1456,85 @@ def register_routes(app):
             }), 500
         except Exception as e:
             return jsonify({'success': False, 'message': str(e)}), 500
+
+    # ============================================
+    # API ДЛЯ РАБОТЫ СО СПИСКОМ ФАЙЛОВ
+    # ============================================
+
+    @app.route('/api/file/list', methods=['POST'])
+    def file_list():
+        """Возвращает список файлов в папке"""
+        try:
+            data = request.get_json()
+            path = data.get('path', '').strip()
+            pattern = data.get('pattern', None)
+            
+            if not path:
+                return jsonify({'success': False, 'message': 'Путь не указан'}), 400
+            
+            if not os.path.exists(path):
+                return jsonify({'success': False, 'message': f'Папка не существует: {path}'}), 404
+            
+            files = []
+            for f in os.listdir(path):
+                full_path = os.path.join(path, f)
+                if os.path.isfile(full_path):
+                    if pattern:
+                        import fnmatch
+                        if fnmatch.fnmatch(f, pattern):
+                            files.append(f)
+                    else:
+                        files.append(f)
+            
+            return jsonify({
+                'success': True,
+                'files': sorted(files)
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения списка файлов: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
+
+    # ============================================
+    # API ДЛЯ РАБОТЫ СО СПИСКОМ ФАЙЛОВ
+    # ============================================
+
+    @app.route('/api/file/list', methods=['POST'])
+    def file_list_new():
+        """Возвращает список файлов в папке"""
+        try:
+            data = request.get_json()
+            path = data.get('path', '').strip()
+            pattern = data.get('pattern', None)
+            
+            if not path:
+                return jsonify({'success': False, 'message': 'Путь не указан'}), 400
+            
+            if not os.path.exists(path):
+                return jsonify({'success': False, 'message': f'Папка не существует: {path}'}), 404
+            
+            files = []
+            for f in os.listdir(path):
+                full_path = os.path.join(path, f)
+                if os.path.isfile(full_path):
+                    if pattern:
+                        import fnmatch
+                        if fnmatch.fnmatch(f, pattern):
+                            files.append(f)
+                    else:
+                        files.append(f)
+            
+            return jsonify({
+                'success': True,
+                'files': sorted(files)
+            })
+            
+        except Exception as e:
+            print(f'❌ Ошибка получения списка файлов: {e}')
+            return jsonify({
+                'success': False,
+                'message': str(e)
+            }), 500
