@@ -12675,3 +12675,28 @@ main {
         padding: 6px 12px;
     }
 }
+
+/* В CSS замените блок .territories-file-item.active на этот: */
+
+.territories-file-item.active {
+    background: rgba(167, 139, 250, 0.08);
+    border: 1.5px solid #a78bfa !important;
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.08);
+    position: relative;
+}
+
+.territories-file-item.active .territories-file-item-name {
+    color: #a78bfa;
+}
+
+/* Добавляем маленький индикатор слева для активного файла */
+.territories-file-item.active::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 20%;
+    height: 60%;
+    width: 3px;
+    background: #a78bfa;
+    border-radius: 0 3px 3px 0;
+}

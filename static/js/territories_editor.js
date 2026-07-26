@@ -18,7 +18,8 @@ let territoriesState = {
     availableFiles: [],
     currentFile: null,
     selectedTerritoryIndex: null,
-    isFileLoaded: false
+    isFileLoaded: false,
+    filesCache: {}
 };
 
 // ============================================
@@ -72,7 +73,7 @@ const TERRITORY_ZONE_TYPES = {
 };
 
 // ============================================
-// ИНИЦИАЛИЗАЦИЯ (ОБНОВЛЕННАЯ)
+// ИНИЦИАЛИЗАЦИЯ
 // ============================================
 
 function initTerritoriesEditor() {
@@ -84,7 +85,6 @@ function initTerritoriesEditor() {
         return;
     }
     
-    // Показываем загрузку
     renderTerritoriesEditor(container, true);
     
     loadServerPath()
@@ -98,16 +98,13 @@ function initTerritoriesEditor() {
         })
         .then(() => {
             console.log('✅ Путь к территориям:', territoriesState.territoriesPath);
-            // Загружаем файлы - внутри уже будет автозагрузка первого файла и перерисовка
             return loadAvailableFiles();
         })
-        // loadAvailableFiles уже перерисовывает интерфейс, так что здесь ничего не делаем
         .catch((e) => {
             console.error('❌ Ошибка инициализации:', e);
             if (typeof notifications !== 'undefined') {
                 notifications.error('Ошибка загрузки: ' + e.message);
             }
-            // В случае ошибки показываем интерфейс
             const container = document.getElementById('editorContentArea');
             if (container) {
                 renderTerritoriesEditor(container, false);
@@ -200,7 +197,7 @@ function buildTerritoriesPath() {
 }
 
 // ============================================
-// ЗАГРУЗКА СПИСКА ФАЙЛОВ И АВТОЗАГРУЗКА ПЕРВОГО
+// ЗАГРУЗКА СПИСКА ФАЙЛОВ И ВСЕХ ДАННЫХ
 // ============================================
 
 async function loadAvailableFiles() {
@@ -210,7 +207,7 @@ async function loadAvailableFiles() {
     }
     
     territoriesState.isLoading = true;
-    updateTerritoriesStatus('⏳ Загрузка списка файлов...');
+    updateTerritoriesStatus('⏳ Загрузка файлов...');
     
     try {
         const response = await fetch('/api/file/list', {
@@ -234,15 +231,27 @@ async function loadAvailableFiles() {
             console.log(`📋 Найдено ${territoryFiles.length} файлов территорий`);
             
             if (territoryFiles.length > 0) {
-                // ✅ АВТОМАТИЧЕСКИ ЗАГРУЖАЕМ ПЕРВЫЙ ФАЙЛ
+                updateTerritoriesStatus(`⏳ Загрузка ${territoryFiles.length} файлов...`);
+                
+                for (const file of territoryFiles) {
+                    try {
+                        await loadFileToCache(file);
+                        console.log(`✅ Загружен в кеш: ${file}`);
+                    } catch (e) {
+                        console.warn(`⚠️ Ошибка загрузки ${file}:`, e);
+                    }
+                }
+                
                 const firstFile = territoryFiles[0];
-                console.log(`🔄 Автозагрузка первого файла: ${firstFile}`);
+                territoriesState.currentFile = firstFile;
+                territoriesState.territories = territoriesState.filesCache[firstFile] || [];
+                territoriesState.isFileLoaded = true;
                 
-                // Загружаем файл и только после этого обновляем интерфейс
-                await loadTerritoriesFile(firstFile);
+                updateTerritoriesStatus(`✅ Загружено ${territoryFiles.length} файлов (${territoriesState.territories.length} территорий в первом)`);
                 
-                // Обновляем статус
-                updateTerritoriesStatus(`✅ Загружено ${territoriesState.territories.length} территорий из ${firstFile}`);
+                if (typeof notifications !== 'undefined') {
+                    notifications.success(`Загружено ${territoryFiles.length} файлов территорий`);
+                }
             } else {
                 territoriesState.territories = [];
                 territoriesState.currentFile = null;
@@ -253,7 +262,6 @@ async function loadAvailableFiles() {
                 }
             }
             
-            // Перерисовываем интерфейс
             const container = document.getElementById('editorContentArea');
             if (container) {
                 renderTerritoriesEditor(container, false);
@@ -293,10 +301,10 @@ async function loadAvailableFiles() {
 }
 
 // ============================================
-// ЗАГРУЗКА ФАЙЛА ТЕРРИТОРИЙ
+// ЗАГРУЗКА ФАЙЛА В КЕШ
 // ============================================
 
-function loadTerritoriesFile(filename) {
+function loadFileToCache(filename) {
     return new Promise((resolve, reject) => {
         if (!territoriesState.territoriesPath) {
             reject(new Error('Путь к территориям не загружен'));
@@ -304,10 +312,6 @@ function loadTerritoriesFile(filename) {
         }
         
         const fullPath = territoriesState.territoriesPath + '/' + filename;
-        territoriesState.currentFile = filename;
-        territoriesState.isFileLoaded = false;
-        
-        updateTerritoriesStatus(`⏳ Загрузка ${filename}...`);
         
         fetch('/api/file/read', {
             method: 'POST',
@@ -317,53 +321,16 @@ function loadTerritoriesFile(filename) {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.content) {
-                territoriesState.rawContent = data.content;
-                territoriesState.originalContent = data.content;
-                
                 const parsed = parseTerritoriesXml(data.content);
-                territoriesState.territories = parsed.territories || [];
-                territoriesState.isFileLoaded = true;
-                
-                const species = getSpeciesFromFilename(filename);
-                
-                console.log(`✅ Загружено ${territoriesState.territories.length} территорий из ${filename}`);
-                updateTerritoriesStatus(`✅ Загружено ${territoriesState.territories.length} территорий`);
-                
-                // Обновляем список файлов
-                const container = document.getElementById('editorContentArea');
-                if (container) {
-                    renderTerritoriesEditor(container, false);
-                }
-                
-                if (typeof notifications !== 'undefined') {
-                    notifications.success(`Загружено ${territoriesState.territories.length} территорий из ${filename}`);
-                }
-                
+                territoriesState.filesCache[filename] = parsed.territories || [];
                 resolve();
             } else {
-                territoriesState.territories = [];
-                territoriesState.isFileLoaded = false;
-                updateTerritoriesStatus(`⚠️ Ошибка загрузки ${filename}`);
-                
-                const container = document.getElementById('editorContentArea');
-                if (container) {
-                    renderTerritoriesEditor(container, false);
-                }
-                
+                territoriesState.filesCache[filename] = [];
                 reject(new Error('Файл не найден или пуст'));
             }
         })
         .catch(e => {
-            console.error(`❌ Ошибка загрузки ${filename}:`, e);
-            territoriesState.territories = [];
-            territoriesState.isFileLoaded = false;
-            updateTerritoriesStatus(`❌ Ошибка загрузки ${filename}`);
-            
-            const container = document.getElementById('editorContentArea');
-            if (container) {
-                renderTerritoriesEditor(container, false);
-            }
-            
+            territoriesState.filesCache[filename] = [];
             reject(e);
         });
     });
@@ -500,6 +467,7 @@ async function saveTerritoriesConfig() {
         if (data.success) {
             territoriesState.isDirty = false;
             territoriesState.originalContent = content;
+            territoriesState.filesCache[territoriesState.currentFile] = territoriesState.territories;
             updateTerritoriesStatus(`✅ Сохранено (${territoriesState.territories.length} территорий)`);
             
             if (typeof notifications !== 'undefined') {
@@ -537,30 +505,155 @@ function updateTerritoriesStatus(message) {
 }
 
 // ============================================
-// ВЫБОР ФАЙЛА
+// ОТРИСОВКА ГЛАВНОГО ИНТЕРФЕЙСА (СПИСОК ФАЙЛОВ)
+// ============================================
+
+function renderTerritoriesEditor(container, isLoading = false) {
+    let filesListHtml = '';
+    if (territoriesState.availableFiles.length > 0) {
+        filesListHtml = territoriesState.availableFiles.map(f => {
+            const isActive = f === territoriesState.currentFile;
+            const species = getSpeciesFromFilename(f);
+            const speciesLabel = TERRITORIES_SPECIES[species] || 'Неизвестно';
+            const count = territoriesState.filesCache[f] ? territoriesState.filesCache[f].length : '—';
+            return `
+                <div class="territories-file-item ${isActive ? 'active' : ''}" onclick="territoriesSelectFile('${f}')">
+                    <span class="territories-file-item-icon">📄</span>
+                    <span class="territories-file-item-name">${f}</span>
+                    <span class="territories-file-item-species">${speciesLabel}</span>
+                    <span class="territories-file-item-count">${count}</span>
+                </div>
+            `;
+        }).join('');
+    } else {
+        filesListHtml = `
+            <div class="territories-empty-files">
+                <span class="territories-empty-icon">📭</span>
+                <p>Нет файлов территорий</p>
+                <p class="territories-empty-hint">Проверьте папку env на сервере</p>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = `
+        <div class="territories-editor">
+            <button class="territories-back-btn" onclick="territoriesBackToTiles()" title="Вернуться к выбору редакторов">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15,18 9,12 15,6"/>
+                </svg>
+                <span>Назад</span>
+            </button>
+
+            <div class="territories-header">
+                <div class="territories-header-info">
+                    <span class="territories-header-icon">🗺️</span>
+                    <div>
+                        <h2 class="territories-header-title">Редактор территорий животных</h2>
+                        <p class="territories-header-subtitle">Карта <strong>${territoriesState.mapName || 'не определена'}</strong> • ${territoriesState.availableFiles.length} файлов</p>
+                    </div>
+                </div>
+                <div class="territories-header-actions">
+                    <button class="btn btn-secondary" onclick="loadAvailableFiles()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23,4 23,10 17,10"/>
+                            <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                            <polyline points="1,20 1,14 7,14"/>
+                            <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                        </svg>
+                        Обновить
+                    </button>
+                </div>
+            </div>
+
+            <div class="territories-status-bar">
+                <span class="territories-status" id="territoriesStatus">${isLoading ? '⏳ Загрузка...' : '✅ Готово'}</span>
+                <span class="territories-path">${territoriesState.territoriesPath || 'Путь не указан'}</span>
+            </div>
+
+            <!-- СПИСОК ФАЙЛОВ -->
+            <div class="territories-files-container">
+                <div class="territories-files-header">
+                    <h3>📄 Файлы территорий</h3>
+                    <span class="territories-files-count">${territoriesState.availableFiles.length}</span>
+                </div>
+                <div class="territories-files-list">
+                    ${filesListHtml}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    setTimeout(createTerritoriesScrollTopButton, 300);
+}
+
+// ============================================
+// ВЫБОР ФАЙЛА - С ЗАКРЫТИЕМ ПРИ ПОВТОРНОМ КЛИКЕ
 // ============================================
 
 function territoriesSelectFile(filename) {
     console.log(`📂 Выбран файл: ${filename}`);
     
-    if (filename === territoriesState.currentFile && territoriesState.isFileLoaded) {
-        // Если файл уже загружен - просто открываем модалку
-        showTerritoriesFileModal(filename);
+    // Проверяем, открыто ли уже модальное окно с этим файлом
+    const existingModal = document.getElementById('territoriesFileModal');
+    if (existingModal) {
+        // Если окно уже открыто - закрываем его
+        console.log(`📂 Модальное окно уже открыто, закрываем`);
+        territoriesCloseFileModal();
         return;
     }
     
-    // Показываем модальное окно с загрузкой
-    showTerritoriesFileModal(filename);
+    // Проверяем, есть ли файл в кеше
+    if (!territoriesState.filesCache[filename]) {
+        console.warn(`⚠️ Файл ${filename} не найден в кеше, загружаем...`);
+        loadFileToCache(filename).then(() => {
+            territoriesState.currentFile = filename;
+            territoriesState.territories = territoriesState.filesCache[filename] || [];
+            territoriesState.isFileLoaded = true;
+            showTerritoriesFileModalWithData(filename);
+            const container = document.getElementById('editorContentArea');
+            if (container) {
+                renderTerritoriesEditor(container, false);
+            }
+        });
+        return;
+    }
+    
+    // Обновляем текущий файл
+    territoriesState.currentFile = filename;
+    territoriesState.territories = territoriesState.filesCache[filename] || [];
+    territoriesState.isFileLoaded = true;
+    
+    const container = document.getElementById('editorContentArea');
+    if (container) {
+        renderTerritoriesEditor(container, false);
+    }
+    
+    showTerritoriesFileModalWithData(filename);
 }
+
+function territoriesCloseFileModal() {
+    const modal = document.getElementById('territoriesFileModal');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.remove();
+        }, 300);
+    }
+}
+
 // ============================================
-// МОДАЛЬНОЕ ОКНО С НАСТРОЙКАМИ ФАЙЛА
+// ПОКАЗ МОДАЛЬНОГО ОКНА С ДАННЫМИ ИЗ КЕША
 // ============================================
 
-function showTerritoriesFileModal(filename) {
+function showTerritoriesFileModalWithData(filename) {
+    // Закрываем старое окно если есть
     const oldModal = document.getElementById('territoriesFileModal');
     if (oldModal) {
         oldModal.remove();
     }
+
+    const territories = territoriesState.filesCache[filename] || [];
+    const count = territories.length;
 
     const modal = document.createElement('div');
     modal.id = 'territoriesFileModal';
@@ -572,7 +665,7 @@ function showTerritoriesFileModal(filename) {
                     <span class="territories-modal-icon">🗺️</span>
                     ${filename}
                     <span style="font-size: 0.6rem; font-weight: 400; color: rgba(255,255,255,0.3); margin-left: 8px;">
-                        ${territoriesState.isFileLoaded ? `${territoriesState.territories.length} территорий` : 'Загрузка...'}
+                        ${count} территорий
                     </span>
                 </h3>
                 <button class="modal-close" onclick="territoriesCloseFileModal()">
@@ -583,10 +676,7 @@ function showTerritoriesFileModal(filename) {
                 </button>
             </div>
             <div class="modal-body territories-modal-body" id="territoriesFileModalBody">
-                <div class="territories-loading">
-                    <span class="spinner"></span>
-                    Загрузка файла...
-                </div>
+                <!-- Сюда рендерится содержимое -->
             </div>
             <div class="modal-footer territories-modal-footer">
                 <button class="btn btn-secondary" onclick="territoriesCloseFileModal()">Закрыть</button>
@@ -608,22 +698,7 @@ function showTerritoriesFileModal(filename) {
         modal.classList.add('show');
     });
 
-    // Загружаем файл
-    loadTerritoriesFile(filename)
-        .then(() => {
-            renderTerritoriesFileContent();
-        })
-        .catch((e) => {
-            const body = document.getElementById('territoriesFileModalBody');
-            if (body) {
-                body.innerHTML = `
-                    <div class="territories-empty-list">
-                        <span class="territories-empty-icon">❌</span>
-                        <p>Ошибка загрузки: ${e.message}</p>
-                    </div>
-                `;
-            }
-        });
+    renderTerritoriesFileContentFromCache(filename);
 
     modal.addEventListener('click', function(e) {
         if (e.target === this) {
@@ -638,25 +713,15 @@ function showTerritoriesFileModal(filename) {
     });
 }
 
-function territoriesCloseFileModal() {
-    const modal = document.getElementById('territoriesFileModal');
-    if (modal) {
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.remove();
-        }, 300);
-    }
-}
-
 // ============================================
-// ОТРИСОВКА КОНТЕНТА В МОДАЛЬНОМ ОКНЕ
+// ОТРИСОВКА КОНТЕНТА В МОДАЛЬНОМ ОКНЕ ИЗ КЕША
 // ============================================
 
-function renderTerritoriesFileContent() {
+function renderTerritoriesFileContentFromCache(filename) {
     const body = document.getElementById('territoriesFileModalBody');
     if (!body) return;
     
-    const territories = territoriesState.territories || [];
+    const territories = territoriesState.filesCache[filename] || [];
     
     if (territories.length === 0) {
         body.innerHTML = `
@@ -728,87 +793,11 @@ function renderTerritoriesFileContent() {
 }
 
 // ============================================
-// ОТРИСОВКА ГЛАВНОГО ИНТЕРФЕЙСА (СПИСОК ФАЙЛОВ)
+// ОТРИСОВКА КОНТЕНТА В МОДАЛЬНОМ ОКНЕ (ДЛЯ ТЕКУЩЕГО ФАЙЛА)
 // ============================================
 
-function renderTerritoriesEditor(container, isLoading = false) {
-    let filesListHtml = '';
-    if (territoriesState.availableFiles.length > 0) {
-        filesListHtml = territoriesState.availableFiles.map(f => {
-            const isActive = f === territoriesState.currentFile;
-            const species = getSpeciesFromFilename(f);
-            const speciesLabel = TERRITORIES_SPECIES[species] || 'Неизвестно';
-            const count = (f === territoriesState.currentFile && territoriesState.isFileLoaded) ? 
-                territoriesState.territories.length : '—';
-            return `
-                <div class="territories-file-item ${isActive ? 'active' : ''}" onclick="territoriesSelectFile('${f}')">
-                    <span class="territories-file-item-icon">📄</span>
-                    <span class="territories-file-item-name">${f}</span>
-                    <span class="territories-file-item-species">${speciesLabel}</span>
-                    <span class="territories-file-item-count">${count}</span>
-                    ${isActive ? '<span class="territories-file-item-badge">✅</span>' : ''}
-                </div>
-            `;
-        }).join('');
-    } else {
-        filesListHtml = `
-            <div class="territories-empty-files">
-                <span class="territories-empty-icon">📭</span>
-                <p>Нет файлов территорий</p>
-                <p class="territories-empty-hint">Проверьте папку env на сервере</p>
-            </div>
-        `;
-    }
-    
-    container.innerHTML = `
-        <div class="territories-editor">
-            <button class="territories-back-btn" onclick="territoriesBackToTiles()" title="Вернуться к выбору редакторов">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15,18 9,12 15,6"/>
-                </svg>
-                <span>Назад</span>
-            </button>
-
-            <div class="territories-header">
-                <div class="territories-header-info">
-                    <span class="territories-header-icon">🗺️</span>
-                    <div>
-                        <h2 class="territories-header-title">Редактор территорий животных</h2>
-                        <p class="territories-header-subtitle">Карта <strong>${territoriesState.mapName || 'не определена'}</strong> • ${territoriesState.availableFiles.length} файлов</p>
-                    </div>
-                </div>
-                <div class="territories-header-actions">
-                    <button class="btn btn-secondary" onclick="loadAvailableFiles()">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="23,4 23,10 17,10"/>
-                            <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
-                            <polyline points="1,20 1,14 7,14"/>
-                            <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
-                        </svg>
-                        Обновить
-                    </button>
-                </div>
-            </div>
-
-            <div class="territories-status-bar">
-                <span class="territories-status" id="territoriesStatus">${isLoading ? '⏳ Загрузка...' : '✅ Готово'}</span>
-                <span class="territories-path">${territoriesState.territoriesPath || 'Путь не указан'}</span>
-            </div>
-
-            <!-- СПИСОК ФАЙЛОВ -->
-            <div class="territories-files-container">
-                <div class="territories-files-header">
-                    <h3>📄 Файлы территорий</h3>
-                    <span class="territories-files-count">${territoriesState.availableFiles.length}</span>
-                </div>
-                <div class="territories-files-list">
-                    ${filesListHtml}
-                </div>
-            </div>
-        </div>
-    `;
-    
-    setTimeout(createTerritoriesScrollTopButton, 300);
+function renderTerritoriesFileContent() {
+    renderTerritoriesFileContentFromCache(territoriesState.currentFile);
 }
 
 // ============================================
@@ -821,7 +810,6 @@ function territoriesOpenTerritoryModalFromModal(index) {
 
 function territoriesAddTerritoryFromModal() {
     territoriesAddTerritory();
-    // Обновляем содержимое модала
     setTimeout(() => {
         renderTerritoriesFileContent();
     }, 300);
@@ -1160,7 +1148,10 @@ function territoriesAddTerritory() {
     territoriesState.isDirty = true;
     updateTerritoriesStatus('⚠️ Есть несохранённые изменения');
     
-    // Обновляем список в модальном окне
+    if (territoriesState.currentFile) {
+        territoriesState.filesCache[territoriesState.currentFile] = territoriesState.territories;
+    }
+    
     renderTerritoriesFileContent();
     
     const newIndex = territoriesState.territories.length - 1;
@@ -1198,6 +1189,10 @@ function territoriesExecuteDeleteTerritory(index) {
         territoriesState.selectedTerritoryIndex--;
     }
     territoriesState.isDirty = true;
+    
+    if (territoriesState.currentFile) {
+        territoriesState.filesCache[territoriesState.currentFile] = territoriesState.territories;
+    }
     
     renderTerritoriesFileContent();
     updateTerritoriesStatus('⚠️ Есть несохранённые изменения');
@@ -1334,6 +1329,11 @@ function territoriesApplyRaw() {
         territoriesState.territories = parsed.territories || [];
         territoriesState.isDirty = true;
         updateTerritoriesStatus('⚠️ Есть несохранённые изменения');
+        
+        if (territoriesState.currentFile) {
+            territoriesState.filesCache[territoriesState.currentFile] = territoriesState.territories;
+        }
+        
         renderTerritoriesFileContent();
         territoriesCloseRaw();
         
@@ -1492,4 +1492,4 @@ window.territoriesOpenTerritoryModalFromModal = territoriesOpenTerritoryModalFro
 window.territoriesAddTerritoryFromModal = territoriesAddTerritoryFromModal;
 window.territoriesConfirmDeleteTerritoryFromModal = territoriesConfirmDeleteTerritoryFromModal;
 
-console.log('🗺️ territories_editor.js загружен (список файлов + модальное окно)');
+console.log('🗺️ territories_editor.js загружен (с кешированием и закрытием по клику)');
