@@ -1,1 +1,183 @@
-{}
+{
+  "workshop_1559212036": {
+    "server_mod": true
+  },
+  "workshop_3422882242": {
+    "server": true
+  },
+  "workshop_3120779051": {
+    "server": true
+  },
+  "workshop_1623711988": {
+    "server_mod": false
+  },
+  "workshop_1828439124": {
+    "server_mod": true
+  },
+  "workshop_2968284194": {
+    "server_mod": true
+  },
+  "workshop_3770734718": {
+    "server_mod": false
+  },
+  "workshop_3065185420": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3762031498": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "custom_Bonny_Cars_Pack": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "custom_Bonny_Mod_Pack": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1565871491": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1646187754": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1564026768": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3216309629": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2545327648": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2276010135": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1819514788": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2937138060": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3471358849": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3711012403": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3711906263": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3069507753": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1962144102": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1734713776": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2820370970": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3711024720": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2988726228": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2076911747": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2623995836": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2952842170": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2443122116": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1583941197": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_1590841260": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2760785960": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_2148600210": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3739774497": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3434633875": {
+    "server": false,
+    "server_mod": false,
+    "client": true
+  },
+  "workshop_3303128154": {
+    "server": false,
+    "server_mod": true,
+    "client": true
+  }
+}

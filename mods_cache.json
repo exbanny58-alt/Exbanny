@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-25T13:37:08.809989",
+  "timestamp": "2026-07-26T12:27:30.159793",
   "mods": [
     {
       "id": "workshop_3065185420",
@@ -11,7 +11,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": true,
+      "server_mod": false,
       "client": true
     },
     {
@@ -37,7 +37,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": true,
+      "server_mod": false,
       "client": true
     },
     {
@@ -76,7 +76,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": false,
+      "server_mod": true,
       "client": true
     },
     {
@@ -244,7 +244,7 @@
       "version": "Неизвестно",
       "enabled": true,
       "has_meta": true,
-      "server": false,
+      "server": true,
       "server_mod": false,
       "client": true
     },
@@ -253,6 +253,19 @@
       "name": "MPG_Spawner",
       "folder": "3120779051",
       "path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\3120779051",
+      "type": "workshop",
+      "version": "Неизвестно",
+      "enabled": true,
+      "has_meta": true,
+      "server": true,
+      "server_mod": false,
+      "client": true
+    },
+    {
+      "id": "workshop_3303128154",
+      "name": "MPG_SpawnerConfigReload",
+      "folder": "3303128154",
+      "path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\3303128154",
       "type": "workshop",
       "version": "Неизвестно",
       "enabled": true,
@@ -440,7 +453,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": false,
+      "server_mod": true,
       "client": true
     },
     {
@@ -453,7 +466,7 @@
       "enabled": true,
       "has_meta": true,
       "server": false,
-      "server_mod": false,
+      "server_mod": true,
       "client": true
     },
     {
@@ -496,5 +509,5 @@
       "client": true
     }
   ],
-  "hash": "2433bd4dfdc2980a63e848b4223c8644"
+  "hash": "9c39a5c81758829cfa7f19734afb7416"
 }

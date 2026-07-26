@@ -1,1 +1,68 @@
-{}
+{
+  "workshop_1559212036": {
+    "mod_id": "workshop_1559212036",
+    "mod_name": "CF",
+    "mod_folder": "1559212036",
+    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\1559212036",
+    "link_name": "@CF",
+    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@CF",
+    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
+    "created_at": "2026-07-26T12:09:59.294617",
+    "enabled": true
+  },
+  "workshop_1828439124": {
+    "mod_id": "workshop_1828439124",
+    "mod_name": "VPPAdminTools",
+    "mod_folder": "1828439124",
+    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\1828439124",
+    "link_name": "@VPPAdminTools",
+    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@VPPAdminTools",
+    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
+    "created_at": "2026-07-26T12:10:00.123502",
+    "enabled": true
+  },
+  "workshop_2968284194": {
+    "mod_id": "workshop_2968284194",
+    "mod_name": "VPPAdminTools RU Translate",
+    "mod_folder": "2968284194",
+    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\2968284194",
+    "link_name": "@VPPAdminTools_RU_Translate",
+    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@VPPAdminTools_RU_Translate",
+    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
+    "created_at": "2026-07-26T12:10:00.840383",
+    "enabled": true
+  },
+  "workshop_3120779051": {
+    "mod_id": "workshop_3120779051",
+    "mod_name": "MPG_Spawner",
+    "mod_folder": "3120779051",
+    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\3120779051",
+    "link_name": "@MPG_Spawner",
+    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@MPG_Spawner",
+    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
+    "created_at": "2026-07-26T12:10:01.592714",
+    "enabled": true
+  },
+  "workshop_3422882242": {
+    "mod_id": "workshop_3422882242",
+    "mod_name": "MPG_LootExtractor",
+    "mod_folder": "3422882242",
+    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\3422882242",
+    "link_name": "@MPG_LootExtractor",
+    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@MPG_LootExtractor",
+    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
+    "created_at": "2026-07-26T12:10:02.228557",
+    "enabled": true
+  },
+  "workshop_3303128154": {
+    "mod_id": "workshop_3303128154",
+    "mod_name": "MPG_SpawnerConfigReload",
+    "mod_folder": "3303128154",
+    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\3303128154",
+    "link_name": "@MPG_SpawnerConfigReload",
+    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@MPG_SpawnerConfigReload",
+    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
+    "created_at": "2026-07-26T12:27:56.688187",
+    "enabled": true
+  }
+}

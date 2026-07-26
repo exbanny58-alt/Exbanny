@@ -264,20 +264,26 @@ function getLootList(category, fallback) {
 
 function initMpgEditor() {
     console.log('📝 Инициализация MPG Spawner Editor');
-    
+
     const container = document.getElementById('editorContentArea');
     if (!container) {
         console.warn('⚠️ editorContentArea не найден');
         return;
     }
-    
-    loadProfilesPath()
+
+    // 1. Сначала загружаем путь и дожидаемся его
+    mpgLoadProfilesPath()
         .then(() => {
+            // 2. Только ПОСЛЕ того, как путь точно установлен, идем дальше
+            console.log('✅ Путь к profiles установлен:', mpgState.profilesPath);
+
+            // 3. Загружаем категории лута и дожидаемся их
             return loadMpgLootCategories();
         })
         .then(() => {
-            console.log('✅ Путь загружен:', mpgState.profilesPath);
+            // 4. Отрисовываем интерфейс
             renderMpgEditor(container);
+            // 5. Теперь, когда и путь, и категории готовы, безопасно загружаем все данные
             return loadAllData();
         })
         .catch((e) => {
@@ -288,7 +294,7 @@ function initMpgEditor() {
         });
 }
 
-function loadProfilesPath() {
+function mpgLoadProfilesPath() {  // ← УНИКАЛЬНОЕ ИМЯ
     return new Promise((resolve, reject) => {
         fetch('/api/settings')
             .then(response => response.json())
@@ -315,7 +321,7 @@ function loadProfilesPath() {
 async function loadAllData() {
     if (!mpgState.profilesPath) {
         console.warn('⚠️ Путь к profiles не загружен, пробуем загрузить...');
-        await loadProfilesPath();
+        await mpgLoadProfilesPath();
     }
     
     mpgState.isLoading = true;
@@ -349,20 +355,33 @@ async function loadAllData() {
 }
 
 async function loadConfig() {
+    // НЕ ПЫТАЕМСЯ загрузить путь здесь — он должен быть загружен ДО вызова loadConfig
     if (!mpgState.profilesPath) {
-        console.warn('⚠️ Путь к profiles не загружен, пробуем загрузить...');
-        await loadProfilesPath();
+        console.error('❌ loadConfig: Путь к profiles не загружен ДО вызова функции!');
+        console.error('❌ Стек вызовов:', new Error().stack);
+        
+        // Создаем пустой конфиг, но НЕ сохраняем его
+        mpgState.config = {
+            configVersion: 6,
+            documentation: "https://docs.mpg-dayz.ru/spawner/",
+            isModDisabled: 0,
+            logLevel: 3,
+            pointsConfigs: [],
+            admins: []
+        };
+        return;  // ← ПРОСТО ВЫХОДИМ, не пытаемся сохранить
     }
     
     try {
-        const path = mpgState.profilesPath + '/' + MPG_CONFIG.paths.config;
-        console.log(`📂 Загрузка Config.json: ${path}`);
+        const fullPath = mpgState.profilesPath + '/' + MPG_CONFIG.paths.config;
+        console.log(`📂 Загрузка Config.json: ${fullPath}`);
         
         const response = await fetch('/api/file/read', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: path })
+            body: JSON.stringify({ path: fullPath })
         });
+        
         const data = await response.json();
         
         if (data.success && data.content) {
@@ -378,6 +397,7 @@ async function loadConfig() {
             }
         }
         
+        // Файл не найден — создаем новый
         console.warn('⚠️ Config.json не найден или повреждён, создаём новый');
         mpgState.config = {
             configVersion: 6,
@@ -388,11 +408,13 @@ async function loadConfig() {
             admins: []
         };
         
-        await mpgSaveConfig();
+        // ТЕПЕРЬ сохраняем (путь точно есть)
+        const saved = await mpgSaveConfig();
         
-        if (typeof notifications !== 'undefined') {
+        if (saved && typeof notifications !== 'undefined') {
             notifications.warning('Config.json не найден, создан новый');
         }
+        
     } catch (e) {
         console.error('❌ Ошибка загрузки Config.json:', e);
         mpgState.config = {
@@ -403,9 +425,6 @@ async function loadConfig() {
             pointsConfigs: [],
             admins: []
         };
-        if (typeof notifications !== 'undefined') {
-            notifications.warning('Config.json не найден, создан новый');
-        }
     }
 }
 
