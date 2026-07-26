@@ -38,13 +38,6 @@ const pages = {
                     Очистить подключения
                 </button>
                 
-                <button class="btn btn-secondary" id="openServerFolderBtn" title="Открыть папку сервера">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
-                    </svg>
-                    Открыть папку сервера
-                </button>
-                
                 <div class="server-filter">
                     <input type="text" id="serverModsSearchInput" placeholder="🔍 Поиск модов..." class="server-search">
                 </div>
@@ -81,21 +74,6 @@ const pages = {
                         <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
                     </svg>
                     Обновить список
-                </button>
-                
-                <button class="btn btn-danger" id="clearGameLinksBtn" title="Очистить все подключения и удалить симлинки игры">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="3,6 5,6 21,6"/>
-                        <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
-                    </svg>
-                    Очистить подключения
-                </button>
-                
-                <button class="btn btn-secondary" id="openGameFolderBtn" title="Открыть папку игры">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
-                    </svg>
-                    Открыть папку игры
                 </button>
                 
                 <button class="btn btn-nickname" id="changeNicknameBtn" title="Изменить ник в игре">
@@ -167,48 +145,21 @@ const pages = {
                         </svg>
                         Обновить список
                     </button>
-                    
-                    <button class="btn btn-danger" id="resetModsConfigBtn" title="Сбросить все настройки модов">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3,6 5,6 21,6"/>
-                            <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
-                        </svg>
-                        Сбросить настройки
-                    </button>
-                    
                     <button class="btn btn-secondary" id="openWorkshopBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
                         </svg>
                         Открыть Workshop
                     </button>
-                    
                     <button class="btn btn-secondary" id="openCustomModsBtn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
                         </svg>
                         Открыть кастомные
                     </button>
-                    
                     <div class="mods-filter">
                         <input type="text" id="modsSearchInput" placeholder="🔍 Поиск модов..." class="mods-search">
                     </div>
-                </div>
-
-                <!-- Легенда -->
-                <div class="mods-legend">
-                    <span class="legend-item">
-                        <span class="legend-dot server"></span>
-                        Серверный
-                    </span>
-                    <span class="legend-item">
-                        <span class="legend-dot server-mod"></span>
-                        СерверМод
-                    </span>
-                    <span class="legend-item">
-                        <span class="legend-dot client"></span>
-                        КлиентМод
-                    </span>
                 </div>
 
                 <!-- Список модов -->
@@ -250,55 +201,7 @@ const pages = {
                 <!-- Сюда будет подгружаться контент выбранного редактора -->
             </div>
         </div>
-    `,
-    player: `
-        <div class="player-content-wrapper">
-            <div class="player-header">
-                <h1>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 18V5l12-2v13"/>
-                        <circle cx="6" cy="18" r="3"/>
-                        <circle cx="18" cy="16" r="3"/>
-                    </svg>
-                    Музыкальный проигрыватель
-                </h1>
-                <p class="player-subtitle">Наслаждайтесь музыкой во время работы с сервером</p>
-            </div>
-            
-            <div class="player-container" id="playerContainer">
-                <div class="player-album-cover">
-                    <div class="player-swiper swiper">
-                        <div class="swiper-wrapper" id="playerSwiperWrapper">
-                            <!-- Слайды будут добавлены через JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="player-controls">
-                    <h1 id="playerSongTitle">Title</h1>
-                    <p id="playerArtistName">Song Name</p>
-
-                    <audio id="playerAudio">
-                        <source src="" type="audio/mpeg" />
-                    </audio>
-
-                    <input type="range" value="0" id="playerProgress" />
-
-                    <div class="player-buttons">
-                        <button class="player-btn player-backward" title="Предыдущий трек">
-                            <i class="fa-solid fa-backward"></i>
-                        </button>
-                        <button class="player-btn player-play-pause" title="Воспроизвести/Пауза">
-                            <i class="fa-solid fa-play" id="playerControlIcon"></i>
-                        </button>
-                        <button class="player-btn player-forward" title="Следующий трек">
-                            <i class="fa-solid fa-forward"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `,
+    `
 };
 
 // Текущий активный раздел
@@ -417,26 +320,6 @@ function initPageAfterLoad(page) {
                 if (typeof initModsPage === 'function') {
                     initModsPage();
                 }
-                
-                if (typeof setupModsSearch === 'function') {
-                    setupModsSearch();
-                }
-                
-                if (typeof attachModsButtonHandlers === 'function') {
-                    attachModsButtonHandlers();
-                }
-                
-                // Кнопка сброса настроек модов
-                const resetModsConfigBtn = document.getElementById('resetModsConfigBtn');
-                if (resetModsConfigBtn) {
-                    const newBtn = resetModsConfigBtn.cloneNode(true);
-                    resetModsConfigBtn.parentNode.replaceChild(newBtn, resetModsConfigBtn);
-                    newBtn.addEventListener('click', () => {
-                        if (typeof resetModsConfig === 'function') {
-                            resetModsConfig();
-                        }
-                    });
-                }
                 return;
             }
             
@@ -448,7 +331,8 @@ function initPageAfterLoad(page) {
         }
         
         setTimeout(tryInitMods, 100);
-    }    
+    }
+    
     // ============================================
     // СТРАНИЦА СЕРВЕРА
     // ============================================
@@ -480,22 +364,6 @@ function initPageAfterLoad(page) {
                         }
                     });
                 }
-                
-                // Кнопка открытия папки сервера
-                const openServerFolderBtn = document.getElementById('openServerFolderBtn');
-                if (openServerFolderBtn) {
-                    const newBtn = openServerFolderBtn.cloneNode(true);
-                    openServerFolderBtn.parentNode.replaceChild(newBtn, openServerFolderBtn);
-                    newBtn.addEventListener('click', () => {
-                        if (typeof openServerFolder === 'function') {
-                            openServerFolder();
-                        }
-                    });
-                }
-                
-                // Кнопка очистки подключений сервера (уже есть в server.js)
-                // Оставляем как есть, она уже привязана через onclick
-                
                 return;
             }
             
@@ -510,7 +378,7 @@ function initPageAfterLoad(page) {
     }
 
     // ============================================
-    // СТРАНИЦА КЛИЕНТА (ИГРЫ)
+    // СТРАНИЦА КЛИЕНТА
     // ============================================   
     if (page === 'game') {
         let attempts = 0;
@@ -540,54 +408,6 @@ function initPageAfterLoad(page) {
                         }
                     });
                 }
-                
-                // Кнопка открытия папки игры
-                const openGameFolderBtn = document.getElementById('openGameFolderBtn');
-                if (openGameFolderBtn) {
-                    const newBtn = openGameFolderBtn.cloneNode(true);
-                    openGameFolderBtn.parentNode.replaceChild(newBtn, openGameFolderBtn);
-                    newBtn.addEventListener('click', () => {
-                        if (typeof openGameFolder === 'function') {
-                            openGameFolder();
-                        }
-                    });
-                }
-                
-                // Кнопка очистки подключений игры
-                const clearGameLinksBtn = document.getElementById('clearGameLinksBtn');
-                if (clearGameLinksBtn) {
-                    const newBtn = clearGameLinksBtn.cloneNode(true);
-                    clearGameLinksBtn.parentNode.replaceChild(newBtn, clearGameLinksBtn);
-                    newBtn.addEventListener('click', () => {
-                        if (typeof clearGameLinks === 'function') {
-                            clearGameLinks();
-                        }
-                    });
-                }
-                
-                // Кнопка подключения всех модов сервера
-                const connectAllBtn = document.getElementById('connectAllGameModsBtn');
-                if (connectAllBtn) {
-                    const newBtn = connectAllBtn.cloneNode(true);
-                    connectAllBtn.parentNode.replaceChild(newBtn, connectAllBtn);
-                    newBtn.addEventListener('click', () => {
-                        if (typeof connectAllServerMods === 'function') {
-                            connectAllServerMods();
-                        }
-                    });
-                }
-                
-                // Кнопка смены ника
-                const nicknameBtn = document.getElementById('changeNicknameBtn');
-                if (nicknameBtn) {
-                    const newBtn = nicknameBtn.cloneNode(true);
-                    nicknameBtn.parentNode.replaceChild(newBtn, nicknameBtn);
-                    newBtn.addEventListener('click', () => {
-                        if (typeof showNicknameModal === 'function') {
-                            showNicknameModal();
-                        }
-                    });
-                }
                 return;
             }
             
@@ -600,6 +420,7 @@ function initPageAfterLoad(page) {
         
         setTimeout(tryInitGame, 100);
     }
+
     // ============================================
     // СТРАНИЦА РЕДАКТОРОВ
     // ============================================   
@@ -943,31 +764,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
 });
-
-// ============================================
-// СТРАНИЦА МУЗЫКИ
-// ============================================
-if (page === 'player') {
-    let attempts = 0;
-    const maxAttempts = 10;
-    
-    function tryInitPlayer() {
-        attempts++;
-        const container = document.getElementById('playerContainer');
-        
-        if (container) {
-            if (typeof initPlayer === 'function') {
-                initPlayer();
-            }
-            return;
-        }
-        
-        if (attempts < maxAttempts) {
-            setTimeout(tryInitPlayer, 200);
-        } else {
-            console.warn('Не удалось инициализировать страницу музыки');
-        }
-    }
-    
-    setTimeout(tryInitPlayer, 100);
-}

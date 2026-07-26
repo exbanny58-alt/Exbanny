@@ -39,737 +39,39 @@ let mpgState = {
 };
 
 // ============================================
-// ЗАГРУЗКА КАТЕГОРИЙ ИЗ LOOT_CATEGORIES.JSON
-// ============================================
-
-let mpgLootData = null;
-
-async function loadMpgLootCategories() {
-    try {
-        const categoriesPath = mpgState.profilesPath + '/MPG_LootExtractor/Loot_Categories.json';
-        console.log(`📂 Загрузка категорий: ${categoriesPath}`);
-        
-        const response = await fetch('/api/file/read', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: categoriesPath })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success && result.content) {
-            mpgLootData = JSON.parse(result.content);
-            console.log('📚 Загружены категории из Loot_Categories.json:');
-            for (const [cat, items] of Object.entries(mpgLootData)) {
-                if (items.length > 0) {
-                    console.log(`   ${cat}: ${items.length} предметов`);
-                }
-            }
-            return true;
-        }
-    } catch (e) {
-        console.warn('⚠️ Не удалось загрузить Loot_Categories.json:', e);
-    }
-    
-    console.log('🔄 Loot_Categories.json не найден, пробуем загрузить напрямую из Loot.json...');
-    return await loadMpgLootFromLootJson();
-}
-
-async function loadMpgLootFromLootJson() {
-    try {
-        const lootPath = mpgState.profilesPath + '/MPG_LootExtractor/Loot.json';
-        
-        const response = await fetch('/api/file/read', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: lootPath })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success && result.content) {
-            const data = JSON.parse(result.content);
-            
-            const categories = {
-                animals: [],
-                zombies: [],
-                weapons: [],
-                magazines: [],
-                ammo: [],
-                attachments: [],
-                clothing: [],
-                vests: [],
-                bags: [],
-                food: [],
-                drinks: [],
-                medical: [],
-                tools: [],
-                materials: [],
-                vehicles: [],
-                vehicle_parts: [],
-                boats: [],
-                books: [],
-                fish: [],
-                items: [],
-                other: []
-            };
-            
-            for (const [key, name] of Object.entries(data)) {
-                const category = detectMpgCategory(key, name);
-                if (categories[category]) {
-                    categories[category].push(key);
-                } else {
-                    categories.items.push(key);
-                }
-            }
-            
-            for (const cat of Object.keys(categories)) {
-                categories[cat].sort((a, b) => a.localeCompare(b));
-            }
-            
-            mpgLootData = categories;
-            console.log('📚 Загружены категории напрямую из Loot.json');
-            return true;
-        }
-    } catch (e) {
-        console.warn('⚠️ Не удалось загрузить Loot.json:', e);
-    }
-    return false;
-}
-
-function detectMpgCategory(key, name) {
-    const k = key.toLowerCase();
-    
-    if (k.startsWith('animal_') || k.includes('_animal') || 
-        k.includes('ursus') || k.includes('canis') || k.includes('cervus') || 
-        k.includes('susscrofa')) {
-        return 'animals';
-    }
-    
-    if (k.startsWith('zmb') || k.includes('_zmb') || k.includes('zombie') || 
-        k.includes('infected')) {
-        return 'zombies';
-    }
-    
-    const weaponKeywords = ['ak', 'm4', 'mosin', 'svd', 'vss', 'mp5', 'glock', 'colt',
-        'revolver', 'magnum', 'deagle', 'shotgun', 'rifle', 'carbine', 'pistol', 'smg',
-        'aug', 'fal', 'famas', 'fnx', 'lar', 'lemas', 'm16', 'mkii', 'rak', 'sks',
-        'saiga', 'scout', 'pioneer', 'blaze', 'winchester', 'crossbow', 'longhorn'];
-    for (const w of weaponKeywords) {
-        if (k === w || k.startsWith(w + '_') || k.startsWith(w + '-')) return 'weapons';
-    }
-    
-    if (k.startsWith('mag_') || k.includes('_mag_') || 
-        (k.includes('mag') && (k.includes('rnd') || k.includes('round') || k.includes('cyl')))) {
-        if (!k.includes('azine')) return 'magazines';
-    }
-    
-    if (k.startsWith('ammo_') || k.includes('_ammo') || k.includes('cartridge') || 
-        k.includes('bullet') || (k.includes('box') && k.includes('rnd'))) {
-        return 'ammo';
-    }
-    
-    const attachKeywords = ['optic', 'scope', 'sight', 'suppressor', 'silencer', 'muzzle', 
-        'bttstck', 'stock', 'buttstock', 'hndgrd', 'handguard', 'rail', 'bayonet', 
-        'compensator', 'flash', 'grip', 'bipod', 'laser', 'kobra', 'pso', 'acog',
-        'holo', 'reflex', 'starlight', 'tlr', 'nvg'];
-    for (const a of attachKeywords) {
-        if (k.includes(a)) return 'attachments';
-    }
-    
-    const clothingKeywords = ['jacket', 'pants', 'shirt', 'tshirt', 'sweater', 'hoodie', 'coat',
-        'hat', 'cap', 'helmet', 'mask', 'goggles', 'glasses', 'boots', 'shoes', 'sneakers', 
-        'gloves', 'suit', 'dress', 'skirt', 'uniform', 'bdu', 'raincoat', 'parka', 'anorak',
-        'balaclava', 'shemag', 'bandana', 'hood', 'beanie'];
-    for (const c of clothingKeywords) {
-        if (k.includes(c)) {
-            if (k.includes('platecarrier') || k.includes('pressvest') || 
-                k.includes('tacticalvest') || k.includes('highcapacity') || 
-                k.includes('ukass') || k.includes('smersh') || k.includes('reflex')) {
-                return 'vests';
-            }
-            if (k.includes('bag') || k.includes('backpack') || k.includes('pack') ||
-                k.includes('pouch') || k.includes('sack')) {
-                return 'bags';
-            }
-            return 'clothing';
-        }
-    }
-    
-    if (k.includes('platecarrier') || k.includes('pressvest') || k.includes('tacticalvest') ||
-        k.includes('highcapacityvest') || k.includes('ukassvest') || k.includes('smershvest') ||
-        k.includes('reflexvest')) {
-        return 'vests';
-    }
-    
-    if (k.includes('bag') || k.includes('backpack') || k.includes('pack') || 
-        k.includes('pouch') || k.includes('sack') || k.includes('coyote') ||
-        k.includes('taloon') || k.includes('tortilla') || k.includes('drybag') ||
-        k.includes('duffel') || k.includes('assault') || k.includes('alice')) {
-        return 'bags';
-    }
-    
-    const foodKeywords = ['can', 'mushroom', 'meat', 'steak', 'fillet', 'pate', 'bacon',
-        'cereal', 'chips', 'crackers', 'rice', 'pasta', 'honey', 'jam', 'marmalade',
-        'apple', 'pear', 'plum', 'tomato', 'potato', 'pumpkin', 'zucchini', 'pepper',
-        'bread', 'cake', 'cookie', 'chocolate', 'candy'];
-    for (const f of foodKeywords) {
-        if (k.includes(f)) return 'food';
-    }
-    
-    if (k.includes('water') || k.includes('soda') || k.includes('kvass') ||
-        k.includes('cola') || k.includes('lemonade') || k.includes('canteen') ||
-        k.includes('bottle') || k.includes('drink') || k.includes('juice') ||
-        k.includes('tea') || k.includes('coffee') || k.includes('beer') ||
-        k.includes('wine') || k.includes('vodka')) {
-        return 'drinks';
-    }
-    
-    const medKeywords = ['bandage', 'blood', 'morphine', 'epinephrine', 'adrenaline',
-        'saline', 'antibiotics', 'vitamins', 'painkiller', 'iodine', 'charcoal',
-        'tetracycline', 'defibrillator', 'splint', 'syringe', 'firstaid', 'thermometer',
-        'disinfectant', 'purification'];
-    for (const m of medKeywords) {
-        if (k.includes(m)) return 'medical';
-    }
-    
-    const toolKeywords = ['knife', 'axe', 'saw', 'hammer', 'wrench', 'screwdriver',
-        'pliers', 'shovel', 'pickaxe', 'crowbar', 'hacksaw', 'hatchet', 'machete',
-        'sickle', 'sword', 'spear', 'mace', 'trap', 'lockpick', 'compass', 'map',
-        'radio', 'flashlight', 'lighter', 'matches', 'rope', 'ducttape', 'sewing'];
-    for (const t of toolKeywords) {
-        if (k.includes(t)) return 'tools';
-    }
-    
-    const matKeywords = ['wood', 'stone', 'metal', 'steel', 'iron', 'burlap', 'leather', 
-        'fabric', 'netting', 'feather', 'pelt', 'hide', 'skin', 'gut', 'fur', 'wool',
-        'bone', 'nail', 'wire', 'plank', 'log', 'bark', 'lime', 'epoxy', 'plastic'];
-    for (const m of matKeywords) {
-        if (k.includes(m)) return 'materials';
-    }
-    
-    return 'items';
-}
-
-function getLootList(category, fallback) {
-    if (mpgLootData && mpgLootData[category] && mpgLootData[category].length > 0) {
-        return mpgLootData[category];
-    }
-    return fallback || [];
-}
-
-// ============================================
 // ИНИЦИАЛИЗАЦИЯ
 // ============================================
 
 function initMpgEditor() {
     console.log('📝 Инициализация MPG Spawner Editor');
-
+    
     const container = document.getElementById('editorContentArea');
     if (!container) {
         console.warn('⚠️ editorContentArea не найден');
         return;
     }
-
-    // 1. Сначала загружаем путь и дожидаемся его
-    mpgLoadProfilesPath()
-        .then(() => {
-            // 2. Только ПОСЛЕ того, как путь точно установлен, идем дальше
-            console.log('✅ Путь к profiles установлен:', mpgState.profilesPath);
-
-            // 3. Загружаем категории лута и дожидаемся их
-            return loadMpgLootCategories();
-        })
-        .then(() => {
-            // 4. Отрисовываем интерфейс
-            renderMpgEditor(container);
-            // 5. Теперь, когда и путь, и категории готовы, безопасно загружаем все данные
-            return loadAllData();
-        })
-        .catch((e) => {
-            console.error('❌ Ошибка инициализации:', e);
-            if (typeof notifications !== 'undefined') {
-                notifications.error('Ошибка загрузки: ' + e.message);
-            }
-        });
-}
-
-function mpgLoadProfilesPath() {  // ← УНИКАЛЬНОЕ ИМЯ
-    return new Promise((resolve, reject) => {
-        fetch('/api/settings')
-            .then(response => response.json())
-            .then(settings => {
-                if (settings.server_exe) {
-                    const serverDir = settings.server_exe.replace(/\\/g, '/').replace(/\/[^/]*$/, '');
-                    mpgState.profilesPath = serverDir + '/profiles';
-                    console.log(`📁 Путь к profiles: ${mpgState.profilesPath}`);
-                    resolve(mpgState.profilesPath);
-                } else {
-                    reject(new Error('Путь к серверу не указан в настройках'));
-                }
-            })
-            .catch(e => {
-                console.warn('⚠️ Не удалось загрузить путь к серверу:', e);
-                if (typeof notifications !== 'undefined') {
-                    notifications.warning('Не удалось загрузить путь к серверу');
-                }
-                reject(e);
-            });
+    
+    loadProfilesPath().then(() => {
+        renderMpgEditor(container);
+        loadAllData();
     });
 }
 
-async function loadAllData() {
-    if (!mpgState.profilesPath) {
-        console.warn('⚠️ Путь к profiles не загружен, пробуем загрузить...');
-        await mpgLoadProfilesPath();
-    }
-    
-    mpgState.isLoading = true;
-    updateStatus('⏳ Загрузка данных...');
-    
+async function loadProfilesPath() {
     try {
-        await loadConfig();
-        await loadPoints();
-        await loadGroups();
-        
-        const container = document.getElementById('editorContentArea');
-        if (container) {
-            renderMpgEditor(container);
+        const response = await fetch('/api/settings');
+        const settings = await response.json();
+        if (settings.server_exe) {
+            const serverDir = settings.server_exe.replace(/\\/g, '/').replace(/\/[^/]*$/, '');
+            mpgState.profilesPath = serverDir + '/profiles';
+            console.log(`📁 Путь к profiles: ${mpgState.profilesPath}`);
         }
-        renderPointsList();
-        renderGroupsList();
-        
-        updateStatus('✅ Данные загружены');
+    } catch (e) {
+        console.warn('⚠️ Не удалось загрузить путь к серверу:', e);
         if (typeof notifications !== 'undefined') {
-            notifications.success(`Загружено ${mpgState.points.length} точек, ${mpgState.groups.length} групп`);
-        }
-    } catch (e) {
-        console.error('❌ Ошибка загрузки:', e);
-        updateStatus('❌ Ошибка: ' + e.message);
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка загрузки: ' + e.message);
+            notifications.warning('Не удалось загрузить путь к серверу');
         }
     }
-    
-    mpgState.isLoading = false;
-}
-
-async function loadConfig() {
-    // НЕ ПЫТАЕМСЯ загрузить путь здесь — он должен быть загружен ДО вызова loadConfig
-    if (!mpgState.profilesPath) {
-        console.error('❌ loadConfig: Путь к profiles не загружен ДО вызова функции!');
-        console.error('❌ Стек вызовов:', new Error().stack);
-        
-        // Создаем пустой конфиг, но НЕ сохраняем его
-        mpgState.config = {
-            configVersion: 6,
-            documentation: "https://docs.mpg-dayz.ru/spawner/",
-            isModDisabled: 0,
-            logLevel: 3,
-            pointsConfigs: [],
-            admins: []
-        };
-        return;  // ← ПРОСТО ВЫХОДИМ, не пытаемся сохранить
-    }
-    
-    try {
-        const fullPath = mpgState.profilesPath + '/' + MPG_CONFIG.paths.config;
-        console.log(`📂 Загрузка Config.json: ${fullPath}`);
-        
-        const response = await fetch('/api/file/read', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: fullPath })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success && data.content) {
-            try {
-                const parsed = JSON.parse(data.content);
-                if (parsed && typeof parsed === 'object') {
-                    mpgState.config = parsed;
-                    console.log('✅ Config.json загружен успешно');
-                    return;
-                }
-            } catch (parseError) {
-                console.warn('⚠️ Ошибка парсинга Config.json:', parseError);
-            }
-        }
-        
-        // Файл не найден — создаем новый
-        console.warn('⚠️ Config.json не найден или повреждён, создаём новый');
-        mpgState.config = {
-            configVersion: 6,
-            documentation: "https://docs.mpg-dayz.ru/spawner/",
-            isModDisabled: 0,
-            logLevel: 3,
-            pointsConfigs: [],
-            admins: []
-        };
-        
-        // ТЕПЕРЬ сохраняем (путь точно есть)
-        const saved = await mpgSaveConfig();
-        
-        if (saved && typeof notifications !== 'undefined') {
-            notifications.warning('Config.json не найден, создан новый');
-        }
-        
-    } catch (e) {
-        console.error('❌ Ошибка загрузки Config.json:', e);
-        mpgState.config = {
-            configVersion: 6,
-            documentation: "https://docs.mpg-dayz.ru/spawner/",
-            isModDisabled: 0,
-            logLevel: 3,
-            pointsConfigs: [],
-            admins: []
-        };
-    }
-}
-
-async function mpgSaveConfig() {
-    if (!mpgState.profilesPath) {
-        console.error('❌ Путь к profiles не загружен');
-        return false;
-    }
-    
-    try {
-        const configPath = mpgState.profilesPath + '/' + MPG_CONFIG.paths.config;
-        const content = JSON.stringify(mpgState.config, null, 4);
-        
-        const response = await fetch('/api/file/write', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: configPath, content: content })
-        });
-        const data = await response.json();
-        
-        if (data.success) {
-            console.log('✅ Config.json сохранён');
-            return true;
-        } else {
-            console.warn('⚠️ Ошибка сохранения Config.json:', data.message);
-            return false;
-        }
-    } catch (e) {
-        console.error('❌ Ошибка сохранения Config.json:', e);
-        return false;
-    }
-}
-
-// ============================================
-// КАСТОМНЫЙ SELECT - ОКНО ПО ЦЕНТРУ
-// ============================================
-
-let activeCustomSelectModal = null;
-
-function createMpgCustomSelect(selectElement) {
-    if (!selectElement || selectElement.dataset.customized === 'true') return;
-    
-    const selectId = selectElement.id;
-    console.log(`🔧 Создание кастомного селекта: ${selectId}`);
-    selectElement.dataset.customized = 'true';
-    
-    const options = Array.from(selectElement.options).map(opt => ({
-        value: opt.value,
-        text: opt.textContent
-    }));
-    
-    // Создаем обертку
-    const wrapper = document.createElement('div');
-    wrapper.className = 'mpg-custom-select-wrapper';
-    
-    // Создаем кнопку-триггер
-    const trigger = document.createElement('button');
-    trigger.type = 'button';
-    trigger.className = 'mpg-custom-select-trigger';
-    
-    const currentText = selectElement.value ? 
-        (selectElement.options[selectElement.selectedIndex]?.text || 'Выберите...') : 
-        'Выберите...';
-    
-    trigger.innerHTML = `
-        <span class="mpg-custom-select-text">${currentText}</span>
-        <span class="mpg-custom-select-arrow">▼</span>
-    `;
-    
-    // ============================================
-    // СОЗДАЕМ МОДАЛЬНОЕ ОКНО (по центру)
-    // ============================================
-    
-    // Создаем overlay
-    const overlay = document.createElement('div');
-    overlay.className = 'mpg-select-overlay';
-    overlay.style.cssText = `
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        z-index: 999998 !important;
-        background: rgba(0, 0, 0, 0.4) !important;
-        backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        transition: opacity 0.3s ease !important;
-    `;
-    document.body.appendChild(overlay);
-    
-    // Создаем модальное окно
-    const modal = document.createElement('div');
-    modal.className = 'mpg-select-modal';
-    modal.style.cssText = `
-        position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) scale(0.9) !important;
-        z-index: 999999 !important;
-        min-width: 400px !important;
-        max-width: 550px !important;
-        max-height: 70vh !important;
-        background: rgba(16, 21, 61, 0.65) !important;
-        backdrop-filter: blur(24px) saturate(1.5) !important;
-        -webkit-backdrop-filter: blur(24px) saturate(1.5) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 16px !important;
-        box-shadow: 0 12px 60px rgba(0, 0, 0, 0.6) !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-        overflow: hidden !important;
-        display: flex !important;
-        flex-direction: column !important;
-    `;
-    
-    // Заголовок
-    const header = document.createElement('div');
-    header.className = 'mpg-select-modal-header';
-    header.style.cssText = `
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        padding: 16px 20px 12px 20px !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-        flex-shrink: 0 !important;
-    `;
-    header.innerHTML = `
-        <span class="modal-title" style="font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.5px;">Выберите значение</span>
-        <button class="modal-close-btn" style="background:rgba(255,255,255,0.04);border:none;color:rgba(255,255,255,0.25);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;font-size:1.2rem;padding:0;font-family:'Nunito',sans-serif;">✕</button>
-    `;
-    modal.appendChild(header);
-    
-    // Поиск
-    const searchWrap = document.createElement('div');
-    searchWrap.className = 'mpg-select-modal-search';
-    searchWrap.style.cssText = `
-        padding: 12px 16px 14px 16px !important;
-        flex-shrink: 0 !important;
-    `;
-    searchWrap.innerHTML = `
-        <div style="position:relative;">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:0.85rem;opacity:0.3;">🔍</span>
-            <input type="text" placeholder="Поиск..." class="mpg-select-modal-search-input" style="width:100%;padding:10px 12px 10px 38px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:8px;color:#e5e5e5;font-size:0.85rem;font-family:'Nunito',sans-serif;outline:none;transition:all 0.3s ease;box-sizing:border-box;">
-        </div>
-    `;
-    modal.appendChild(searchWrap);
-    
-    // Список опций
-    const optionsContainer = document.createElement('div');
-    optionsContainer.className = 'mpg-select-modal-list';
-    optionsContainer.style.cssText = `
-        flex: 1 !important;
-        overflow-y: auto !important;
-        padding: 6px 12px 16px 12px !important;
-    `;
-    modal.appendChild(optionsContainer);
-    
-    document.body.appendChild(modal);
-    
-    // Функция рендеринга опций
-    function renderOptions(filter = '') {
-        const searchTerm = filter.toLowerCase().trim();
-        const filtered = searchTerm ? 
-            options.filter(opt => 
-                opt.text.toLowerCase().includes(searchTerm) || 
-                opt.value.toLowerCase().includes(searchTerm)
-            ) : 
-            options;
-        
-        if (filtered.length === 0) {
-            optionsContainer.innerHTML = `
-                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:rgba(255,255,255,0.15);text-align:center;">
-                    <span style="font-size:2rem;margin-bottom:8px;">🔍</span>
-                    <span style="font-size:0.85rem;">Ничего не найдено</span>
-                </div>
-            `;
-            return;
-        }
-        
-        optionsContainer.innerHTML = filtered.map(opt => {
-            const isSelected = opt.value === selectElement.value;
-            return `
-                <div class="mpg-select-option ${isSelected ? 'selected' : ''}" data-value="${opt.value}" style="display:flex;align-items:center;padding:10px 14px;border-radius:8px;cursor:pointer;color:${isSelected ? '#a78bfa' : 'rgba(255,255,255,0.5)'};font-size:0.85rem;font-family:'Nunito',sans-serif;transition:all 0.2s ease;border:1px solid ${isSelected ? 'rgba(167,139,250,0.15)' : 'transparent'};margin:2px 0;gap:10px;background:${isSelected ? 'rgba(167,139,250,0.12)' : 'transparent'};font-weight:${isSelected ? '600' : '400'};">
-                    <span style="width:22px;flex-shrink:0;color:${isSelected ? '#a78bfa' : 'rgba(167,139,250,0.2)'};font-size:0.9rem;text-align:center;">${isSelected ? '✓' : ''}</span>
-                    ${opt.text}
-                </div>
-            `;
-        }).join('');
-        
-        // Добавляем обработчики кликов
-        optionsContainer.querySelectorAll('.mpg-select-option').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const value = el.dataset.value;
-                selectElement.value = value;
-                
-                // Обновляем текст на триггере
-                const text = options.find(o => o.value === value)?.text || 'Выберите...';
-                trigger.querySelector('.mpg-custom-select-text').textContent = text;
-                
-                // Закрываем модал
-                closeModal();
-                
-                // Вызываем событие change
-                const event = new Event('change', { bubbles: true });
-                selectElement.dispatchEvent(event);
-                
-                console.log(`✅ Выбрано: ${value}`);
-            });
-            
-            el.addEventListener('mouseenter', () => {
-                if (el.dataset.value !== selectElement.value) {
-                    el.style.background = 'rgba(167,139,250,0.05)';
-                }
-            });
-            
-            el.addEventListener('mouseleave', () => {
-                if (el.dataset.value !== selectElement.value) {
-                    el.style.background = 'transparent';
-                }
-            });
-        });
-    }
-    
-    // Начальный рендер
-    renderOptions();
-    
-    // Функции открытия/закрытия модала
-    function openModal() {
-        overlay.style.opacity = '1';
-        overlay.style.pointerEvents = 'auto';
-        modal.style.opacity = '1';
-        modal.style.pointerEvents = 'auto';
-        modal.style.transform = 'translate(-50%, -50%) scale(1)';
-        
-        // Фокус на поиск
-        const searchInput = modal.querySelector('.mpg-select-modal-search-input');
-        if (searchInput) {
-            setTimeout(() => {
-                searchInput.value = '';
-                searchInput.focus();
-                renderOptions();
-            }, 100);
-        }
-    }
-    
-    function closeModal() {
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
-        modal.style.opacity = '0';
-        modal.style.pointerEvents = 'none';
-        modal.style.transform = 'translate(-50%, -50%) scale(0.9)';
-        trigger.classList.remove('active');
-    }
-    
-    // Обработчик клика по триггеру
-    trigger.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Закрываем все другие модалы
-        document.querySelectorAll('.mpg-select-modal').forEach(m => {
-            m.style.opacity = '0';
-            m.style.pointerEvents = 'none';
-            m.style.transform = 'translate(-50%, -50%) scale(0.9)';
-        });
-        document.querySelectorAll('.mpg-select-overlay').forEach(o => {
-            o.style.opacity = '0';
-            o.style.pointerEvents = 'none';
-        });
-        
-        trigger.classList.add('active');
-        openModal();
-    });
-    
-    // Закрытие при клике на overlay
-    overlay.addEventListener('click', closeModal);
-    
-    // Закрытие по крестику
-    const closeBtn = header.querySelector('.modal-close-btn');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
-    }
-    
-    // Закрытие по Escape
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && modal.style.opacity === '1') {
-            closeModal();
-        }
-    });
-    
-    // Поиск
-    const searchInput = modal.querySelector('.mpg-select-modal-search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            renderOptions(searchInput.value);
-        });
-    }
-    
-    // Обновление при программном изменении select
-    selectElement.addEventListener('change', () => {
-        const text = selectElement.value ? 
-            selectElement.options[selectElement.selectedIndex]?.text || 'Выберите...' : 
-            'Выберите...';
-        trigger.querySelector('.mpg-custom-select-text').textContent = text;
-    });
-    
-    // Собираем и заменяем
-    const parent = selectElement.parentNode;
-    if (parent) {
-        parent.insertBefore(wrapper, selectElement);
-        selectElement.style.display = 'none';
-        wrapper.appendChild(trigger);
-        wrapper.appendChild(selectElement);
-        
-        console.log(`✅ Кастомный селект ${selectId} создан (${options.length} опций)`);
-    }
-}
-function initAllMpgCustomSelects(container) {
-    if (!container) return;
-    
-    console.log('🔍 Инициализация кастомных селектов...');
-    
-    const selectIds = [
-        'mpgAnimalSelect',
-        'mpgZombieSelect', 
-        'mpgItemSelect',
-        'mpgGroupAnimalSelect',
-        'mpgGroupZombieSelect'
-    ];
-    
-    // Ждем немного, чтобы DOM точно был готов
-    setTimeout(() => {
-        selectIds.forEach(id => {
-            const select = document.getElementById(id);
-            if (select) {
-                createMpgCustomSelect(select);
-            } else {
-                console.log(`⚠️ Селект ${id} не найден`);
-            }
-        });
-    }, 50);
 }
 
 // ============================================
@@ -779,6 +81,7 @@ function initAllMpgCustomSelects(container) {
 function renderMpgEditor(container) {
     container.innerHTML = `
         <div class="mpg-editor">
+            <!-- Плавающая кнопка "Назад" -->
             <button class="mpg-back-btn" onclick="mpgBackToTiles()" title="Вернуться к выбору редакторов">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="15,18 9,12 15,6"/>
@@ -786,6 +89,7 @@ function renderMpgEditor(container) {
                 <span>Назад</span>
             </button>
 
+            <!-- Заголовок -->
             <div class="mpg-header">
                 <div class="mpg-header-info">
                     <span class="mpg-header-icon">
@@ -824,6 +128,7 @@ function renderMpgEditor(container) {
                 </div>
             </div>
 
+            <!-- Статус -->
             <div class="mpg-status-bar" id="mpgStatusBar">
                 <span class="mpg-status">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -833,7 +138,7 @@ function renderMpgEditor(container) {
                 </span>
                 <span class="mpg-path">${mpgState.profilesPath || 'Путь не указан'}</span>
             </div>
-            
+            <!-- Вкладки -->
             <div class="mpg-tabs">
                 <button class="mpg-tab ${mpgState.activeTab === 'points' ? 'active' : ''}" onclick="mpgSwitchTab('points')">
                     <span class="mpg-tab-icon">📌</span>
@@ -851,6 +156,7 @@ function renderMpgEditor(container) {
                 </button>
             </div>
 
+            <!-- Контент вкладок -->
             <div class="mpg-body">
                 <!-- Точки -->
                 <div class="mpg-tab-content ${mpgState.activeTab === 'points' ? 'active' : ''}" id="mpgTabPoints">
@@ -999,14 +305,13 @@ function renderMpgEditor(container) {
         </div>
     `;
     
+    // После рендера восстанавливаем состояние редакторов
     if (mpgState.activeTab === 'points' && mpgState.currentPoint !== null) {
         renderPointEditor(mpgState.currentPoint);
     }
     if (mpgState.activeTab === 'groups' && mpgState.currentGroup !== null) {
         renderGroupEditor(mpgState.currentGroup);
     }
-    
-    setTimeout(createMpgScrollTopButton, 300);
 }
 
 // ============================================
@@ -1097,10 +402,12 @@ function mpgSwitchTab(tab) {
             function() {
                 mpgState.isDirty = false;
                 mpgState.activeTab = tab;
+                // Перерисовываем контейнер
                 const container = document.getElementById('editorContentArea');
                 if (container) {
                     renderMpgEditor(container);
                 }
+                // Обновляем списки
                 renderPointsList();
                 renderGroupsList();
                 updateStatus('✅ Готово');
@@ -1124,8 +431,6 @@ function mpgSwitchTab(tab) {
 // ============================================
 
 function mpgBackToTiles() {
-    destroyMpgScrollTopButton();
-    
     if (mpgState.isDirty) {
         mpgShowConfirmModal(
             'Несохранённые изменения',
@@ -1174,8 +479,81 @@ function mpgBackToTiles() {
 }
 
 // ============================================
-// ЗАГРУЗКА ТОЧЕК
+// ЗАГРУЗКА ДАННЫХ
 // ============================================
+
+async function loadAllData() {
+    mpgState.isLoading = true;
+    updateStatus('⏳ Загрузка данных...');
+    
+    try {
+        await loadConfig();
+        await loadPoints();
+        await loadGroups();
+        
+        // Обновляем интерфейс
+        const container = document.getElementById('editorContentArea');
+        if (container) {
+            renderMpgEditor(container);
+        }
+        renderPointsList();
+        renderGroupsList();
+        
+        updateStatus('✅ Данные загружены');
+        if (typeof notifications !== 'undefined') {
+            notifications.success(`Загружено ${mpgState.points.length} точек, ${mpgState.groups.length} групп`);
+        }
+    } catch (e) {
+        console.error('❌ Ошибка загрузки:', e);
+        updateStatus('❌ Ошибка: ' + e.message);
+        if (typeof notifications !== 'undefined') {
+            notifications.error('Ошибка загрузки: ' + e.message);
+        }
+    }
+    
+    mpgState.isLoading = false;
+}
+
+async function loadConfig() {
+    try {
+        const path = mpgState.profilesPath + '/' + MPG_CONFIG.paths.config;
+        const response = await fetch('/api/file/read', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: path })
+        });
+        const data = await response.json();
+        if (data.success) {
+            mpgState.config = JSON.parse(data.content);
+            console.log('✅ Config загружен');
+        } else {
+            mpgState.config = {
+                configVersion: 6,
+                documentation: "https://docs.mpg-dayz.ru/spawner/",
+                isModDisabled: 0,
+                logLevel: 3,
+                pointsConfigs: [],
+                admins: []
+            };
+            if (typeof notifications !== 'undefined') {
+                notifications.warning('Config.json не найден, создан новый');
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ Не удалось загрузить Config.json:', e);
+        mpgState.config = {
+            configVersion: 6,
+            documentation: "https://docs.mpg-dayz.ru/spawner/",
+            isModDisabled: 0,
+            logLevel: 3,
+            pointsConfigs: [],
+            admins: []
+        };
+        if (typeof notifications !== 'undefined') {
+            notifications.warning('Config.json не найден, создан новый');
+        }
+    }
+}
 
 async function loadPoints() {
     mpgState.points = [];
@@ -1223,10 +601,6 @@ async function loadPoints() {
         }
     }
 }
-
-// ============================================
-// ЗАГРУЗКА ГРУПП
-// ============================================
 
 async function loadGroups() {
     mpgState.groups = [];
@@ -1334,7 +708,6 @@ function renderGroupsList() {
 }
 
 function mpgSelectGroup(index) {
-    destroyMpgScrollTopButton();
     mpgState.currentGroup = index;
     renderGroupsList();
     renderGroupEditor(index);
@@ -1358,14 +731,11 @@ function renderGroupEditor(index) {
         `<option value="${w}" ${group.weather && group.weather.includes(w) ? 'selected' : ''}>${w}</option>`
     ).join('');
     
-    const animalList = getLootList('animals', MPG_CONFIG.entityTypes.animals);
-    const zombieList = getLootList('zombies', MPG_CONFIG.entityTypes.zombies);
-    
-    const animalOptions = animalList.map(a => 
+    const animalOptions = MPG_CONFIG.entityTypes.animals.map(a => 
         `<option value="${a}">${a}</option>`
     ).join('');
     
-    const zombieOptions = zombieList.map(z => 
+    const zombieOptions = MPG_CONFIG.entityTypes.zombies.map(z => 
         `<option value="${z}">${z}</option>`
     ).join('');
     
@@ -1454,11 +824,153 @@ function renderGroupEditor(index) {
             </div>
         </div>
     `;
+}
+
+function mpgUpdateGroupField(index, field, value) {
+    if (!mpgState.groups[index]) return;
+    mpgState.groups[index][field] = value;
+    mpgState.isDirty = true;
+    updateStatus('⚠️ Есть несохранённые изменения');
+    renderGroupsList();
+}
+
+function mpgUpdateGroupWeather(index, select) {
+    const selected = Array.from(select.selectedOptions).map(o => o.value);
+    if (!mpgState.groups[index]) return;
+    mpgState.groups[index].weather = selected;
+    mpgState.isDirty = true;
+    updateStatus('⚠️ Есть несохранённые изменения');
+}
+
+function mpgAddGroupEntity(index, type) {
+    const selectId = type === 'animals' ? 'mpgGroupAnimalSelect' : 'mpgGroupZombieSelect';
+    const select = document.getElementById(selectId);
+    if (!select) return;
     
-    setTimeout(createMpgScrollTopButton, 300);
+    const value = select.value;
+    if (!value) return;
     
-    // ✅ Инициализация кастомных селектов для групп
-    setTimeout(() => initAllMpgCustomSelects(container), 100);
+    const group = mpgState.groups[index];
+    if (!group) return;
+    
+    if (!group.spawnList) group.spawnList = [];
+    if (!group.spawnList.includes(value)) {
+        group.spawnList.push(value);
+        mpgState.isDirty = true;
+        updateStatus('⚠️ Есть несохранённые изменения');
+        renderGroupEditor(index);
+        renderGroupsList();
+        if (typeof notifications !== 'undefined') {
+            notifications.success(`Добавлено: ${value}`);
+        }
+    } else {
+        if (typeof notifications !== 'undefined') {
+            notifications.warning(`"${value}" уже есть в списке`);
+        }
+    }
+}
+
+function mpgAddCustomGroupEntity(index, input) {
+    const value = input.value.trim();
+    if (!value) return;
+    
+    const group = mpgState.groups[index];
+    if (!group) return;
+    
+    if (!group.spawnList) group.spawnList = [];
+    if (!group.spawnList.includes(value)) {
+        group.spawnList.push(value);
+        mpgState.isDirty = true;
+        updateStatus('⚠️ Есть несохранённые изменения');
+        renderGroupEditor(index);
+        renderGroupsList();
+        if (typeof notifications !== 'undefined') {
+            notifications.success(`Добавлено: ${value}`);
+        }
+    } else {
+        if (typeof notifications !== 'undefined') {
+            notifications.warning(`"${value}" уже есть в списке`);
+        }
+    }
+    input.value = '';
+}
+
+function mpgRemoveFromGroupList(index, value) {
+    const group = mpgState.groups[index];
+    if (!group) return;
+    
+    group.spawnList = (group.spawnList || []).filter(s => s !== value);
+    mpgState.isDirty = true;
+    updateStatus('⚠️ Есть несохранённые изменения');
+    renderGroupEditor(index);
+    renderGroupsList();
+    if (typeof notifications !== 'undefined') {
+        notifications.info(`Удалено: ${value}`);
+    }
+}
+
+function mpgAddGroup() {
+    const newGroup = {
+        groupName: `Группа ${mpgState.groups.length + 1}`,
+        isDisabled: 0,
+        spawnTime: "0-24",
+        chance: 1.0,
+        weather: ["clear", "cloudy"],
+        spawnList: [],
+        isAiBandits: 0,
+        spawnOnce: 0,
+        notificationTextSpawn: "",
+        _file: `Groups_${String(mpgState.groups.length + 1).padStart(2, '0')}.json`
+    };
+    
+    mpgState.groups.push(newGroup);
+    mpgState.currentGroup = mpgState.groups.length - 1;
+    mpgState.isDirty = true;
+    
+    renderGroupsList();
+    renderGroupEditor(mpgState.currentGroup);
+    updateStatus('⚠️ Есть несохранённые изменения');
+    
+    if (typeof notifications !== 'undefined') {
+        notifications.success(`Создана новая группа: ${newGroup.groupName}`);
+    }
+}
+
+function mpgConfirmDeleteGroup(index) {
+    const group = mpgState.groups[index];
+    if (!group) return;
+    
+    mpgShowConfirmModal(
+        'Удаление группы',
+        `Вы уверены, что хотите удалить группу "<strong>${group.groupName}</strong>"?<br>Это действие нельзя отменить.`,
+        function() {
+            mpgExecuteDeleteGroup(index);
+        },
+        function() {}
+    );
+}
+
+function mpgExecuteDeleteGroup(index) {
+    const group = mpgState.groups[index];
+    if (!group) return;
+    
+    const groupName = group.groupName;
+    
+    mpgState.groups.splice(index, 1);
+    if (mpgState.currentGroup === index) {
+        mpgState.currentGroup = null;
+    } else if (mpgState.currentGroup > index) {
+        mpgState.currentGroup--;
+    }
+    mpgState.isDirty = true;
+    
+    renderGroupsList();
+    renderGroupEditor(mpgState.currentGroup);
+    updateStatus('⚠️ Есть несохранённые изменения');
+    
+    if (typeof notifications !== 'undefined') {
+        notifications.info(`Удалена группа: ${groupName}`);
+    }
 }
 
 // ============================================
@@ -1511,10 +1023,117 @@ function renderPointsList() {
 }
 
 function mpgSelectPoint(index) {
-    destroyMpgScrollTopButton();
     mpgState.currentPoint = index;
     renderPointsList();
     renderPointEditor(index);
+}
+
+function mpgAddPoint() {
+    const nextId = mpgState.points.reduce((max, p) => Math.max(max, p.pointId || 0), 0) + 1;
+    
+    const newPoint = {
+        pointId: nextId,
+        isLogsEnabled: 1,
+        isDisabled: 0,
+        showVisualisation: 0,
+        showEntityLabels: 0,
+        notificationTitle: `Точка ${nextId}`,
+        notificationTextEnter: `Вы вошли в точку ${nextId}`,
+        notificationTextExit: `Вы покинули точку ${nextId}`,
+        notificationTextSpawn: "Где-то рядом появились новые сущности.",
+        notificationTextWin: "Замечательно! Вы убили всех врагов!",
+        notificationTime: 8,
+        notificationIcon: "set:dayz_gui image:iconSkull",
+        triggerDependencies: [],
+        triggerDependenciesAnyOf: 0,
+        triggersToEnableOnEnter: [],
+        triggersToEnableOnFirstSpawn: [],
+        triggersToEnableOnWin: [],
+        triggersToEnableOnLeave: [],
+        triggerPosition: "0.0 0.0 0.0",
+        triggerDebugColor: "red",
+        triggerRadius: "50.0",
+        triggerHeight: "",
+        triggerWidthX: "",
+        triggerWidthY: "",
+        triggerFirstDelay: "10-15",
+        triggerCooldown: "60-70",
+        triggerSafeDistance: 25.0,
+        triggerEnterDelay: 0,
+        triggerCleanupOnLeave: 0,
+        triggerCleanupOnLunchTime: 0,
+        triggerCleanupImmersive: 0,
+        triggerCleanupDelay: 0,
+        triggerInactiveResetDelay: 0,
+        triggerWorkingTime: "0-24",
+        triggerDisableOnWin: 0,
+        triggerDisableOnLeave: 0,
+        spawnPositions: ["0.0 0.0 0.0"],
+        spawnRadius: "50.0",
+        spawnMin: 2,
+        spawnMax: 5,
+        spawnCountLimit: 30,
+        spawnLoopInside: 1,
+        spawnQueueDelay: 0,
+        triggerRequireItem: {},
+        enableEquipCE: 0,
+        spawnList: [],
+        clearDeathAnimals: 0,
+        clearDeathZombies: 0,
+        mappingData: [],
+        _file: `Point_${String(nextId).padStart(2, '0')}.json`
+    };
+    
+    mpgState.points.push(newPoint);
+    mpgState.currentPoint = mpgState.points.length - 1;
+    mpgState.isDirty = true;
+    
+    renderPointsList();
+    renderPointEditor(mpgState.currentPoint);
+    updateStatus('⚠️ Есть несохранённые изменения');
+    
+    if (typeof notifications !== 'undefined') {
+        notifications.success(`Создана новая точка #${nextId}`);
+    }
+}
+
+function mpgConfirmDeletePoint(index) {
+    const point = mpgState.points[index];
+    if (!point) return;
+    
+    const pointName = point.notificationTitle || `Точка #${point.pointId}`;
+    
+    mpgShowConfirmModal(
+        'Удаление точки',
+        `Вы уверены, что хотите удалить точку "<strong>${pointName}</strong>"?<br>Это действие нельзя отменить.`,
+        function() {
+            mpgExecuteDeletePoint(index);
+        },
+        function() {}
+    );
+}
+
+function mpgExecuteDeletePoint(index) {
+    const point = mpgState.points[index];
+    if (!point) return;
+    
+    const pointName = point.notificationTitle || `Точка #${point.pointId}`;
+    
+    mpgState.points.splice(index, 1);
+    if (mpgState.currentPoint === index) {
+        mpgState.currentPoint = null;
+    } else if (mpgState.currentPoint > index) {
+        mpgState.currentPoint--;
+    }
+    mpgState.isDirty = true;
+    
+    renderPointsList();
+    renderPointEditor(mpgState.currentPoint);
+    updateStatus('⚠️ Есть несохранённые изменения');
+    
+    if (typeof notifications !== 'undefined') {
+        notifications.info(`Удалена точка: ${pointName}`);
+    }
 }
 
 function renderPointEditor(index) {
@@ -1531,19 +1150,15 @@ function renderPointEditor(index) {
     if (empty) empty.style.display = 'none';
     if (container) container.style.display = 'block';
     
-    const animalList = getLootList('animals', MPG_CONFIG.entityTypes.animals);
-    const zombieList = getLootList('zombies', MPG_CONFIG.entityTypes.zombies);
-    const itemList = getLootList('items', MPG_CONFIG.entityTypes.items);
-    
-    const animalOptions = animalList.map(a => 
+    const animalOptions = MPG_CONFIG.entityTypes.animals.map(a => 
         `<option value="${a}">${a}</option>`
     ).join('');
     
-    const zombieOptions = zombieList.map(z => 
+    const zombieOptions = MPG_CONFIG.entityTypes.zombies.map(z => 
         `<option value="${z}">${z}</option>`
     ).join('');
     
-    const itemOptions = itemList.map(i => 
+    const itemOptions = MPG_CONFIG.entityTypes.items.map(i => 
         `<option value="${i}">${i}</option>`
     ).join('');
     
@@ -1793,167 +1408,7 @@ function renderPointEditor(index) {
             </div>
         </div>
     `;
-    
-    setTimeout(createMpgScrollTopButton, 300);
-    
-    // ✅ Инициализация кастомных селектов для точек
-    setTimeout(() => initAllMpgCustomSelects(container), 100);
 }
-
-// ============================================
-// ГРУППЫ - ОСТАЛЬНЫЕ ФУНКЦИИ
-// ============================================
-
-function mpgUpdateGroupField(index, field, value) {
-    if (!mpgState.groups[index]) return;
-    mpgState.groups[index][field] = value;
-    mpgState.isDirty = true;
-    updateStatus('⚠️ Есть несохранённые изменения');
-    renderGroupsList();
-}
-
-function mpgUpdateGroupWeather(index, select) {
-    const selected = Array.from(select.selectedOptions).map(o => o.value);
-    if (!mpgState.groups[index]) return;
-    mpgState.groups[index].weather = selected;
-    mpgState.isDirty = true;
-    updateStatus('⚠️ Есть несохранённые изменения');
-}
-
-function mpgAddGroupEntity(index, type) {
-    const selectId = type === 'animals' ? 'mpgGroupAnimalSelect' : 'mpgGroupZombieSelect';
-    const select = document.getElementById(selectId);
-    if (!select) return;
-    
-    const value = select.value;
-    if (!value) return;
-    
-    const group = mpgState.groups[index];
-    if (!group) return;
-    
-    if (!group.spawnList) group.spawnList = [];
-    if (!group.spawnList.includes(value)) {
-        group.spawnList.push(value);
-        mpgState.isDirty = true;
-        updateStatus('⚠️ Есть несохранённые изменения');
-        renderGroupEditor(index);
-        renderGroupsList();
-        if (typeof notifications !== 'undefined') {
-            notifications.success(`Добавлено: ${value}`);
-        }
-    } else {
-        if (typeof notifications !== 'undefined') {
-            notifications.warning(`"${value}" уже есть в списке`);
-        }
-    }
-}
-
-function mpgAddCustomGroupEntity(index, input) {
-    const value = input.value.trim();
-    if (!value) return;
-    
-    const group = mpgState.groups[index];
-    if (!group) return;
-    
-    if (!group.spawnList) group.spawnList = [];
-    if (!group.spawnList.includes(value)) {
-        group.spawnList.push(value);
-        mpgState.isDirty = true;
-        updateStatus('⚠️ Есть несохранённые изменения');
-        renderGroupEditor(index);
-        renderGroupsList();
-        if (typeof notifications !== 'undefined') {
-            notifications.success(`Добавлено: ${value}`);
-        }
-    } else {
-        if (typeof notifications !== 'undefined') {
-            notifications.warning(`"${value}" уже есть в списке`);
-        }
-    }
-    input.value = '';
-}
-
-function mpgRemoveFromGroupList(index, value) {
-    const group = mpgState.groups[index];
-    if (!group) return;
-    
-    group.spawnList = (group.spawnList || []).filter(s => s !== value);
-    mpgState.isDirty = true;
-    updateStatus('⚠️ Есть несохранённые изменения');
-    renderGroupEditor(index);
-    renderGroupsList();
-    if (typeof notifications !== 'undefined') {
-        notifications.info(`Удалено: ${value}`);
-    }
-}
-
-function mpgAddGroup() {
-    const newGroup = {
-        groupName: `Группа ${mpgState.groups.length + 1}`,
-        isDisabled: 0,
-        spawnTime: "0-24",
-        chance: 1.0,
-        weather: ["clear", "cloudy"],
-        spawnList: [],
-        isAiBandits: 0,
-        spawnOnce: 0,
-        notificationTextSpawn: "",
-        _file: `Groups_${String(mpgState.groups.length + 1).padStart(2, '0')}.json`
-    };
-    
-    mpgState.groups.push(newGroup);
-    mpgState.currentGroup = mpgState.groups.length - 1;
-    mpgState.isDirty = true;
-    
-    renderGroupsList();
-    renderGroupEditor(mpgState.currentGroup);
-    updateStatus('⚠️ Есть несохранённые изменения');
-    
-    if (typeof notifications !== 'undefined') {
-        notifications.success(`Создана новая группа: ${newGroup.groupName}`);
-    }
-}
-
-function mpgConfirmDeleteGroup(index) {
-    const group = mpgState.groups[index];
-    if (!group) return;
-    
-    mpgShowConfirmModal(
-        'Удаление группы',
-        `Вы уверены, что хотите удалить группу "<strong>${group.groupName}</strong>"?<br>Это действие нельзя отменить.`,
-        function() {
-            mpgExecuteDeleteGroup(index);
-        },
-        function() {}
-    );
-}
-
-function mpgExecuteDeleteGroup(index) {
-    const group = mpgState.groups[index];
-    if (!group) return;
-    
-    const groupName = group.groupName;
-    
-    mpgState.groups.splice(index, 1);
-    if (mpgState.currentGroup === index) {
-        mpgState.currentGroup = null;
-    } else if (mpgState.currentGroup > index) {
-        mpgState.currentGroup--;
-    }
-    mpgState.isDirty = true;
-    
-    renderGroupsList();
-    renderGroupEditor(mpgState.currentGroup);
-    updateStatus('⚠️ Есть несохранённые изменения');
-    
-    if (typeof notifications !== 'undefined') {
-        notifications.info(`Удалена группа: ${groupName}`);
-    }
-}
-
-// ============================================
-// ТОЧКИ - ОСТАЛЬНЫЕ ФУНКЦИИ
-// ============================================
 
 function mpgUpdatePointField(index, field, value) {
     if (!mpgState.points[index]) return;
@@ -2024,114 +1479,6 @@ function mpgRemoveFromSpawnList(index, value) {
     renderPointEditor(index);
     if (typeof notifications !== 'undefined') {
         notifications.info(`Удалено: ${value}`);
-    }
-}
-
-function mpgAddPoint() {
-    const nextId = mpgState.points.reduce((max, p) => Math.max(max, p.pointId || 0), 0) + 1;
-    
-    const newPoint = {
-        pointId: nextId,
-        isLogsEnabled: 1,
-        isDisabled: 0,
-        showVisualisation: 0,
-        showEntityLabels: 0,
-        notificationTitle: `Точка ${nextId}`,
-        notificationTextEnter: `Вы вошли в точку ${nextId}`,
-        notificationTextExit: `Вы покинули точку ${nextId}`,
-        notificationTextSpawn: "Где-то рядом появились новые сущности.",
-        notificationTextWin: "Замечательно! Вы убили всех врагов!",
-        notificationTime: 8,
-        notificationIcon: "set:dayz_gui image:iconSkull",
-        triggerDependencies: [],
-        triggerDependenciesAnyOf: 0,
-        triggersToEnableOnEnter: [],
-        triggersToEnableOnFirstSpawn: [],
-        triggersToEnableOnWin: [],
-        triggersToEnableOnLeave: [],
-        triggerPosition: "0.0 0.0 0.0",
-        triggerDebugColor: "red",
-        triggerRadius: "50.0",
-        triggerHeight: "",
-        triggerWidthX: "",
-        triggerWidthY: "",
-        triggerFirstDelay: "10-15",
-        triggerCooldown: "60-70",
-        triggerSafeDistance: 25.0,
-        triggerEnterDelay: 0,
-        triggerCleanupOnLeave: 0,
-        triggerCleanupOnLunchTime: 0,
-        triggerCleanupImmersive: 0,
-        triggerCleanupDelay: 0,
-        triggerInactiveResetDelay: 0,
-        triggerWorkingTime: "0-24",
-        triggerDisableOnWin: 0,
-        triggerDisableOnLeave: 0,
-        spawnPositions: ["0.0 0.0 0.0"],
-        spawnRadius: "50.0",
-        spawnMin: 2,
-        spawnMax: 5,
-        spawnCountLimit: 30,
-        spawnLoopInside: 1,
-        spawnQueueDelay: 0,
-        triggerRequireItem: {},
-        enableEquipCE: 0,
-        spawnList: [],
-        clearDeathAnimals: 0,
-        clearDeathZombies: 0,
-        mappingData: [],
-        _file: `Point_${String(nextId).padStart(2, '0')}.json`
-    };
-    
-    mpgState.points.push(newPoint);
-    mpgState.currentPoint = mpgState.points.length - 1;
-    mpgState.isDirty = true;
-    
-    renderPointsList();
-    renderPointEditor(mpgState.currentPoint);
-    updateStatus('⚠️ Есть несохранённые изменения');
-    
-    if (typeof notifications !== 'undefined') {
-        notifications.success(`Создана новая точка #${nextId}`);
-    }
-}
-
-function mpgConfirmDeletePoint(index) {
-    const point = mpgState.points[index];
-    if (!point) return;
-    
-    const pointName = point.notificationTitle || `Точка #${point.pointId}`;
-    
-    mpgShowConfirmModal(
-        'Удаление точки',
-        `Вы уверены, что хотите удалить точку "<strong>${pointName}</strong>"?<br>Это действие нельзя отменить.`,
-        function() {
-            mpgExecuteDeletePoint(index);
-        },
-        function() {}
-    );
-}
-
-function mpgExecuteDeletePoint(index) {
-    const point = mpgState.points[index];
-    if (!point) return;
-    
-    const pointName = point.notificationTitle || `Точка #${point.pointId}`;
-    
-    mpgState.points.splice(index, 1);
-    if (mpgState.currentPoint === index) {
-        mpgState.currentPoint = null;
-    } else if (mpgState.currentPoint > index) {
-        mpgState.currentPoint--;
-    }
-    mpgState.isDirty = true;
-    
-    renderPointsList();
-    renderPointEditor(mpgState.currentPoint);
-    updateStatus('⚠️ Есть несохранённые изменения');
-    
-    if (typeof notifications !== 'undefined') {
-        notifications.info(`Удалена точка: ${pointName}`);
     }
 }
 
@@ -2256,6 +1603,7 @@ async function mpgSaveAll() {
     updateStatus('⏳ Сохранение...');
     
     try {
+        // Сохраняем точки
         const pointsDir = mpgState.profilesPath + '/' + MPG_CONFIG.paths.points;
         const pointFiles = {};
         
@@ -2281,6 +1629,7 @@ async function mpgSaveAll() {
             console.log(`✅ Сохранён: ${file}`);
         }
         
+        // Сохраняем группы
         const groupsDir = mpgState.profilesPath + '/' + MPG_CONFIG.paths.groups;
         const groupFiles = {};
         
@@ -2306,7 +1655,19 @@ async function mpgSaveAll() {
             console.log(`✅ Сохранён: ${file}`);
         }
         
-        await mpgSaveConfig();
+        // Сохраняем Config.json
+        const configPath = mpgState.profilesPath + '/' + MPG_CONFIG.paths.config;
+        const configContent = JSON.stringify(mpgState.config, null, 4);
+        const configResponse = await fetch('/api/file/write', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: configPath, content: configContent })
+        });
+        const configData = await configResponse.json();
+        if (!configData.success) {
+            throw new Error(`Ошибка сохранения Config.json: ${configData.message}`);
+        }
+        console.log('✅ Сохранён: Config.json');
         
         mpgState.isDirty = false;
         const totalPoints = mpgState.points.length;
@@ -2326,6 +1687,10 @@ async function mpgSaveAll() {
     }
 }
 
+// ============================================
+// ПЕРЕЗАГРУЗКА
+// ============================================
+
 function mpgReload() {
     if (mpgState.isDirty) {
         mpgShowConfirmModal(
@@ -2342,103 +1707,6 @@ function mpgReload() {
 }
 
 // ============================================
-// ПЛАВАЮЩАЯ КНОПКА "НАВЕРХ" ДЛЯ MPG EDITOR
-// ============================================
-
-let mpgScrollTopBtn = null;
-let mpgScrollCheckTimer = null;
-
-function createMpgScrollTopButton() {
-    const oldBtn = document.getElementById('mpgScrollTopBtn');
-    if (oldBtn) {
-        oldBtn.remove();
-        mpgScrollTopBtn = null;
-    }
-    
-    if (mpgScrollCheckTimer) {
-        clearInterval(mpgScrollCheckTimer);
-        mpgScrollCheckTimer = null;
-    }
-    
-    mpgScrollTopBtn = document.createElement('button');
-    mpgScrollTopBtn.id = 'mpgScrollTopBtn';
-    mpgScrollTopBtn.innerHTML = '↑';
-    mpgScrollTopBtn.title = 'Наверх';
-    
-    let isScrolling = false;
-    
-    mpgScrollTopBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        
-        if (isScrolling) return;
-        isScrolling = true;
-        
-        const contentArea = document.getElementById('contentArea');
-        if (contentArea) {
-            const scrollContainer = contentArea.querySelector('div:first-child');
-            if (scrollContainer) {
-                scrollContainer.scrollTo({ 
-                    top: 0, 
-                    behavior: 'smooth' 
-                });
-                
-                setTimeout(function() {
-                    isScrolling = false;
-                }, 800);
-                return;
-            }
-        }
-        
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(function() {
-            isScrolling = false;
-        }, 800);
-    });
-    
-    document.body.appendChild(mpgScrollTopBtn);
-    console.log('✅ Кнопка "Наверх" для MPG Editor создана');
-    
-    mpgScrollCheckTimer = setInterval(function() {
-        checkMpgScroll();
-    }, 300);
-    
-    setTimeout(checkMpgScroll, 200);
-}
-
-function checkMpgScroll() {
-    if (!mpgScrollTopBtn) return;
-    
-    const contentArea = document.getElementById('contentArea');
-    let hasScroll = false;
-    
-    if (contentArea) {
-        const scrollContainer = contentArea.querySelector('div:first-child');
-        if (scrollContainer && scrollContainer.scrollTop > 50) {
-            hasScroll = true;
-        }
-    }
-    
-    if (hasScroll) {
-        mpgScrollTopBtn.classList.add('visible');
-    } else {
-        mpgScrollTopBtn.classList.remove('visible');
-    }
-}
-
-function destroyMpgScrollTopButton() {
-    if (mpgScrollCheckTimer) {
-        clearInterval(mpgScrollCheckTimer);
-        mpgScrollCheckTimer = null;
-    }
-    
-    const btn = document.getElementById('mpgScrollTopBtn');
-    if (btn) {
-        btn.remove();
-        mpgScrollTopBtn = null;
-    }
-}
-
-// ============================================
 // ЭКСПОРТ ФУНКЦИЙ
 // ============================================
 
@@ -2448,6 +1716,7 @@ window.mpgReload = mpgReload;
 window.mpgSwitchTab = mpgSwitchTab;
 window.mpgBackToTiles = mpgBackToTiles;
 
+// Точки
 window.mpgAddPoint = mpgAddPoint;
 window.mpgConfirmDeletePoint = mpgConfirmDeletePoint;
 window.mpgSelectPoint = mpgSelectPoint;
@@ -2456,6 +1725,7 @@ window.mpgAddEntity = mpgAddEntity;
 window.mpgAddCustomEntity = mpgAddCustomEntity;
 window.mpgRemoveFromSpawnList = mpgRemoveFromSpawnList;
 
+// Группы
 window.mpgAddGroup = mpgAddGroup;
 window.mpgConfirmDeleteGroup = mpgConfirmDeleteGroup;
 window.mpgSelectGroup = mpgSelectGroup;
@@ -2465,6 +1735,7 @@ window.mpgAddGroupEntity = mpgAddGroupEntity;
 window.mpgAddCustomGroupEntity = mpgAddCustomGroupEntity;
 window.mpgRemoveFromGroupList = mpgRemoveFromGroupList;
 
+// Конфиг
 window.mpgUpdateConfigField = mpgUpdateConfigField;
 window.mpgAddConfigFile = mpgAddConfigFile;
 window.mpgRemoveConfigFile = mpgRemoveConfigFile;

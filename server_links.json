@@ -7,7 +7,7 @@
     "link_name": "@CF",
     "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@CF",
     "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
-    "created_at": "2026-07-26T12:09:59.294617",
+    "created_at": "2026-07-20T11:49:17.875108",
     "enabled": true
   },
   "workshop_1828439124": {
@@ -18,7 +18,7 @@
     "link_name": "@VPPAdminTools",
     "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@VPPAdminTools",
     "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
-    "created_at": "2026-07-26T12:10:00.123502",
+    "created_at": "2026-07-20T11:49:18.374312",
     "enabled": true
   },
   "workshop_2968284194": {
@@ -29,7 +29,7 @@
     "link_name": "@VPPAdminTools_RU_Translate",
     "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@VPPAdminTools_RU_Translate",
     "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
-    "created_at": "2026-07-26T12:10:00.840383",
+    "created_at": "2026-07-20T11:49:19.028539",
     "enabled": true
   },
   "workshop_3120779051": {
@@ -40,7 +40,7 @@
     "link_name": "@MPG_Spawner",
     "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@MPG_Spawner",
     "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
-    "created_at": "2026-07-26T12:10:01.592714",
+    "created_at": "2026-07-20T11:49:19.924303",
     "enabled": true
   },
   "workshop_3422882242": {
@@ -51,18 +51,7 @@
     "link_name": "@MPG_LootExtractor",
     "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@MPG_LootExtractor",
     "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
-    "created_at": "2026-07-26T12:10:02.228557",
-    "enabled": true
-  },
-  "workshop_3303128154": {
-    "mod_id": "workshop_3303128154",
-    "mod_name": "MPG_SpawnerConfigReload",
-    "mod_folder": "3303128154",
-    "mod_path": "C:/Program Files (x86)/Steam/steamapps/workshop/content/221100\\3303128154",
-    "link_name": "@MPG_SpawnerConfigReload",
-    "link_path": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer\\@MPG_SpawnerConfigReload",
-    "server_dir": "C:/Program Files (x86)/Steam/steamapps/common/DayZServer",
-    "created_at": "2026-07-26T12:27:56.688187",
+    "created_at": "2026-07-20T15:08:12.517383",
     "enabled": true
   }
 }

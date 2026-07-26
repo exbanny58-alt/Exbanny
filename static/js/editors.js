@@ -2,100 +2,26 @@
 // РЕДАКТОРЫ - ПОЛНАЯ ЛОГИКА
 // ============================================
 
-// Конфигурация редакторов
+// Конфигурация всех редакторов
 const EDITORS_CONFIG = {
-    // ============ НОВЫЙ РЕДАКТОР СЕРВЕРА ============
-    server: {
-        id: 'server',
-        name: 'Редакторы сервера',
-        icon: '⚙️',
-        description: 'Инструменты для редактирования файлов сервера DayZ',
-        type: 'custom',
-        init: 'initServerEditor',
-        tiles: [
-            {
-                id: 'server_config',
-                icon: '⚙️',
-                title: 'Редактор serverDZ.cfg',
-                description: 'Основной конфигурационный файл сервера DayZ',
-                badge: 'Основной',
-                init: 'initServerConfigEditor'
-            },
-            {
-                id: 'types_editor',
-                icon: '📦',
-                title: 'Редактор types.xml',
-                description: 'Настройка лута через файл types.xml',
-                badge: 'Лут',
-                init: 'initTypesEditor'
-            },
-            {
-                id: 'globals_editor',
-                icon: '🌍',
-                title: 'Редактор globals.xml',
-                description: 'Глобальные переменные сервера (зомби, животные, лут и т.д.)',
-                badge: 'Глобальные',
-                init: 'initGlobalsEditor'
-            },
-            {
-                id: 'events_editor',
-                icon: '📋',
-                title: 'Редактор events.xml',
-                description: 'Настройка событий, животных, зомби и транспорта',
-                badge: 'События',
-                init: 'initEventsEditor'
-            },
-            {
-                id: 'territories_editor',
-                icon: '🗺️',
-                title: 'Редактор территорий животных',
-                description: 'Редактирование зон обитания животных и зомби',
-                badge: 'Территории',
-                init: 'initTerritoriesEditor'
-            }
-            // Сюда можно будет добавить другие редакторы серверных файлов
-        ]
-    },
-    // ================================================
     mpg: {
         id: 'mpg',
         name: 'MPG Spawner Editor',
-        icon: '📍',
-        description: 'Редактор точек спавна для мода MPG Spawner',
+        icon: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>',
         type: 'custom',
         init: 'initMpgEditor',
-        tiles: [
-            {
-                id: 'mpg_spawner',
-                icon: '📍',
-                title: 'MPG Spawner Editor',
-                description: 'Редактор точек спавна для мода MPG Spawner',
-                badge: 'Редактор',
-                init: 'initMpgEditor'
-            },
-            {
-                id: 'loot_extractor',
-                icon: '📦',
-                title: 'Loot Extractor',
-                description: 'Справочник всех предметов DayZ с поиском',
-                badge: 'Справочник',
-                init: 'initLootExtractor'
-            }
-        ]
-    },
-    fc_fish: {
-        id: 'fc_fish',
-        name: 'FC Fish Config Editor',
-        icon: '🐟',
-        description: 'Редактор конфига рыболовного мода FC Fish',
-        type: 'custom',
-        init: 'initFcFishEditor',
-        tiles: []
+        tile: {
+            icon: '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>',
+            title: 'MPG Spawner',
+            description: 'Редактор точек спавна для мода MPG Spawner'
+        }
     }
 };
 
 // Текущее состояние
 let currentEditor = null;
+let currentFile = null;
+let isMpgEditorOpen = false;
 
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ СТРАНИЦЫ РЕДАКТОРОВ
@@ -119,15 +45,11 @@ function initEditorsPage() {
         } else {
             const contentArea = document.getElementById('editorContentArea');
             if (contentArea) {
-                contentArea.innerHTML = `
-                    <div class="editor-placeholder">
-                        <div class="editor-placeholder-icon">📂</div>
-                        <p class="editor-placeholder-title">Выберите редактор</p>
-                        <p class="editor-placeholder-text">Выберите редактор из выпадающего списка выше</p>
-                    </div>
-                `;
+                contentArea.innerHTML = '';
             }
             currentEditor = null;
+            currentFile = null;
+            isMpgEditorOpen = false;
         }
     });
 }
@@ -145,25 +67,14 @@ function populateEditorSelect(select) {
     emptyOption.textContent = '— Выберите редактор —';
     select.appendChild(emptyOption);
     
-    // ПЕРВЫЙ: Редакторы сервера
-    const serverOption = document.createElement('option');
-    serverOption.value = 'server';
-    serverOption.textContent = '⚙️ Редакторы сервера';
-    select.appendChild(serverOption);
-    
-    // ВТОРОЙ: MPG Spawner Editor
-    const mpgOption = document.createElement('option');
-    mpgOption.value = 'mpg';
-    mpgOption.textContent = '📍 MPG Spawner Editor';
-    select.appendChild(mpgOption);
-    
-    // ТРЕТИЙ: FC Fish Config Editor
-    const fcFishOption = document.createElement('option');
-    fcFishOption.value = 'fc_fish';
-    fcFishOption.textContent = '🐟 FC Fish Config Editor';
-    select.appendChild(fcFishOption);
+    for (const [key, config] of Object.entries(EDITORS_CONFIG)) {
+        const option = document.createElement('option');
+        option.value = key;
+        // Убираем эмодзи из текста, оставляем только название
+        option.textContent = `MPG Spawner Editor`;
+        select.appendChild(option);
+    }
 }
-
 // ============================================
 // ОТКРЫТЬ РЕДАКТОР
 // ============================================
@@ -175,140 +86,58 @@ function openEditor(editorId) {
     }
     
     currentEditor = editorId;
+    currentFile = null;
+    isMpgEditorOpen = false;
     
     const contentArea = document.getElementById('editorContentArea');
     if (!contentArea) return;
     
-    // Если у редактора есть плитки - показываем их
-    if (config.tiles && config.tiles.length > 0) {
-        renderTiles(contentArea, config);
+    // Показываем плитку с редактором
+    if (config.type === 'custom' && config.tile) {
+        renderMpgTile(contentArea, config);
+        return;
+    }
+    
+    // Старый стиль для файлов
+    if (config.type === 'files') {
+        renderFileList(contentArea, config);
     } else {
-        // Иначе сразу загружаем редактор
-        if (config.init && typeof window[config.init] === 'function') {
-            window[config.init]();
-        } else {
-            // Если функция не загружена - подгружаем скрипт
-            loadEditorScript(editorId, config);
-        }
+        renderEditorPlaceholder(contentArea, config);
     }
     
     if (typeof notifications !== 'undefined') {
-        notifications.info(`📂 Открыт: ${config.name}`);
+        notifications.info(`${config.icon} Открыт: ${config.name}`);
     }
 }
 
 // ============================================
-// ЗАГРУЗКА СКРИПТА РЕДАКТОРА
+// ОТРИСОВКА ПЛИТКИ MPG EDITOR
 // ============================================
-function loadEditorScript(editorId, config) {
-    const contentArea = document.getElementById('editorContentArea');
-    if (!contentArea) return;
-    
-    contentArea.innerHTML = `
-        <div class="editor-placeholder">
-            <div class="editor-placeholder-icon">⏳</div>
-            <p>Загрузка ${config.name}...</p>
-        </div>
-    `;
-    
-    let scriptSrc = '';
-    if (editorId === 'server') {
-        // Для серверных редакторов грузим server_editors.js
-        scriptSrc = '/static/js/server_editors.js';
-    } else if (editorId === 'mpg') {
-        scriptSrc = '/static/js/mpg_editor.js';
-    } else if (editorId === 'fc_fish') {
-        scriptSrc = '/static/js/fc_fish_editor.js';
-    } else {
-        contentArea.innerHTML = `
-            <div class="editor-placeholder">
-                <div class="editor-placeholder-icon">❌</div>
-                <p>Неизвестный редактор</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Проверяем, не загружен ли уже скрипт
-    if (typeof window[config.init] === 'function') {
-        window[config.init]();
-        return;
-    }
-    
-    const script = document.createElement('script');
-    script.src = scriptSrc;
-    script.onload = function() {
-        if (typeof window[config.init] === 'function') {
-            window[config.init]();
-        } else {
-            contentArea.innerHTML = `
-                <div class="editor-placeholder">
-                    <div class="editor-placeholder-icon">❌</div>
-                    <p>Ошибка загрузки ${config.name}</p>
-                </div>
-            `;
-        }
-    };
-    script.onerror = function() {
-        contentArea.innerHTML = `
-            <div class="editor-placeholder">
-                <div class="editor-placeholder-icon">❌</div>
-                <p>Не удалось загрузить ${config.name}</p>
-            </div>
-        `;
-    };
-    document.head.appendChild(script);
-}
-
-// ============================================
-// ОТРИСОВКА ПЛИТОК РЕДАКТОРА
-// ============================================
-function renderTiles(container, config) {
-    if (!config.tiles || config.tiles.length === 0) {
-        container.innerHTML = `
-            <div class="editor-placeholder">
-                <div class="editor-placeholder-icon">📭</div>
-                <p>Нет доступных инструментов</p>
-            </div>
-        `;
-        return;
-    }
-    
-    let tilesHtml = '';
-    config.tiles.forEach(tile => {
-        tilesHtml += `
-            <div class="editor-tile-wrapper">
-                <div class="editor-tile" onclick="openTile('${tile.id}', '${tile.init}')">
-                    <div class="editor-tile-icon">${tile.icon}</div>
-                    <div class="editor-tile-content">
-                        <h3 class="editor-tile-title">${tile.title}</h3>
-                        <p class="editor-tile-description">${tile.description}</p>
-                        <div class="editor-tile-badge">${tile.badge || 'Нажмите для открытия'}</div>
-                    </div>
-                    <div class="editor-tile-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9,18 15,12 9,6"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
+function renderMpgTile(container, config) {
     container.innerHTML = `
-        <div class="editor-tiles-wrapper">
-            <div class="editor-tiles-grid">
-                ${tilesHtml}
+        <div class="editor-tile-wrapper">
+            <div class="editor-tile" onclick="openMpgEditor()">
+                <div class="editor-tile-icon">${config.tile.icon}</div>
+                <div class="editor-tile-content">
+                    <h3 class="editor-tile-title">${config.tile.title}</h3>
+                    <p class="editor-tile-description">${config.tile.description}</p>
+                    <div class="editor-tile-badge">Нажмите для открытия</div>
+                </div>
+                <div class="editor-tile-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9,18 15,12 9,6"/>
+                    </svg>
+                </div>
             </div>
         </div>
     `;
 }
-
 // ============================================
-// ОТКРЫТЬ КОНКРЕТНУЮ ПЛИТКУ
+// ОТКРЫТЬ MPG EDITOR (по клику на плитку)
 // ============================================
-function openTile(tileId, initFunctionName) {
-    console.log(`🔓 Открытие плитки: ${tileId}`);
+function openMpgEditor() {
+    if (isMpgEditorOpen) return;
+    isMpgEditorOpen = true;
     
     const container = document.getElementById('editorContentArea');
     if (!container) return;
@@ -317,147 +146,143 @@ function openTile(tileId, initFunctionName) {
     container.innerHTML = `
         <div class="editor-placeholder">
             <div class="editor-placeholder-icon">⏳</div>
-            <p>Загрузка...</p>
+            <p>Загрузка редактора...</p>
         </div>
     `;
     
-    // Проверяем, загружена ли функция
-    if (typeof window[initFunctionName] !== 'function') {
-        // Определяем какой скрипт грузить
-        let scriptSrc = '';
-        if (tileId === 'server_config') {
-            scriptSrc = '/static/js/server_config_editor.js';
-        } else if (tileId === 'types_editor') {
-            scriptSrc = '/static/js/types_editor.js';
-        } else if (tileId === 'globals_editor') {
-            scriptSrc = '/static/js/globals_editor.js';
-        } else if (tileId === 'events_editor') {
-            scriptSrc = '/static/js/events_editor.js';
-        } else if (tileId === 'territories_editor') {
-            scriptSrc = '/static/js/territories_editor.js';
-        } else if (tileId === 'mpg_spawner') {
-            scriptSrc = '/static/js/mpg_editor.js';
-        } else if (tileId === 'loot_extractor') {
-            scriptSrc = '/static/js/loot_extractor.js';
-        } else if (tileId === 'fc_fish') {
-            scriptSrc = '/static/js/fc_fish_editor.js';
-        } else {
-            container.innerHTML = `
-                <div class="editor-placeholder">
-                    <div class="editor-placeholder-icon">❌</div>
-                    <p>Неизвестный инструмент</p>
-                </div>
-            `;
-            return;
-        }
-        
+    // Проверяем, загружен ли mpg_editor.js
+    if (typeof window.initMpgEditor !== 'function') {
         const script = document.createElement('script');
-        script.src = scriptSrc;
+        script.src = '/static/js/mpg_editor.js';
         script.onload = function() {
-            if (typeof window[initFunctionName] === 'function') {
-                window[initFunctionName]();
+            if (typeof window.initMpgEditor === 'function') {
+                window.initMpgEditor();
             } else {
                 container.innerHTML = `
                     <div class="editor-placeholder">
                         <div class="editor-placeholder-icon">❌</div>
-                        <p>Ошибка загрузки</p>
+                        <p>Ошибка загрузки редактора</p>
                     </div>
                 `;
+                isMpgEditorOpen = false;
             }
         };
         script.onerror = function() {
             container.innerHTML = `
                 <div class="editor-placeholder">
                     <div class="editor-placeholder-icon">❌</div>
-                    <p>Не удалось загрузить инструмент</p>
+                    <p>Не удалось загрузить редактор</p>
                 </div>
             `;
+            isMpgEditorOpen = false;
         };
         document.head.appendChild(script);
         return;
     }
     
-    window[initFunctionName]();
+    window.initMpgEditor();
 }
 
 // ============================================
-// ВОЗВРАТ К ПЛИТКАМ (для server_config_editor.js)
+// ОТРИСОВКА СПИСКА ФАЙЛОВ (устаревшее)
 // ============================================
-function backToServerTiles() {
-    const container = document.getElementById('editorContentArea');
-    if (!container) return;
-    
-    // Удаляем кнопку "Назад" если она есть
-    const backBtn = document.querySelector('.server-config-back-btn');
-    if (backBtn) {
-        backBtn.remove();
-    }
-    
-    // Переоткрываем редактор сервера
-    if (currentEditor && EDITORS_CONFIG[currentEditor]) {
-        renderTiles(container, EDITORS_CONFIG[currentEditor]);
-    } else {
-        const serverConfig = EDITORS_CONFIG['server'];
-        if (serverConfig) {
-            renderTiles(container, serverConfig);
-        }
-    }
-}
-
-// ============================================
-// ВОЗВРАТ К ПЛИТКАМ (для mpg_editor.js)
-// ============================================
-function backToTiles() {
-    const container = document.getElementById('editorContentArea');
-    if (!container) return;
-    
-    // Удаляем кнопку "Назад" если она есть
-    const backBtn = document.querySelector('.mpg-back-btn');
-    if (backBtn) {
-        backBtn.remove();
-    }
-    
-    // Переоткрываем редактор
-    if (currentEditor && EDITORS_CONFIG[currentEditor]) {
-        renderTiles(container, EDITORS_CONFIG[currentEditor]);
-    } else {
-        // Или показываем плитки по умолчанию
-        const defaultConfig = EDITORS_CONFIG['mpg'];
-        if (defaultConfig) {
-            renderTiles(container, defaultConfig);
-        }
-    }
-}
-
-// ============================================
-// ВОЗВРАТ К ВЫБОРУ РЕДАКТОРА (для fc_fish_editor.js)
-// ============================================
-function backToEditorSelect() {
-    const container = document.getElementById('editorContentArea');
-    if (!container) return;
-    
-    // Удаляем кнопку "Назад" если она есть
-    const backBtn = document.querySelector('.fc-fish-back-btn');
-    if (backBtn) {
-        backBtn.remove();
-    }
-    
-    // Показываем пустое состояние
+function renderFileList(container, config) {
     container.innerHTML = `
-        <div class="editor-placeholder">
-            <div class="editor-placeholder-icon">📂</div>
-            <p class="editor-placeholder-title">Выберите редактор</p>
-            <p class="editor-placeholder-text">Выберите редактор из выпадающего списка выше</p>
+        <div class="editor-header">
+            <div class="editor-header-info">
+                <span class="editor-header-icon">${config.icon}</span>
+                <div>
+                    <h2 class="editor-header-title">${config.name}</h2>
+                    <p class="editor-header-subtitle">Выберите файл для редактирования</p>
+                </div>
+            </div>
+        </div>
+        <div class="editor-files-grid">
+            ${config.files.map(file => `
+                <div class="editor-file-tile" onclick="openFile('${config.id}', '${file}')">
+                    <div class="editor-file-icon">📄</div>
+                    <div class="editor-file-name">${file}</div>
+                    <div class="editor-file-badge">В разработке</div>
+                </div>
+            `).join('')}
         </div>
     `;
+}
+
+// ============================================
+// ОТРИСОВКА ПЛЕЙСХОЛДЕРА
+// ============================================
+function renderEditorPlaceholder(container, config) {
+    container.innerHTML = `
+        <div class="editor-placeholder">
+            <div class="editor-placeholder-icon">${config.icon}</div>
+            <h2 class="editor-placeholder-title">${config.name}</h2>
+            <p class="editor-placeholder-text">
+                Редактор "${config.name}" находится в разработке.<br>
+                Функционал будет доступен в следующих обновлениях.
+            </p>
+            <div class="editor-placeholder-status">
+                <span class="status-dot"></span>
+                Статус: <span class="status-text">В разработке</span>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================
+// ОТКРЫТЬ ФАЙЛ (устаревшее)
+// ============================================
+function openFile(editorId, fileName) {
+    currentFile = fileName;
+    const config = EDITORS_CONFIG[editorId];
     
-    // Сбрасываем выпадающий список
-    const select = document.getElementById('editorSelect');
-    if (select) {
-        select.value = '';
+    if (typeof notifications !== 'undefined') {
+        notifications.info(`📄 Открыт файл: ${fileName} (в разработке)`);
     }
     
-    currentEditor = null;
+    console.log(`📄 Открыт файл: ${fileName} в редакторе ${config.name}`);
+    
+    const contentArea = document.getElementById('editorContentArea');
+    if (!contentArea) return;
+    
+    contentArea.innerHTML = `
+        <div class="file-editor-placeholder">
+            <div class="file-editor-header">
+                <button class="btn btn-back" onclick="restoreFileList('${editorId}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15,18 9,12 15,6"/>
+                    </svg>
+                    Назад
+                </button>
+                <div class="file-editor-title">
+                    <span class="file-editor-icon">📄</span>
+                    <span>${fileName}</span>
+                </div>
+                <div class="file-editor-status">В разработке</div>
+            </div>
+            <div class="file-editor-body">
+                <div class="file-editor-placeholder-icon">🔨</div>
+                <div class="file-editor-placeholder-text">
+                    <p>Редактор файла <strong>${fileName}</strong> находится в разработке.</p>
+                    <p>Функционал будет доступен в следующих обновлениях.</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================
+// ВОССТАНОВИТЬ СПИСОК ФАЙЛОВ (устаревшее)
+// ============================================
+function restoreFileList(editorId) {
+    const config = EDITORS_CONFIG[editorId];
+    if (!config) return;
+    
+    const contentArea = document.getElementById('editorContentArea');
+    if (!contentArea) return;
+    
+    renderFileList(contentArea, config);
+    currentFile = null;
 }
 
 // ============================================
@@ -465,11 +290,9 @@ function backToEditorSelect() {
 // ============================================
 window.initEditorsPage = initEditorsPage;
 window.openEditor = openEditor;
-window.renderTiles = renderTiles;
-window.openTile = openTile;
-window.backToTiles = backToTiles;
-window.backToServerTiles = backToServerTiles;
-window.backToEditorSelect = backToEditorSelect;
+window.openMpgEditor = openMpgEditor;
 window.populateEditorSelect = populateEditorSelect;
+window.renderFileList = renderFileList;
+window.renderEditorPlaceholder = renderEditorPlaceholder;
 
 console.log('📝 editors.js загружен');
