@@ -250,7 +250,55 @@ const pages = {
                 <!-- Сюда будет подгружаться контент выбранного редактора -->
             </div>
         </div>
-    `
+    `,
+    player: `
+        <div class="player-content-wrapper">
+            <div class="player-header">
+                <h1>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="16" r="3"/>
+                    </svg>
+                    Музыкальный проигрыватель
+                </h1>
+                <p class="player-subtitle">Наслаждайтесь музыкой во время работы с сервером</p>
+            </div>
+            
+            <div class="player-container" id="playerContainer">
+                <div class="player-album-cover">
+                    <div class="player-swiper swiper">
+                        <div class="swiper-wrapper" id="playerSwiperWrapper">
+                            <!-- Слайды будут добавлены через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="player-controls">
+                    <h1 id="playerSongTitle">Title</h1>
+                    <p id="playerArtistName">Song Name</p>
+
+                    <audio id="playerAudio">
+                        <source src="" type="audio/mpeg" />
+                    </audio>
+
+                    <input type="range" value="0" id="playerProgress" />
+
+                    <div class="player-buttons">
+                        <button class="player-btn player-backward" title="Предыдущий трек">
+                            <i class="fa-solid fa-backward"></i>
+                        </button>
+                        <button class="player-btn player-play-pause" title="Воспроизвести/Пауза">
+                            <i class="fa-solid fa-play" id="playerControlIcon"></i>
+                        </button>
+                        <button class="player-btn player-forward" title="Следующий трек">
+                            <i class="fa-solid fa-forward"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
 };
 
 // Текущий активный раздел
@@ -895,3 +943,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
 });
+
+// ============================================
+// СТРАНИЦА МУЗЫКИ
+// ============================================
+if (page === 'player') {
+    let attempts = 0;
+    const maxAttempts = 10;
+    
+    function tryInitPlayer() {
+        attempts++;
+        const container = document.getElementById('playerContainer');
+        
+        if (container) {
+            if (typeof initPlayer === 'function') {
+                initPlayer();
+            }
+            return;
+        }
+        
+        if (attempts < maxAttempts) {
+            setTimeout(tryInitPlayer, 200);
+        } else {
+            console.warn('Не удалось инициализировать страницу музыки');
+        }
+    }
+    
+    setTimeout(tryInitPlayer, 100);
+}
