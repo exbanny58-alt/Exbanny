@@ -1102,3 +1102,248 @@ main{display:grid;grid-template-columns:255px 1fr;width:96vw;height:92vh;margin:
     margin-top: 4px;
 }
 
+/* ============================================
+   TOAST - РАМКА + БЛУР КАК В ОСНОВНОМ
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 400px;
+    min-width: 280px;
+    pointer-events: none;
+}
+
+.toast-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 22px;
+    min-width: 280px;
+    max-width: 400px;
+    border-radius: 14px;
+    
+    /* ТОЛЬКО БЛУР 10px КАК В ОСНОВНОМ */
+    background: transparent;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    
+    border: 1.5px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    
+    color: #ffffff;
+    font-family: "Nunito", sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+    cursor: default;
+}
+
+.toast-item::before,
+.toast-item::after {
+    display: none !important;
+}
+
+.toast-item.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast-item.hiding {
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+}
+
+.toast-item:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   ИКОНКА
+   ============================================ */
+.toast-icon {
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    position: relative;
+    z-index: 2;
+}
+
+/* ============================================
+   ТЕКСТ
+   ============================================ */
+.toast-message {
+    flex: 1;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================================
+   КНОПКА ЗАКРЫТИЯ
+   ============================================ */
+.toast-close {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.3);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    padding: 0;
+    position: relative;
+    z-index: 2;
+    font-size: 0.8rem;
+}
+
+.toast-close:hover {
+    background: rgba(255, 255, 255, 0.10);
+    color: #ffffff;
+    transform: rotate(90deg) scale(1.05);
+}
+
+/* ============================================
+   ЛЕВАЯ ГРАНИЦА (ЦВЕТНАЯ)
+   ============================================ */
+.toast-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 14px 0 0 14px;
+    z-index: 2;
+}
+
+.toast-success .toast-border {
+    background: #4ade80;
+}
+.toast-error .toast-border {
+    background: #f87171;
+}
+.toast-warning .toast-border {
+    background: #fbbf24;
+}
+.toast-info .toast-border {
+    background: #60a5fa;
+}
+
+/* ============================================
+   ЦВЕТ ИКОНКИ
+   ============================================ */
+.toast-success .toast-icon {
+    color: #4ade80;
+}
+.toast-error .toast-icon {
+    color: #f87171;
+}
+.toast-warning .toast-icon {
+    color: #fbbf24;
+}
+.toast-info .toast-icon {
+    color: #60a5fa;
+}
+
+/* ============================================
+   ПРОГРЕСС-БАР
+   ============================================ */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    border-radius: 0 0 0 3px;
+    width: 100%;
+    transform-origin: left;
+    z-index: 2;
+    animation: toastProgress linear forwards;
+}
+
+.toast-success .toast-progress {
+    background: #4ade80;
+}
+.toast-error .toast-progress {
+    background: #f87171;
+}
+.toast-warning .toast-progress {
+    background: #fbbf24;
+}
+.toast-info .toast-progress {
+    background: #60a5fa;
+}
+
+@keyframes toastProgress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+.toast-item:hover .toast-progress {
+    animation-play-state: paused;
+}
+
+/* ============================================
+   АНИМАЦИЯ ПОЯВЛЕНИЯ
+   ============================================ */
+@keyframes toastPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.toast-item.show .toast-icon {
+    animation: toastPulse 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+@media (max-width: 768px) {
+    .toast-container {
+        top: 12px;
+        right: 12px;
+        max-width: calc(100% - 24px);
+        min-width: auto;
+    }
+
+    .toast-item {
+        padding: 14px 16px;
+        font-size: 0.85rem;
+        border-radius: 12px;
+        min-width: auto;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .toast-container {
+        top: 8px;
+        right: 8px;
+        max-width: calc(100% - 16px);
+        gap: 8px;
+    }
+
+    .toast-item {
+        padding: 12px 14px;
+        font-size: 0.8rem;
+        border-radius: 10px;
+        gap: 10px;
+    }
+}

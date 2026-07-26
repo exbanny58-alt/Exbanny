@@ -1,5 +1,5 @@
 // ============================================
-// НАСТРОЙКИ С ИСПОЛЬЗОВАНИЕМ НОВОЙ СИСТЕМЫ УВЕДОМЛЕНИЙ
+// НАСТРОЙКИ С ИСПОЛЬЗОВАНИЕМ НОВОЙ СИСТЕМЫ TOAST
 // ============================================
 
 // Загрузка сохранённых путей из сервера
@@ -13,19 +13,14 @@ async function loadSettings() {
         
         fields.forEach((field, i) => {
             const input = document.getElementById(inputIds[i]);
-            // Проверяем существование элемента
             if (input) {
-                if (data[field] && data[field].trim()) {
-                    input.value = data[field];
-                } else {
-                    input.value = '';
-                }
+                input.value = data[field] && data[field].trim() ? data[field] : '';
             }
         });
     } catch (e) {
         console.error('Ошибка загрузки настроек:', e);
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка загрузки настроек');
+        if (typeof toast !== 'undefined') {
+            toast.error('Ошибка загрузки настроек');
         }
     }
 }
@@ -45,13 +40,11 @@ async function saveField(field, inputId, statusId) {
             statusEl.textContent = 'Укажите путь';
             statusEl.style.color = '#f87171';
         }
-        if (typeof notifications !== 'undefined') {
-            notifications.warning('Укажите путь перед сохранением');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Укажите путь перед сохранением');
         }
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '';
-            }
+            if (statusEl) statusEl.textContent = '';
         }, 2000);
         return;
     }
@@ -59,42 +52,37 @@ async function saveField(field, inputId, statusId) {
     try {
         const response = await fetch('/api/settings');
         const settings = await response.json();
-        
         settings[field] = value;
         
         const saveResponse = await fetch('/api/settings', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(settings)
         });
         
         const result = await saveResponse.json();
-        
         const statusEl = document.getElementById(statusId);
+        
         if (result.success) {
             if (statusEl) {
                 statusEl.textContent = '✓ Сохранено';
                 statusEl.style.color = '#4ade80';
             }
-            if (typeof notifications !== 'undefined') {
-                notifications.success('Настройки сохранены успешно');
+            if (typeof toast !== 'undefined') {
+                toast.success('Настройки сохранены');
             }
         } else {
             if (statusEl) {
                 statusEl.textContent = '❌ Ошибка';
                 statusEl.style.color = '#f87171';
             }
-            if (typeof notifications !== 'undefined') {
-                notifications.error('Ошибка сохранения настроек');
+            if (typeof toast !== 'undefined') {
+                toast.error('Ошибка сохранения');
             }
         }
         
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '';
-            }
+            if (statusEl) statusEl.textContent = '';
         }, 2000);
     } catch (e) {
         const statusEl = document.getElementById(statusId);
@@ -102,13 +90,11 @@ async function saveField(field, inputId, statusId) {
             statusEl.textContent = '❌ Ошибка';
             statusEl.style.color = '#f87171';
         }
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка сохранения: ' + e.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Ошибка: ' + e.message);
         }
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '';
-            }
+            if (statusEl) statusEl.textContent = '';
         }, 2000);
     }
 }
@@ -130,23 +116,21 @@ async function resetField(field, inputId, statusId) {
                 statusEl.textContent = '✓ Сброшено';
                 statusEl.style.color = '#4ade80';
             }
-            if (typeof notifications !== 'undefined') {
-                notifications.success('Поле сброшено');
+            if (typeof toast !== 'undefined') {
+                toast.success('Поле сброшено');
             }
         } else {
             if (statusEl) {
                 statusEl.textContent = '❌ Ошибка';
                 statusEl.style.color = '#f87171';
             }
-            if (typeof notifications !== 'undefined') {
-                notifications.error('Ошибка сброса');
+            if (typeof toast !== 'undefined') {
+                toast.error('Ошибка сброса');
             }
         }
         
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '';
-            }
+            if (statusEl) statusEl.textContent = '';
         }, 2000);
     } catch (e) {
         const statusEl = document.getElementById(statusId);
@@ -154,13 +138,11 @@ async function resetField(field, inputId, statusId) {
             statusEl.textContent = '❌ Ошибка';
             statusEl.style.color = '#f87171';
         }
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка: ' + e.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Ошибка: ' + e.message);
         }
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '';
-            }
+            if (statusEl) statusEl.textContent = '';
         }, 2000);
     }
 }
@@ -171,62 +153,49 @@ async function browseFile(inputId, type = 'file') {
     const field = btn?.dataset.field;
     if (!field) {
         console.error('Не найден field для inputId:', inputId);
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка: не найден параметр');
+        if (typeof toast !== 'undefined') {
+            toast.error('Ошибка: не найден параметр');
         }
         return;
     }
     
-    // Показываем, что процесс начался
     const statusId = `status-${field}`;
     const statusEl = document.getElementById(statusId);
     if (statusEl) {
         statusEl.textContent = '⏳ Открывается диалог...';
         statusEl.style.color = '#60a5fa';
     }
-    if (typeof notifications !== 'undefined') {
-        notifications.info('Открывается диалог выбора...');
+    if (typeof toast !== 'undefined') {
+        toast.info('Открывается диалог выбора...');
     }
     
     try {
         const endpoint = type === 'folder' ? '/api/browse/folder' : '/api/browse/file';
         const response = await fetch(endpoint, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                field: field,
-                inputId: inputId
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ field, inputId })
         });
         
         const result = await response.json();
         
         if (result.success && result.path) {
             const input = document.getElementById(inputId);
-            if (input) {
-                input.value = result.path;
-            }
-            
-            // Автоматически сохраняем после выбора
+            if (input) input.value = result.path;
             await saveField(field, inputId, statusId);
-            
-            if (typeof notifications !== 'undefined') {
-                notifications.success('Путь выбран и сохранён');
+            if (typeof toast !== 'undefined') {
+                toast.success('Путь выбран и сохранён');
             }
-        } else if (!result.success) {
+        } else {
             if (statusEl) {
                 statusEl.textContent = '❌ ' + (result.message || 'Ошибка выбора');
                 statusEl.style.color = '#f87171';
             }
-            if (typeof notifications !== 'undefined') {
-                notifications.error(result.message || 'Ошибка выбора');
+            if (typeof toast !== 'undefined') {
+                toast.error(result.message || 'Ошибка выбора');
             }
             setTimeout(() => {
-                if (statusEl) {
-                    statusEl.textContent = '';
-                }
+                if (statusEl) statusEl.textContent = '';
             }, 3000);
         }
     } catch (e) {
@@ -235,13 +204,11 @@ async function browseFile(inputId, type = 'file') {
             statusEl.textContent = '❌ Ошибка: ' + e.message;
             statusEl.style.color = '#f87171';
         }
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка: ' + e.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Ошибка: ' + e.message);
         }
         setTimeout(() => {
-            if (statusEl) {
-                statusEl.textContent = '';
-            }
+            if (statusEl) statusEl.textContent = '';
         }, 3000);
     }
 }
@@ -250,17 +217,16 @@ async function browseFile(inputId, type = 'file') {
 async function openInExplorer(inputId) {
     const input = document.getElementById(inputId);
     if (!input) {
-        if (typeof notifications !== 'undefined') {
-            notifications.warning('Элемент не найден');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Элемент не найден');
         }
         return;
     }
     
     const path = input.value.trim();
-    
     if (!path) {
-        if (typeof notifications !== 'undefined') {
-            notifications.warning('Сначала выберите путь');
+        if (typeof toast !== 'undefined') {
+            toast.warning('Сначала выберите путь');
         }
         return;
     }
@@ -268,31 +234,29 @@ async function openInExplorer(inputId) {
     try {
         const response = await fetch('/api/open/explorer', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ path: path })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path })
         });
         
         const result = await response.json();
         
         if (result.success) {
-            if (typeof notifications !== 'undefined') {
-                notifications.success(result.message);
+            if (typeof toast !== 'undefined') {
+                toast.success(result.message);
             }
         } else {
-            if (typeof notifications !== 'undefined') {
-                notifications.error(result.message);
+            if (typeof toast !== 'undefined') {
+                toast.error(result.message);
             }
         }
     } catch (e) {
-        if (typeof notifications !== 'undefined') {
-            notifications.error('Ошибка: ' + e.message);
+        if (typeof toast !== 'undefined') {
+            toast.error('Ошибка: ' + e.message);
         }
     }
 }
 
-// Функция для прикрепления обработчиков (вызывается из script.js)
+// Функция для прикрепления обработчиков
 function attachSettingsHandlers() {
     document.querySelectorAll('.save-single-btn').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -328,7 +292,7 @@ function attachSettingsHandlers() {
     });
 }
 
-// Экспортируем для использования в script.js
+// Экспортируем для использования
 window.loadSettings = loadSettings;
 window.attachSettingsHandlers = attachSettingsHandlers;
 window.saveField = saveField;
