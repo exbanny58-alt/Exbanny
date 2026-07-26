@@ -1,1273 +1,1029 @@
 /* ============================================
    ШРИФТЫ
    ============================================ */
-@font-face {
-    font-family: 'Nunito';
-    src: url('/static/webfonts/nunito.woff2') format('woff2');
-    font-weight: 200 1000;
-    font-style: normal;
-}
+@font-face{font-family:'Nunito';src:url('/static/webfonts/nunito.woff2') format('woff2');font-weight:200 1000;font-style:normal}
 
 /* ============================================
    СБРОС СТИЛЕЙ
    ============================================ */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-}
+*,*::before,*::after{box-sizing:border-box;padding:0;margin:0}
 
 /* ============================================
    НАВИГАЦИЯ
    ============================================ */
-nav {
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-}
-
-nav ul,
-nav ul li {
-    outline: 0;
-    list-style: none;
-}
-
-nav ul li a {
-    text-decoration: none;
-}
+nav{user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none}
+nav ul,nav ul li{outline:0;list-style:none}
+nav ul li a{text-decoration:none}
 
 /* ============================================
    BODY - ФОН
    ============================================ */
-body {
-    font-family: "Nunito", sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-image: url('/static/images/fon.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-}
+body{font-family:"Nunito",sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:0;background:url('/static/images/fon.jpg') center/cover no-repeat}
 
 /* ============================================
    ГЛАВНЫЙ КОНТЕЙНЕР (main)
    ============================================ */
-main {
-    display: grid;
-    grid-template-columns: 255px 1fr;
-    
-    width: 96vw;
-    height: 92vh;
-    margin: 4vh auto 4vh;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 0.5px 0 1px rgba(255, 255, 255, 0.23) inset,
-                0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
-                0 4px 16px rgba(0, 0, 0, 0.12);
-    
-    background: rgba(16, 21, 61, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 10;
-    overflow: hidden;
-}
+main{display:grid;grid-template-columns:255px 1fr;width:96vw;height:92vh;margin:4vh auto;border-radius:20px;border:1px solid rgba(255,255,255,.5);box-shadow:0 .5px 0 1px rgba(255,255,255,.23) inset,0 1px 0 0 rgba(255,255,255,.6) inset,0 4px 16px rgba(0,0,0,.12);background:rgba(16,21,61,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:10;overflow:hidden}
 
 /* ============================================
    БОКОВОЕ МЕНЮ
    ============================================ */
-.main-menu {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-right: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 16px 0 20px;
-    overflow: hidden;
-    font-family: inherit;
-    height: 100%;
-}
-
-.menu-top {
-    flex: 1;
-}
-
-.menu-bottom {
-    flex-shrink: 0;
-}
+.main-menu{display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid rgba(255,255,255,.5);padding:16px 0 20px;overflow:hidden;font-family:inherit;height:100%}
+.menu-top{flex:1}
+.menu-bottom{flex-shrink:0}
 
 /* ============================================
    БЛОК МЕНЮ С ОБВОДКОЙ
    ============================================ */
-.menu-block {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    margin: 0 12px 8px 12px;
-    padding: 6px 0;
-    transition: all 0.4s ease;
-    position: relative;
-}
-
-/* Свечение блока при наведении */
-.menu-block:hover {
-    border-color: rgba(167, 139, 250, 0.2);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 30px rgba(167, 139, 250, 0.05);
-}
-
-/* Блок с настройками (нижний) */
-.menu-block-settings {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-    margin: 0 12px;
-    padding: 6px 0;
-    transition: all 0.4s ease;
-}
-
-.menu-block-settings:hover {
-    border-color: rgba(167, 139, 250, 0.15);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-/* Декоративная линия между блоками */
-.menu-divider {
-    height: 1px;
-    margin: 8px 20px;
-    background: linear-gradient(
-        to right,
-        transparent,
-        rgba(255, 255, 255, 0.08),
-        transparent
-    );
-}
-
-.nav-item {
-    display: block;
-    margin: 2px 0;
-}
-
-.nav-item a {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    color: #fff;
-    font-size: 0.95rem;
-    padding: 10px 16px;
-    margin: 0 8px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    position: relative;
-    text-decoration: none;
-    border: 1px solid transparent;
-}
-
-.nav-item a:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(167, 139, 250, 0.25);
-    transform: translateX(3px);
-}
-
-.nav-item a:hover .nav-icon {
-    transform: scale(1.12) rotate(5deg);
-    transition: all 0.3s ease;
-}
-
-/* Активный пункт меню */
-.nav-item.active a {
-    background: rgba(106, 109, 155, 0.25);
-    border: 1px solid rgba(167, 139, 250, 0.35);
-    box-shadow: 0 0 25px rgba(167, 139, 250, 0.08);
-}
-
-.nav-item.active a .nav-icon {
-    color: #a78bfa;
-}
-
-.nav-item.active a .nav-text {
-    color: #a78bfa;
-}
-
-.nav-icon {
-    width: 24px;
-    font-size: 1.2rem;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.nav-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap;
-    color: rgba(255, 255, 255, 0.85);
-}
-
-/* Полоска слева при наведении */
-.nav-item a::before {
-    content: '';
-    position: absolute;
-    left: -1px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 0;
-    background: #a78bfa;
-    border-radius: 0 3px 3px 0;
-    transition: height 0.3s ease;
-}
-
-.nav-item a:hover::before,
-.nav-item.active a::before {
-    height: 60%;
-}
+.menu-block{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;margin:0 12px 8px;padding:6px 0;transition:all .4s ease;position:relative}
+.menu-block:hover{border-color:rgba(167,139,250,.2);background:rgba(255,255,255,.05);box-shadow:0 0 30px rgba(167,139,250,.05)}
+.menu-block-settings{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;margin:0 12px;padding:6px 0;transition:all .4s ease}
+.menu-block-settings:hover{border-color:rgba(167,139,250,.15);background:rgba(255,255,255,.04)}
+.menu-divider{height:1px;margin:8px 20px;background:linear-gradient(to right,transparent,rgba(255,255,255,.08),transparent)}
+.nav-item{display:block;margin:2px 0}
+.nav-item a{display:flex;align-items:center;gap:14px;color:#fff;font-size:.95rem;padding:10px 16px;margin:0 8px;border-radius:10px;transition:all .3s ease;position:relative;text-decoration:none;border:1px solid transparent}
+.nav-item a:hover{background:rgba(255,255,255,.08);border:1px solid rgba(167,139,250,.25);transform:translateX(3px)}
+.nav-item a:hover .nav-icon{transform:scale(1.12) rotate(5deg)}
+.nav-item.active a{background:rgba(106,109,155,.25);border:1px solid rgba(167,139,250,.35);box-shadow:0 0 25px rgba(167,139,250,.08)}
+.nav-item.active a .nav-icon,.nav-item.active a .nav-text{color:#a78bfa}
+.nav-icon{width:24px;font-size:1.2rem;text-align:center;flex-shrink:0}
+.nav-text{font-size:.9rem;font-weight:500;white-space:nowrap;color:rgba(255,255,255,.85)}
+.nav-item a::before{content:'';position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:3px;height:0;background:#a78bfa;border-radius:0 3px 3px 0;transition:height .3s ease}
+.nav-item a:hover::before,.nav-item.active a::before{height:60%}
 
 /* ============================================
    ОСНОВНОЙ КОНТЕНТ
    ============================================ */
-.content {
-    height: 100%;
-    overflow: hidden;
-}
-
-.content-area {
-    padding: 30px 35px;
-    color: #e5e5e5;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-/* Стилизация скроллбара */
-.content-area::-webkit-scrollbar {
-    width: 6px;
-}
-
-.content-area::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.content-area::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.4);
-    border-radius: 10px;
-}
-
-.content-area::-webkit-scrollbar-thumb:hover {
-    background: rgba(167, 139, 250, 0.6);
-}
+.content{height:100%;overflow:hidden}
+.content-area{padding:30px 35px;color:#e5e5e5;height:100%;overflow-y:auto;overflow-x:hidden;transition:all .3s ease;overflow:hidden}
+.content-area::-webkit-scrollbar{width:6px}
+.content-area::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.content-area::-webkit-scrollbar-thumb{background:rgba(167,139,250,.4);border-radius:10px}
+.content-area::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,.6)}
 
 /* ============================================
    НАСТРОЙКИ (внутри контента)
    ============================================ */
-.settings-content-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.settings-header {
-    text-align: center;
-    margin-bottom: 35px;
-}
-
-.settings-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 6px;
-}
-
-.settings-subtitle {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.95rem;
-}
-
-.settings-body {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.settings-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 20px 24px;
-    transition: all 0.3s ease;
-}
-
-.settings-card:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-.settings-card-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 16px;
-}
-
-.settings-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(139, 92, 246, 0.12);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #a78bfa;
-    flex-shrink: 0;
-}
-
-.settings-card-title h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #e2e8f0;
-    margin-bottom: 2px;
-}
-
-.settings-card-title p {
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.input-group {
-    display: flex;
-    gap: 10px;
-}
-
-.settings-input {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #fff;
-    font-size: 0.85rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    cursor: default;
-    transition: border-color 0.3s ease;
-}
-
-.settings-input:focus {
-    border-color: rgba(139, 92, 246, 0.4);
-}
-
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.06);
-    color: #cbd5e1;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.btn-save-row {
-    background: rgba(34, 197, 94, 0.12);
-    color: #4ade80;
-    border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.btn-save-row:hover {
-    background: rgba(34, 197, 94, 0.2);
-}
-
-.btn-reset-row {
-    background: rgba(255, 255, 255, 0.04);
-    color: #94a3b8;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.btn-reset-row:hover {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.input-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-}
-
-.row-status {
-    margin-top: 6px;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
-    min-height: 18px;
-}
+.settings-content-wrapper{max-width:900px;margin:0 auto;height:100%;overflow-y:auto;padding-right:5px}
+.settings-content-wrapper::-webkit-scrollbar{width:6px}
+.settings-content-wrapper::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.settings-content-wrapper::-webkit-scrollbar-thumb{background:rgba(167,139,250,.4);border-radius:10px}
+.settings-content-wrapper::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,.6)}
+.settings-header{text-align:center;margin-bottom:35px}
+.settings-header h1{font-size:2rem;font-weight:700;color:#fff;margin-bottom:6px}
+.settings-subtitle{color:rgba(255,255,255,.5);font-size:.95rem}
+.settings-body{display:flex;flex-direction:column;gap:16px}
+.settings-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px 24px;transition:all .3s ease}
+.settings-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.settings-card-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.settings-icon{width:40px;height:40px;background:rgba(139,92,246,.12);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#a78bfa;flex-shrink:0}
+.settings-card-title h3{font-size:1rem;font-weight:600;color:#e2e8f0;margin-bottom:2px}
+.settings-card-title p{font-size:.82rem;color:rgba(255,255,255,.4)}
+.input-group{display:flex;gap:10px}
+.settings-input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;color:#fff;font-size:.85rem;font-family:"Nunito",sans-serif;outline:none;cursor:default;transition:border-color .3s ease}
+.settings-input:focus{border-color:rgba(139,92,246,.4)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;border:none;transition:all .2s ease}
+.btn-secondary{background:rgba(255,255,255,.06);color:#cbd5e1;border:1px solid rgba(255,255,255,.08)}
+.btn-secondary:hover{background:rgba(255,255,255,.1)}
+.btn-save-row{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.btn-save-row:hover{background:rgba(34,197,94,.2)}
+.btn-reset-row{background:rgba(255,255,255,.04);color:#94a3b8;border:1px solid rgba(255,255,255,.06)}
+.btn-reset-row:hover{background:rgba(255,255,255,.08)}
+.input-actions{display:flex;gap:8px;margin-top:10px}
+.row-status{margin-top:6px;font-size:.75rem;color:rgba(255,255,255,.3);min-height:18px}
 
 /* ============================================
    СТАРТОВАЯ СТРАНИЦА-ЗАГЛУШКА
    ============================================ */
-.start-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    animation: fadeIn 0.6s ease;
-}
-
-.start-content {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.start-logo {
-    font-size: 4rem;
-    color: rgba(167, 139, 250, 0.3);
-    margin-bottom: 20px;
-}
-
-.start-content h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 8px;
-    letter-spacing: 2px;
-}
-
-.start-content p {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.25);
-    margin-bottom: 30px;
-}
-
-/* Анимированные точки */
-.start-hint {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.hint-dot {
-    width: 8px;
-    height: 8px;
-    background: rgba(167, 139, 250, 0.3);
-    border-radius: 50%;
-    animation: dotPulse 1.5s ease-in-out infinite;
-}
-
-.hint-dot:nth-child(1) {
-    animation-delay: 0s;
-}
-
-.hint-dot:nth-child(2) {
-    animation-delay: 0.3s;
-}
-
-.hint-dot:nth-child(3) {
-    animation-delay: 0.6s;
-}
-
-@keyframes dotPulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-    50% {
-        transform: scale(1.5);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+.start-page{display:flex;align-items:center;justify-content:center;height:100%;width:100%;animation:fadeIn .6s ease}
+.start-content{text-align:center;color:rgba(255,255,255,.6)}
+.start-logo{font-size:4rem;color:rgba(167,139,250,.3);margin-bottom:20px}
+.start-content h1{font-size:2.5rem;font-weight:700;color:rgba(255,255,255,.4);margin-bottom:8px;letter-spacing:2px}
+.start-content p{font-size:1rem;color:rgba(255,255,255,.25);margin-bottom:30px}
+.start-hint{display:flex;gap:10px;justify-content:center}
+.hint-dot{width:8px;height:8px;background:rgba(167,139,250,.3);border-radius:50%;animation:dotPulse 1.5s ease-in-out infinite}
+.hint-dot:nth-child(2){animation-delay:.3s}
+.hint-dot:nth-child(3){animation-delay:.6s}
+@keyframes dotPulse{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.5);opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
 /* ============================================
    АНИМАЦИИ ДЛЯ КОНТЕНТА
    ============================================ */
-.content-area {
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-/* Уход ВВЕРХ (когда нажимаем на пункт НИЖЕ) */
-.content-area.slide-up {
-    animation: slideUp 0.3s ease forwards;
-}
-
-/* Уход ВНИЗ (когда нажимаем на пункт ВЫШЕ) */
-.content-area.slide-down {
-    animation: slideDown 0.3s ease forwards;
-}
-
-/* Появление СВЕРХУ (при уходе вниз) */
-.content-area.slide-in-up {
-    animation: slideInUp 0.35s ease forwards;
-}
-
-/* Появление СНИЗУ (при уходе вверх) */
-.content-area.slide-in-down {
-    animation: slideInDown 0.35s ease forwards;
-}
-
-/* Уход вверх - контент уезжает наверх */
-@keyframes slideUp {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-80px);
-    }
-}
-
-/* Уход вниз - контент уезжает вниз */
-@keyframes slideDown {
-    0% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(80px);
-    }
-}
-
-/* Появление сверху (выезжает вниз) */
-@keyframes slideInUp {
-    0% {
-        opacity: 0;
-        transform: translateY(-60px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Появление снизу (выезжает вверх) */
-@keyframes slideInDown {
-    0% {
-        opacity: 0;
-        transform: translateY(60px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ============================================
-   КОНТЕНТ С НАСТРОЙКАМИ - СКРОЛЛ
-   ============================================ */
-.settings-content-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-    height: 100%;           /* ← Добавляем */
-    overflow-y: auto;       /* ← Добавляем скролл */
-    padding-right: 5px;     /* ← Чтобы скролл не наезжал на контент */
-}
-
-/* Стилизация скроллбара для настроек */
-.settings-content-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.settings-content-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.settings-content-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.4);
-    border-radius: 10px;
-}
-
-.settings-content-wrapper::-webkit-scrollbar-thumb:hover {
-    background: rgba(167, 139, 250, 0.6);
-}
-
-/* ============================================
-   УВЕДОМЛЕНИЯ (правый верхний угол)
-   ============================================ */
-
-.notification-container {
-    position: fixed;
-    top: 24px;
-    right: 24px;
-    z-index: 99999;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    max-width: 380px;
-    min-width: 280px;
-    pointer-events: none;
-}
-
-.notification-item {
-    background: rgba(16, 21, 61, 0.55);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 14px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: #fff;
-    font-family: "Nunito", sans-serif;
-    font-size: 0.9rem;
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.1) inset;
-    transform: translateX(calc(100% + 40px));
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    overflow: hidden;
-    pointer-events: auto;
-    cursor: default;
-}
-
-/* Добавляем блик на стекле */
-.notification-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.08) 0%,
-        rgba(255, 255, 255, 0) 100%
-    );
-    border-radius: 14px 14px 0 0;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Второй слой блика для большего эффекта */
-.notification-item::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(
-        circle at 30% 30%,
-        rgba(255, 255, 255, 0.03) 0%,
-        transparent 70%
-    );
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.notification-item:hover::after {
-    opacity: 1;
-}
-
-.notification-item.show {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-.notification-item.hiding {
-    transform: translateX(calc(100% + 40px));
-    opacity: 0;
-}
-
-/* Прогресс-бар с эффектом свечения */
-.notification-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    border-radius: 0 0 0 3px;
-    animation: progressBar linear forwards;
-    animation-play-state: running;
-    width: 100%;
-    transform-origin: left;
-    z-index: 2;
-}
-
-/* Свечение для прогресс-бара */
-.notification-progress::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: 0;
-    right: 0;
-    height: 7px;
-    filter: blur(4px);
-    opacity: 0.5;
-    border-radius: 0 0 0 3px;
-}
-
-@keyframes progressBar {
-    from {
-        transform: scaleX(1);
-    }
-    to {
-        transform: scaleX(0);
-    }
-}
-
-/* Иконка уведомления */
-.notification-icon {
-    flex-shrink: 0;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    position: relative;
-    z-index: 2;
-}
-
-.notification-icon svg {
-    width: 100%;
-    height: 100%;
-    stroke-width: 2.5;
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.1));
-}
-
-/* Цвета для иконок разных типов */
-.notification-success .notification-icon {
-    color: #4ade80;
-}
-
-.notification-success .notification-icon svg {
-    filter: drop-shadow(0 0 12px rgba(74, 222, 128, 0.3));
-}
-
-.notification-success .notification-progress {
-    background: linear-gradient(90deg, #4ade80, #34d399);
-    box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
-}
-
-.notification-success .notification-progress::after {
-    background: linear-gradient(90deg, #4ade80, #34d399);
-}
-
-.notification-error .notification-icon {
-    color: #f87171;
-}
-
-.notification-error .notification-icon svg {
-    filter: drop-shadow(0 0 12px rgba(248, 113, 113, 0.3));
-}
-
-.notification-error .notification-progress {
-    background: linear-gradient(90deg, #f87171, #ef4444);
-    box-shadow: 0 0 12px rgba(248, 113, 113, 0.3);
-}
-
-.notification-error .notification-progress::after {
-    background: linear-gradient(90deg, #f87171, #ef4444);
-}
-
-.notification-warning .notification-icon {
-    color: #fbbf24;
-}
-
-.notification-warning .notification-icon svg {
-    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.3));
-}
-
-.notification-warning .notification-progress {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
-}
-
-.notification-warning .notification-progress::after {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-}
-
-.notification-info .notification-icon {
-    color: #60a5fa;
-}
-
-.notification-info .notification-icon svg {
-    filter: drop-shadow(0 0 12px rgba(96, 165, 250, 0.3));
-}
-
-.notification-info .notification-progress {
-    background: linear-gradient(90deg, #60a5fa, #3b82f6);
-    box-shadow: 0 0 12px rgba(96, 165, 250, 0.3);
-}
-
-.notification-info .notification-progress::after {
-    background: linear-gradient(90deg, #60a5fa, #3b82f6);
-}
-
-/* Текст сообщения */
-.notification-message {
-    flex: 1;
-    line-height: 1.4;
-    color: rgba(255, 255, 255, 0.95);
-    font-weight: 500;
-    position: relative;
-    z-index: 2;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-/* Кнопка закрытия */
-.notification-close {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.4);
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.25s ease;
-    flex-shrink: 0;
-    padding: 0;
-    position: relative;
-    z-index: 2;
-    backdrop-filter: blur(4px);
-}
-
-.notification-close svg {
-    width: 16px;
-    height: 16px;
-    stroke-width: 2.5;
-    transition: transform 0.3s ease;
-}
-
-.notification-close:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    transform: scale(1.05);
-}
-
-.notification-close:hover svg {
-    transform: rotate(90deg);
-}
-
-.notification-close:active {
-    transform: scale(0.95);
-}
-
-/* Анимация пульсации для иконки */
-@keyframes notificationPulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.15);
-    }
-}
-
-.notification-item.show .notification-icon {
-    animation: notificationPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-/* Бордер слева для разных типов (с свечением) */
-.notification-success {
-    border-left: 3px solid rgba(74, 222, 128, 0.6);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
-        0 0 20px rgba(74, 222, 128, 0.05);
-}
-
-.notification-error {
-    border-left: 3px solid rgba(248, 113, 113, 0.6);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
-        0 0 20px rgba(248, 113, 113, 0.05);
-}
-
-.notification-warning {
-    border-left: 3px solid rgba(251, 191, 36, 0.6);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
-        0 0 20px rgba(251, 191, 36, 0.05);
-}
-
-.notification-info {
-    border-left: 3px solid rgba(96, 165, 250, 0.6);
-    box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.5),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.1) inset,
-        0 0 20px rgba(96, 165, 250, 0.05);
-}
-
-/* Эффект парения при наведении */
-.notification-item:hover {
-    transform: translateX(0) translateY(-2px);
-    box-shadow: 
-        0 12px 48px rgba(0, 0, 0, 0.6),
-        0 0 0 1px rgba(255, 255, 255, 0.08) inset,
-        0 1px 0 0 rgba(255, 255, 255, 0.12) inset;
-}
-
-.notification-item:hover .notification-progress {
-    animation-play-state: paused;
-}
-
-/* Медиа-запросы для адаптивности */
-@media (max-width: 768px) {
-    .notification-container {
-        top: 12px;
-        right: 12px;
-        max-width: calc(100% - 24px);
-        min-width: auto;
-        width: calc(100% - 24px);
-    }
-    
-    .notification-item {
-        padding: 14px 16px;
-        font-size: 0.85rem;
-        border-radius: 12px;
-    }
-    
-    .notification-item::before {
-        border-radius: 12px 12px 0 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .notification-container {
-        top: 8px;
-        right: 8px;
-        max-width: calc(100% - 16px);
-        width: calc(100% - 16px);
-        gap: 8px;
-    }
-    
-    .notification-item {
-        padding: 12px 14px;
-        font-size: 0.8rem;
-        border-radius: 10px;
-    }
-    
-    .notification-item::before {
-        border-radius: 10px 10px 0 0;
-    }
-    
-    .notification-icon {
-        width: 20px;
-        height: 20px;
-    }
-    
-    .notification-close {
-        width: 24px;
-        height: 24px;
-    }
-    
-    .notification-close svg {
-        width: 14px;
-        height: 14px;
-    }
-}
+.content-area.slide-up{animation:slideUp .3s ease forwards}
+.content-area.slide-down{animation:slideDown .3s ease forwards}
+.content-area.slide-in-up{animation:slideInUp .35s ease forwards}
+.content-area.slide-in-down{animation:slideInDown .35s ease forwards}
+@keyframes slideUp{to{opacity:0;transform:translateY(-80px)}}
+@keyframes slideDown{to{opacity:0;transform:translateY(80px)}}
+@keyframes slideInUp{from{opacity:0;transform:translateY(-60px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideInDown{from{opacity:0;transform:translateY(60px)}to{opacity:1;transform:translateY(0)}}
 
 /* ============================================
    СТРАНИЦА МОДОВ
    ============================================ */
-.mods-content-wrapper {
-    max-width: 100%;
-    height: 100%;                    /* ← Добавляем */
-    overflow-y: auto;                /* ← Добавляем скролл */
-    padding-right: 8px;              /* ← Отступ для скроллбара */
-    padding-bottom: 20px;
-}
+.mods-content-wrapper{max-width:100%;height:100%;overflow-y:auto;padding-right:8px;padding-bottom:20px}
+.mods-content-wrapper::-webkit-scrollbar{width:6px}
+.mods-content-wrapper::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.mods-content-wrapper::-webkit-scrollbar-thumb{background:rgba(167,139,250,.4);border-radius:10px}
+.mods-content-wrapper::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,.6)}
+.mods-header{text-align:center;margin-bottom:28px}
+.mods-header h1{display:flex;align-items:center;justify-content:center;gap:14px;font-size:2rem;font-weight:700;color:#fff}
+.mods-subtitle{color:rgba(255,255,255,.4);font-size:.95rem;margin-top:4px}
+.mods-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:14px 18px;text-align:center}
+.stat-number{display:block;font-size:1.8rem;font-weight:700;color:#a78bfa;line-height:1.2}
+.stat-label{font-size:.75rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px}
+.mods-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px 16px}
+.mods-filter{margin-left:auto}
+.mods-search{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;color:#fff;font-size:.85rem;font-family:"Nunito",sans-serif;outline:none;width:200px;transition:border-color .3s ease}
+.mods-search:focus{border-color:rgba(139,92,246,.4)}
+.mods-search::placeholder{color:rgba(255,255,255,.2)}
+.mods-list-container{min-height:200px}
+.mod-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 18px;margin-bottom:8px;transition:all .3s ease}
+.mod-item:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+.mod-info{flex:1;min-width:0}
+.mod-name{font-weight:600;color:rgba(255,255,255,.9);font-size:.95rem;display:flex;align-items:center;gap:8px}
+.mod-details{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+.mod-details span{font-size:.7rem;color:rgba(255,255,255,.3)}
+.mod-version{color:rgba(255,255,255,.2)!important}
+.mod-type{padding:1px 8px;border-radius:4px;font-size:.6rem!important;text-transform:uppercase;letter-spacing:.3px}
+.mod-type.workshop{background:rgba(96,165,250,.15);color:#60a5fa!important}
+.mod-type.custom{background:rgba(251,191,36,.15);color:#fbbf24!important}
+.mod-warning{color:#fbbf24!important}
+.mod-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.mod-toggle{position:relative;width:32px;height:18px;cursor:pointer}
+.mod-toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;top:0;left:0;right:0;bottom:0;border-radius:18px;transition:all .3s ease}
+.toggle-slider::before{content:'';position:absolute;height:12px;width:12px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:all .3s ease;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.mod-toggle input:checked+.toggle-slider::before{transform:translateX(14px)}
+.mod-toggle-server .toggle-slider{background:rgba(255,255,255,.08);border:1px solid rgba(251,191,36,.15)}
+.mod-toggle-server input:checked+.toggle-slider{background:rgba(251,191,36,.3);border-color:rgba(251,191,36,.4);box-shadow:0 0 15px rgba(251,191,36,.1)}
+.mod-toggle-server input:checked+.toggle-slider::before{background:#fbbf24}
+.mod-toggle-server-mod .toggle-slider{background:rgba(255,255,255,.08);border:1px solid rgba(96,165,250,.15)}
+.mod-toggle-server-mod input:checked+.toggle-slider{background:rgba(96,165,250,.3);border-color:rgba(96,165,250,.4);box-shadow:0 0 15px rgba(96,165,250,.1)}
+.mod-toggle-server-mod input:checked+.toggle-slider::before{background:#60a5fa}
+.mod-toggle-client .toggle-slider{background:rgba(255,255,255,.08);border:1px solid rgba(74,222,128,.15)}
+.mod-toggle-client input:checked+.toggle-slider{background:rgba(74,222,128,.3);border-color:rgba(74,222,128,.4);box-shadow:0 0 15px rgba(74,222,128,.1)}
+.mod-toggle-client input:checked+.toggle-slider::before{background:#4ade80}
+.toggle-wrapper{display:flex;flex-direction:column;align-items:center;gap:2px}
+.toggle-label{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.toggle-label.server{color:#fbbf24}
+.toggle-label.server-mod{color:#60a5fa}
+.toggle-label.client{color:#4ade80}
+.mods-legend{display:flex;gap:16px;padding:8px 16px;background:rgba(255,255,255,.02);border-radius:8px;margin-bottom:12px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.7rem;color:rgba(255,255,255,.4)}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.legend-dot.server{background:#fbbf24}
+.legend-dot.server-mod{background:#60a5fa}
+.legend-dot.client{background:#4ade80}
+@media(max-width:768px){.mods-stats{grid-template-columns:repeat(2,1fr)}
+.mods-toolbar{flex-direction:column;align-items:stretch}
+.mods-filter{margin-left:0}
+.mods-search{width:100%}
+.mod-item{flex-direction:column;align-items:stretch;gap:10px}
+.mod-actions{justify-content:flex-end;flex-wrap:wrap}
+.toggle-wrapper{flex-direction:row;gap:4px}
+.mod-toggle{width:28px;height:16px}
+.mod-toggle input:checked+.toggle-slider::before{transform:translateX(12px)}
+.toggle-slider::before{height:10px;width:10px;left:2px;bottom:2px}}
+@media(max-width:480px){.mods-stats{grid-template-columns:1fr 1fr;gap:8px}
+.stat-number{font-size:1.4rem}
+.mod-details{gap:8px}}
 
-/* Стилизация скроллбара для модов */
-.mods-content-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
+/* ============================================
+   КНОПКИ ДЛЯ СТРАНИЦЫ МОДОВ
+   ============================================ */
+.btn-primary{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.25);color:#a78bfa;padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;transition:all .3s ease;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-primary:hover{background:rgba(167,139,250,.25);border-color:rgba(167,139,250,.4);color:#c4b5fd;transform:translateY(-1px);box-shadow:0 0 25px rgba(167,139,250,.1)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.btn-primary.loading svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-.mods-content-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
+/* ============================================
+   КНОПКИ ДЛЯ МОДОВ
+   ============================================ */
+.mod-btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;height:38px;padding:4px 8px;border:2px solid rgba(255,255,255,.08);border-radius:8px;background:rgba(255,255,255,.03);color:rgba(255,255,255,.3);cursor:pointer;transition:all .25s ease;font-family:"Nunito",sans-serif;font-weight:600;gap:0;user-select:none;line-height:1}
+.mod-btn .btn-label{font-size:.75rem;font-weight:700;letter-spacing:.5px;transition:all .25s ease}
+.mod-btn .btn-status{font-size:.45rem;font-weight:400;opacity:.5;transition:all .25s ease;letter-spacing:.3px}
+.mod-btn-server{border-color:rgba(251,191,36,.15);color:rgba(251,191,36,.4)}
+.mod-btn-server:hover{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.25);transform:translateY(-1px)}
+.mod-btn-server.active{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.5);color:#fbbf24;box-shadow:0 0 20px rgba(251,191,36,.08)}
+.mod-btn-server.active .btn-status{opacity:1;color:#fbbf24}
+.mod-btn-server-mod{border-color:rgba(96,165,250,.15);color:rgba(96,165,250,.4)}
+.mod-btn-server-mod:hover{background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.25);transform:translateY(-1px)}
+.mod-btn-server-mod.active{background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.5);color:#60a5fa;box-shadow:0 0 20px rgba(96,165,250,.08)}
+.mod-btn-server-mod.active .btn-status{opacity:1;color:#60a5fa}
+.mod-btn-client{border-color:rgba(74,222,128,.15);color:rgba(74,222,128,.4)}
+.mod-btn-client:hover{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.25);transform:translateY(-1px)}
+.mod-btn-client.active{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.5);color:#4ade80;box-shadow:0 0 20px rgba(74,222,128,.08)}
+.mod-btn-client.active .btn-status{opacity:1;color:#4ade80}
+@media(max-width:768px){.mod-btn{min-width:32px;height:32px;padding:3px 6px}
+.mod-btn .btn-label{font-size:.65rem}
+.mod-btn .btn-status{font-size:.4rem}
+.mod-actions{gap:4px}}
+@media(max-width:480px){.mod-btn{min-width:28px;height:28px;padding:2px 4px;border-radius:6px}
+.mod-btn .btn-label{font-size:.55rem}
+.mod-btn .btn-status{font-size:.35rem}}
 
-.mods-content-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.4);
-    border-radius: 10px;
-}
+/* ============================================
+   СТРАНИЦА СЕРВЕРА
+   ============================================ */
+.server-content-wrapper{max-width:100%;height:100%;overflow-y:auto;padding-right:8px;padding-bottom:20px;box-sizing:border-box}
+.server-content-wrapper::-webkit-scrollbar{width:6px}
+.server-content-wrapper::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.server-content-wrapper::-webkit-scrollbar-thumb{background:rgba(167,139,250,.4);border-radius:10px}
+.server-header{text-align:center;margin-bottom:28px}
+.server-header h1{display:flex;align-items:center;justify-content:center;gap:14px;font-size:2rem;font-weight:700;color:#fff}
+.server-subtitle{color:rgba(255,255,255,.3);font-size:.95rem;margin-top:4px}
+.server-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.server-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px 16px}
+.server-filter{margin-left:auto}
+.server-search{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;color:#fff;font-size:.85rem;font-family:"Nunito",sans-serif;outline:none;width:200px;transition:border-color .3s ease}
+.server-search:focus{border-color:rgba(139,92,246,.4)}
+.server-search::placeholder{color:rgba(255,255,255,.2)}
+.server-mods-list-container{min-height:200px}
+.server-mod-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 18px;margin-bottom:8px;transition:all .3s ease}
+.server-mod-item:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+.server-mod-info{flex:1;min-width:0}
+.server-mod-name{font-weight:600;color:rgba(255,255,255,.9);font-size:.95rem;display:flex;align-items:center;gap:8px}
+.server-mod-details{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+.server-mod-details span{font-size:.7rem;color:rgba(255,255,255,.3)}
+.server-mod-version{color:rgba(255,255,255,.2)!important}
+.server-mod-type{padding:1px 8px;border-radius:4px;font-size:.6rem!important;text-transform:uppercase;letter-spacing:.3px}
+.server-mod-type.workshop{background:rgba(96,165,250,.15);color:#60a5fa!important}
+.server-mod-type.custom{background:rgba(251,191,36,.15);color:#fbbf24!important}
+.server-mod-type.unknown{background:rgba(255,255,255,.05);color:rgba(255,255,255,.3)!important}
+.server-mod-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+@media(max-width:768px){.server-stats{grid-template-columns:repeat(3,1fr)}
+.server-toolbar{flex-direction:column;align-items:stretch}
+.server-filter{margin-left:0}
+.server-search{width:100%}
+.server-mod-item{flex-direction:column;align-items:stretch;gap:10px}
+.server-mod-actions{justify-content:flex-end}}
+@media(max-width:480px){.server-stats{grid-template-columns:1fr 1fr}}
+.btn-connect-mod{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.15);color:rgba(74,222,128,.6);padding:4px 12px;border-radius:6px;font-size:.7rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;transition:all .25s ease;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.btn-connect-mod:hover{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.3);color:#4ade80;transform:translateY(-1px)}
+.btn-connect-mod:active{transform:translateY(0)}
+.btn-connect-mod svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
 
-.mods-content-wrapper::-webkit-scrollbar-thumb:hover {
-    background: rgba(167, 139, 250, 0.6);
-}
+/* ============================================
+   СТРАНИЦА ИГРЫ
+   ============================================ */
+.game-content-wrapper{max-width:100%;height:100%;overflow-y:auto;padding-right:8px;padding-bottom:20px;box-sizing:border-box}
+.game-content-wrapper::-webkit-scrollbar{width:6px}
+.game-content-wrapper::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.game-content-wrapper::-webkit-scrollbar-thumb{background:rgba(167,139,250,.4);border-radius:10px}
+.game-header{text-align:center;margin-bottom:28px}
+.game-header h1{display:flex;align-items:center;justify-content:center;gap:14px;font-size:2rem;font-weight:700;color:#fff}
+.game-subtitle{color:rgba(255,255,255,.3);font-size:.95rem;margin-top:4px}
+.game-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px 16px}
+.game-filter{margin-left:auto}
+.game-search{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:8px 14px;color:#fff;font-size:.85rem;font-family:"Nunito",sans-serif;outline:none;width:200px;transition:border-color .3s ease}
+.game-search:focus{border-color:rgba(139,92,246,.4)}
+.game-search::placeholder{color:rgba(255,255,255,.2)}
+.game-mods-list-container{min-height:200px}
+.game-mod-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 18px;margin-bottom:8px;transition:all .3s ease}
+.game-mod-item:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+.game-mod-info{flex:1;min-width:0}
+.game-mod-name{font-weight:600;color:rgba(255,255,255,.9);font-size:.95rem;display:flex;align-items:center;gap:8px}
+.game-mod-details{display:flex;gap:12px;flex-wrap:wrap;margin-top:2px}
+.game-mod-details span{font-size:.7rem;color:rgba(255,255,255,.3)}
+.game-mod-version{color:rgba(255,255,255,.2)!important}
+.game-mod-type{padding:1px 8px;border-radius:4px;font-size:.6rem!important;text-transform:uppercase;letter-spacing:.3px}
+.game-mod-type.workshop{background:rgba(96,165,250,.15);color:#60a5fa!important}
+.game-mod-type.custom{background:rgba(251,191,36,.15);color:#fbbf24!important}
+.game-mod-type.unknown{background:rgba(255,255,255,.05);color:rgba(255,255,255,.3)!important}
+.game-mod-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+@media(max-width:768px){.game-toolbar{flex-direction:column;align-items:stretch}
+.game-filter{margin-left:0}
+.game-search{width:100%}
+.game-mod-item{flex-direction:column;align-items:stretch;gap:10px}
+.game-mod-actions{justify-content:flex-end}}
 
-.mods-header {
-    text-align: center;
-    margin-bottom: 28px;
-}
+/* ============================================
+   ПЛАВАЮЩАЯ КНОПКА КОНСОЛИ
+   ============================================ */
+.console-float-btn{position:fixed;bottom:30px;right:30px;width:56px;height:56px;border-radius:50%;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:#a78bfa;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s ease;z-index:9998;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.console-float-btn:hover{background:rgba(167,139,250,.25);border-color:rgba(167,139,250,.5);transform:scale(1.1);box-shadow:0 4px 30px rgba(167,139,250,.2)}
+.console-float-btn:active{transform:scale(.95)}
+.console-float-btn.active{background:rgba(167,139,250,.3);border-color:rgba(167,139,250,.6);box-shadow:0 0 40px rgba(167,139,250,.3)}
+.console-float-btn svg{width:28px;height:28px;stroke-width:2}
 
-.mods-header h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-}
+/* ============================================
+   ОКНО КОНСОЛИ
+   ============================================ */
+.console-window{position:fixed;bottom:100px;right:30px;width:600px;max-width:calc(100vw - 60px);height:450px;max-height:calc(100vh - 150px);background:rgba(16,21,61,.85);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,.1);border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.6);z-index:9999;display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px) scale(.95);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.console-window.show{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+.console-window.hidden{display:none}
+.console-window-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.console-window-title{display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;color:rgba(255,255,255,.6)}
+.console-window-title svg{stroke:#a78bfa}
+.console-window-actions{display:flex;gap:6px}
+.console-window-actions button{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.3);width:28px;height:28px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
+.console-window-actions button:hover{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.console-clear-btn:hover{color:#fbbf24!important;border-color:rgba(251,191,36,.2)}
+.console-close-btn:hover{color:#f87171!important;border-color:rgba(248,113,113,.2)}
+.console-window-body{flex:1;overflow-y:auto;padding:12px 16px;font-family:'Courier New',monospace;font-size:.8rem;line-height:1.6;background:rgba(0,0,0,.2)}
+.console-window-body::-webkit-scrollbar{width:4px}
+.console-window-body::-webkit-scrollbar-track{background:rgba(255,255,255,.02)}
+.console-window-body::-webkit-scrollbar-thumb{background:rgba(167,139,250,.2);border-radius:10px}
+.console-line{padding:2px 0;color:rgba(255,255,255,.6);border-bottom:1px solid rgba(255,255,255,.02);white-space:pre-wrap;word-break:break-all;font-size:.75rem}
+.console-line.console-info{color:rgba(96,165,250,.6)}
+.console-line.console-success{color:rgba(74,222,128,.6)}
+.console-line.console-warning{color:rgba(251,191,36,.6)}
+.console-line.console-error{color:rgba(248,113,113,.6)}
+.console-line.console-command{color:rgba(167,139,250,.7)}
+.console-line.console-start{color:rgba(96,165,250,.8);font-weight:600}
+.console-line.console-steam{color:rgba(102,192,244,.7)}
+.console-line.console-mission{color:rgba(251,191,36,.7)}
+.console-line.console-economy{color:rgba(251,146,60,.7)}
+.console-line.console-network{color:rgba(74,222,128,.7)}
+.console-line.console-save{color:rgba(74,222,128,.9);font-weight:600;background:rgba(74,222,128,.05);border-radius:4px;padding:2px 8px;margin:2px 0}
+.console-line.console-player_join{color:rgba(74,222,128,.6)}
+.console-line.console-player_leave{color:rgba(248,113,113,.6)}
+.console-line.console-death{color:rgba(248,113,113,.8)}
+.console-line.console-system{color:rgba(167,139,250,.6);font-style:italic}
+.console-window-input{display:flex;gap:8px;padding:10px 16px;border-top:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);flex-shrink:0}
+.console-input-field{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:6px 12px;color:#fff;font-size:.8rem;font-family:'Courier New',monospace;outline:none;transition:border-color .3s ease}
+.console-input-field:focus{border-color:rgba(167,139,250,.3)}
+.console-input-field::placeholder{color:rgba(255,255,255,.15)}
+.console-send-btn{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.2);color:#a78bfa;padding:6px 16px;border-radius:6px;font-size:.75rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;transition:all .3s ease;white-space:nowrap}
+.console-send-btn:hover{background:rgba(167,139,250,.2);border-color:rgba(167,139,250,.35)}
+.console-window-actions .rpt-toggle-btn{font-size:10px!important;font-weight:700!important;letter-spacing:.5px}
+.console-window-actions .rpt-toggle-btn:hover{background:rgba(255,255,255,.08)!important;color:rgba(74,222,128,.8)!important}
+.console-window-actions .rpt-toggle-btn[data-active=true]{color:rgba(74,222,128,.5);border-color:rgba(74,222,128,.15)}
+.console-window-actions .rpt-toggle-btn[data-active=false]{color:rgba(255,255,255,.15);border-color:rgba(255,255,255,.03)}
+.rpt-badge{display:inline-block;font-size:.5rem;font-weight:700;padding:1px 6px;border-radius:4px;background:rgba(74,222,128,.1);color:rgba(74,222,128,.5);border:1px solid rgba(74,222,128,.1);margin-left:6px;vertical-align:middle;text-transform:uppercase;letter-spacing:.3px}
+@media(max-width:768px){.console-window{width:calc(100vw - 24px);max-width:calc(100vw - 24px);right:12px;bottom:80px;height:350px;max-height:calc(100vh - 120px)}
+.console-float-btn{bottom:20px;right:20px;width:48px;height:48px}
+.console-float-btn svg{width:24px;height:24px}}
 
-.mods-subtitle {
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 0.95rem;
-    margin-top: 4px;
-}
+/* ============================================
+   СТАТУС ПОДКЛЮЧЕНИЯ МОДА
+   ============================================ */
+.mod-connected-badge{display:inline-block;font-size:.6rem;font-weight:600;padding:2px 10px;border-radius:10px;background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.2);margin-left:8px;text-transform:uppercase;letter-spacing:.3px}
+.mod-not-connected-badge{display:inline-block;font-size:.6rem;font-weight:600;padding:2px 10px;border-radius:10px;background:rgba(255,255,255,.05);color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.08);margin-left:8px;text-transform:uppercase;letter-spacing:.3px}
+.btn-connect-mod.connected{background:rgba(248,113,113,.08);border-color:rgba(248,113,113,.15);color:rgba(248,113,113,.6)}
+.btn-connect-mod.connected:hover{background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.3);color:#f87171}
+.btn-connect-mod:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
 
-/* Статистика */
-.mods-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-}
+/* ============================================
+   КНОПКА ПОДКЛЮЧИТЬ ВСЕ МОДЫ
+   ============================================ */
+.btn-game-connect-all{background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.2);color:#4ade80;padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;transition:all .3s ease;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-game-connect-all:hover{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.35);color:#6ee7a0;transform:translateY(-1px);box-shadow:0 0 25px rgba(74,222,128,.1)}
+.btn-game-connect-all:active{transform:translateY(0)}
+.btn-game-connect-all.loading svg{animation:spin .8s linear infinite}
+.btn-game-connect-all:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-game-connect-all svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
 
-.stat-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    padding: 14px 18px;
-    text-align: center;
-}
+/* ============================================
+   СТРАНИЦА STEAMCMD
+   ============================================ */
+.steamcmd-content-wrapper{max-width:100%;height:100%;overflow-y:auto;padding-right:8px;padding-bottom:20px;box-sizing:border-box}
+.steamcmd-content-wrapper::-webkit-scrollbar{width:6px}
+.steamcmd-content-wrapper::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.steamcmd-content-wrapper::-webkit-scrollbar-thumb{background:rgba(102,192,244,.4);border-radius:10px}
+.steamcmd-header{text-align:center;margin-bottom:28px}
+.steamcmd-header h1{display:flex;align-items:center;justify-content:center;gap:14px;font-size:2rem;font-weight:700;color:#fff}
+.steamcmd-subtitle{color:rgba(255,255,255,.3);font-size:.95rem;margin-top:4px}
+.steamcmd-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px 16px}
+.steamcmd-console{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.steamcmd-console-header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.5);font-size:.85rem;font-weight:500}
+.steamcmd-console-body{padding:12px 16px;font-family:'Courier New',monospace;font-size:.75rem;line-height:1.6;max-height:300px;overflow-y:auto;color:rgba(255,255,255,.6)}
+.steamcmd-console-body::-webkit-scrollbar{width:4px}
+.steamcmd-console-body::-webkit-scrollbar-track{background:rgba(255,255,255,.02)}
+.steamcmd-console-body::-webkit-scrollbar-thumb{background:rgba(102,192,244,.2);border-radius:10px}
+.steamcmd-console-body .console-line{padding:2px 0;color:rgba(255,255,255,.6);border-bottom:1px solid rgba(255,255,255,.02);white-space:pre-wrap;word-break:break-all}
+.steamcmd-console-body .console-line.steamcmd-info{color:rgba(102,192,244,.6)}
+.steamcmd-console-body .console-line.steamcmd-success{color:rgba(74,222,128,.6)}
+.steamcmd-console-body .console-line.steamcmd-error{color:rgba(248,113,113,.6)}
+.steamcmd-console-body .console-line.steamcmd-warning{color:rgba(251,191,36,.6)}
+.steamcmd-info{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.info-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.info-label{font-size:.8rem;color:rgba(255,255,255,.3)}
+.info-value{font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7)}
+@media(max-width:768px){.steamcmd-toolbar{flex-direction:column;align-items:stretch}
+.steamcmd-info{grid-template-columns:1fr}}
 
-.stat-number {
-    display: block;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #a78bfa;
-    line-height: 1.2;
-}
+/* ============================================
+   МОДАЛЬНОЕ ОКНО ДЛЯ НИКА
+   ============================================ */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease}
+.modal-overlay.show{opacity:1}
+.modal-content{background:rgba(16,21,61,.95);border:1px solid rgba(255,255,255,.1);border-radius:16px;max-width:450px;width:90%;box-shadow:0 8px 40px rgba(0,0,0,.6);transform:scale(.9) translateY(20px);transition:all .3s cubic-bezier(.34,1.56,.64,1);overflow:hidden}
+.modal-overlay.show .modal-content{transform:scale(1) translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+.modal-header h3{display:flex;align-items:center;gap:10px;font-size:1.1rem;font-weight:600;color:#fff;margin:0}
+.modal-header h3 svg{stroke:#a78bfa}
+.modal-close{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.3);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s ease}
+.modal-close:hover{background:rgba(255,255,255,.08);color:#f87171;border-color:rgba(248,113,113,.2)}
+.modal-body{padding:20px 24px}
+.modal-hint{font-size:.85rem;color:rgba(255,255,255,.4);margin-bottom:16px}
+.modal-input-group{position:relative}
+.modal-input-group label{display:block;font-size:.75rem;font-weight:500;color:rgba(255,255,255,.5);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.modal-input{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;color:#fff;font-size:1rem;font-family:"Nunito",sans-serif;outline:none;transition:border-color .3s ease;box-sizing:border-box}
+.modal-input:focus{border-color:rgba(139,92,246,.4)}
+.modal-input::placeholder{color:rgba(255,255,255,.15)}
+.modal-char-count{position:absolute;bottom:10px;right:14px;font-size:.65rem;color:rgba(255,255,255,.2);pointer-events:none}
+.modal-errors{margin-top:12px;font-size:.85rem;padding:8px 12px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.15);border-radius:8px;color:#f87171}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02)}
+.modal-footer .btn{padding:8px 20px;font-size:.85rem}
+.modal-footer .btn-primary{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.25);color:#a78bfa}
+.modal-footer .btn-primary:hover{background:rgba(167,139,250,.25);border-color:rgba(167,139,250,.4)}
+.modal-footer .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-nickname{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);color:rgba(167,139,250,.7);padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;transition:all .3s ease;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-nickname:hover{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.3);color:#c4b5fd;transform:translateY(-1px)}
+.btn-nickname svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.btn-nickname #currentNicknameDisplay{font-weight:600;color:#a78bfa}
+@media(max-width:480px){.modal-content{max-width:100%;width:95%;margin:10px;border-radius:12px}
+.modal-header{padding:14px 16px}
+.modal-body{padding:16px}
+.modal-footer{padding:12px 16px;flex-wrap:wrap}
+.modal-footer .btn{flex:1;justify-content:center}
+.btn-nickname{font-size:.7rem;padding:6px 12px}}
 
-.stat-label {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+/* ============================================
+   СТРАНИЦА РЕДАКТОРОВ
+   ============================================ */
+.editors-content-wrapper{max-width:100%;height:100%;overflow-y:auto;padding-right:8px;padding-bottom:20px;box-sizing:border-box}
+.editors-content-wrapper::-webkit-scrollbar{width:6px}
+.editors-content-wrapper::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.editors-content-wrapper::-webkit-scrollbar-thumb{background:rgba(96,165,250,.4);border-radius:10px}
+.editors-header{text-align:center;margin-bottom:28px}
+.editors-header h1{display:flex;align-items:center;justify-content:center;gap:14px;font-size:2rem;font-weight:700;color:#fff}
+.editors-subtitle{color:rgba(255,255,255,.3);font-size:.95rem;margin-top:4px}
+.editors-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:24px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:16px 20px}
+.editor-select-wrapper{display:flex;align-items:center;gap:12px;flex-wrap:wrap;width:100%}
+.editor-select-label{font-size:.85rem;font-weight:500;color:rgba(255,255,255,.5);white-space:nowrap}
+.editor-select{flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;color:#fff;font-size:.9rem;font-family:"Nunito",sans-serif;outline:none;cursor:pointer;transition:border-color .3s ease;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+.editor-select:focus{border-color:rgba(96,165,250,.4)}
+.editor-select option{background:rgba(16,21,61,.95);color:#fff;padding:8px}
+#openEditorBtn:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.editors-info-panel{display:flex;align-items:flex-start;gap:14px;background:rgba(96,165,250,.04);border:1px solid rgba(96,165,250,.08);border-radius:12px;padding:16px 20px;margin-bottom:24px}
+.info-panel-icon{font-size:1.4rem;line-height:1.4;flex-shrink:0}
+.info-panel-text{font-size:.85rem;color:rgba(255,255,255,.5);line-height:1.5}
+.info-panel-text strong{color:rgba(255,255,255,.7)}
+.editor-content-area{margin-top:12px}
+.editor-header{margin-bottom:20px}
+.editor-header-info{display:flex;align-items:center;gap:16px}
+.editor-header-icon{font-size:2.2rem;line-height:1}
+.editor-header-title{font-size:1.3rem;font-weight:600;color:rgba(255,255,255,.8);margin:0}
+.editor-header-subtitle{font-size:.85rem;color:rgba(255,255,255,.3);margin:0}
+.editor-files-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.editor-file-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px 16px;cursor:pointer;transition:all .3s ease;min-height:120px;position:relative}
+.editor-file-tile:hover{background:rgba(255,255,255,.06);border-color:rgba(96,165,250,.2);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.editor-file-tile:active{transform:scale(.97)}
+.editor-file-icon{font-size:2rem;margin-bottom:8px;line-height:1}
+.editor-file-name{font-size:.85rem;font-weight:500;color:rgba(255,255,255,.7);font-family:'Courier New',monospace}
+.editor-file-badge{position:absolute;top:8px;right:10px;font-size:.5rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:2px 10px;border-radius:10px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.15)}
+.editor-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px 30px;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);border-radius:16px;min-height:250px}
+.editor-placeholder-icon{font-size:3.5rem;margin-bottom:16px;opacity:.6}
+.editor-placeholder-title{font-size:1.4rem;font-weight:600;color:rgba(255,255,255,.7);margin:0 0 8px 0}
+.editor-placeholder-text{font-size:.95rem;color:rgba(255,255,255,.3);line-height:1.6;max-width:450px;margin:0 0 20px 0}
+.editor-placeholder-status{display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(255,255,255,.25);padding:6px 16px;border-radius:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.04)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#fbbf24;animation:pulse-dot 1.5s ease-in-out infinite}
+.status-text{color:#fbbf24;font-weight:500}
+@keyframes pulse-dot{50%{opacity:1;transform:scale(1.2)}}
+.file-editor-placeholder{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden}
+.file-editor-header{display:flex;align-items:center;gap:16px;padding:16px 20px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06)}
+.btn-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.6);padding:6px 14px;border-radius:6px;font-size:.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s ease;font-family:"Nunito",sans-serif}
+.btn-back:hover{background:rgba(255,255,255,.1);color:#fff}
+.file-editor-title{flex:1;display:flex;align-items:center;gap:10px;font-size:1rem;font-weight:600;color:rgba(255,255,255,.8)}
+.file-editor-icon{font-size:1.4rem}
+.file-editor-status{font-size:.7rem;font-weight:600;padding:4px 14px;border-radius:12px;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.15);text-transform:uppercase;letter-spacing:.5px}
+.file-editor-body{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 30px;min-height:200px;text-align:center;gap:16px}
+.file-editor-placeholder-icon{font-size:3rem;opacity:.4}
+.file-editor-placeholder-text p{margin:4px 0;color:rgba(255,255,255,.3);font-size:.95rem}
+.file-editor-placeholder-text strong{color:rgba(255,255,255,.5)}
+@media(max-width:768px){.editor-select-wrapper{flex-direction:column;align-items:stretch}
+.editor-select-label{margin-bottom:4px}
+.editor-select{min-width:auto;width:100%}
+.editors-header h1{font-size:1.6rem}
+.editor-files-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+.editor-file-tile{min-height:100px;padding:16px 12px}
+.editor-file-icon{font-size:1.6rem}
+.editor-file-name{font-size:.75rem}
+.file-editor-header{flex-wrap:wrap;gap:10px}
+.file-editor-title{order:3;flex-basis:100%;justify-content:center}}
+@media(max-width:480px){.editors-header h1{font-size:1.3rem}
+.editors-header h1 svg{width:24px;height:24px}
+.editor-files-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+.editor-file-tile{min-height:80px;padding:12px 8px;border-radius:8px}
+.editor-file-icon{font-size:1.3rem;margin-bottom:4px}
+.editor-file-name{font-size:.65rem}
+.editor-file-badge{font-size:.4rem;padding:1px 6px;top:4px;right:6px}
+.file-editor-body{padding:30px 20px;min-height:150px}
+.file-editor-placeholder-icon{font-size:2.2rem}
+.file-editor-placeholder-text p{font-size:.8rem}}
 
-/* Панель управления */
-.mods-toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px 16px;
-}
+/* ============================================
+   ДОПОЛНИТЕЛЬНЫЕ БЕЙДЖИ
+   ============================================ */
+.server-type-badge{display:inline-block;font-size:.55rem;font-weight:600;padding:2px 8px;border-radius:4px;margin-left:6px;letter-spacing:.3px}
+.server-type-badge.server{background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.15)}
+.server-type-badge.server-mod{background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.15)}
+.server-type-badge.both{background:rgba(251,191,36,.08);color:#fbbf24;border:1px solid rgba(251,191,36,.1)}
 
-.mods-filter {
-    margin-left: auto;
-}
+/* ============================================
+   КНОПКА ОЧИСТКИ
+   ============================================ */
+.btn-danger{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.2);color:#f87171;padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:500;font-family:"Nunito",sans-serif;cursor:pointer;transition:all .3s ease;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-danger:hover{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.35);color:#fca5a5;transform:translateY(-1px);box-shadow:0 0 25px rgba(248,113,113,.1)}
+.btn-danger:active{transform:translateY(0)}
+.btn-danger.loading{opacity:.6;cursor:not-allowed;pointer-events:none}
+.btn-danger:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+.btn-danger svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
 
-.mods-search {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 8px 14px;
-    color: #fff;
-    font-size: 0.85rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    width: 200px;
-    transition: border-color 0.3s ease;
-}
+/* ============================================
+   МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОЧИСТКИ
+   ============================================ */
+.clear-confirm-modal .modal-content.modal-confirm{max-width:480px;border:1px solid rgba(248,113,113,.2)}
+.modal-confirm-header{border-bottom:1px solid rgba(248,113,113,.1);background:rgba(248,113,113,.03);padding:20px 24px 16px 24px;display:flex;align-items:center;gap:14px}
+.modal-confirm-icon{font-size:2rem;line-height:1;animation:shake .5s ease-in-out}
+@keyframes shake{20%{transform:rotate(-15deg)}40%{transform:rotate(15deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(10deg)}}
+.modal-confirm-header h3{font-size:1.2rem;font-weight:700;color:#fff;margin:0;letter-spacing:.5px}
+.modal-confirm-body{padding:24px}
+.modal-confirm-text{font-size:1rem;color:rgba(255,255,255,.8);margin:0 0 20px 0;font-weight:500}
+.modal-confirm-details{display:flex;flex-direction:column;gap:10px}
+.confirm-detail-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.04);font-size:.85rem;color:rgba(255,255,255,.6);transition:all .2s ease}
+.confirm-detail-item:hover{background:rgba(255,255,255,.05)}
+.confirm-detail-icon{font-size:1.1rem;flex-shrink:0;width:24px;text-align:center}
+.confirm-detail-item strong{color:rgba(255,255,255,.8)}
+.confirm-detail-warning{border-color:rgba(248,113,113,.15);background:rgba(248,113,113,.04)}
+.confirm-detail-warning .confirm-detail-icon{animation:pulse-warning 1.5s ease-in-out infinite}
+@keyframes pulse-warning{50%{transform:scale(1.2)}}
+.confirm-detail-warning strong{color:#f87171}
+.modal-confirm-footer{padding:16px 24px 20px 24px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:flex-end;gap:10px;background:rgba(255,255,255,.01)}
+.modal-confirm-footer .btn{padding:10px 24px;font-size:.85rem;font-weight:600}
+.modal-confirm-footer .btn-secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.modal-confirm-footer .btn-secondary:hover{background:rgba(255,255,255,.08);color:#fff}
+.modal-confirm-footer .btn-danger{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.25);color:#f87171}
+.modal-confirm-footer .btn-danger:hover{background:rgba(248,113,113,.25);border-color:rgba(248,113,113,.4);color:#fca5a5;transform:translateY(-1px);box-shadow:0 0 30px rgba(248,113,113,.1)}
+.modal-confirm-footer .btn-danger:active{transform:translateY(0)}
+.modal-confirm-footer .btn-danger svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+.clear-confirm-modal .modal-content{transform:scale(.9) translateY(30px) rotate(-2deg);transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.clear-confirm-modal.show .modal-content{transform:scale(1) translateY(0) rotate(0)}
+.modal-confirm-footer .btn-danger{position:relative;overflow:hidden}
+.modal-confirm-footer .btn-danger::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center,rgba(248,113,113,.05) 0,transparent 70%);opacity:0;transition:opacity .4s ease}
+.modal-confirm-footer .btn-danger:hover::before{opacity:1}
+@media(max-width:480px){.clear-confirm-modal .modal-content.modal-confirm{max-width:100%;width:95%;margin:10px;border-radius:12px}
+.modal-confirm-header{padding:16px 18px}
+.modal-confirm-header h3{font-size:1rem}
+.modal-confirm-icon{font-size:1.6rem}
+.modal-confirm-body{padding:18px}
+.modal-confirm-text{font-size:.9rem}
+.confirm-detail-item{font-size:.75rem;padding:8px 12px}
+.modal-confirm-footer{padding:12px 18px 16px 18px;flex-direction:column-reverse}
+.modal-confirm-footer .btn{width:100%;justify-content:center;padding:10px}}
 
-.mods-search:focus {
-    border-color: rgba(139, 92, 246, 0.4);
-}
+/* ============================================
+   ПЛАВАЮЩАЯ КНОПКА "НАЗАД"
+   ============================================ */
+.mpg-back-btn{position:fixed!important;bottom:18px!important;left:290px!important;z-index:99999!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;padding:12px 20px!important;margin:0!important;background:rgba(16,21,61,.85)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:12px!important;color:rgba(255,255,255,.8)!important;font-family:"Nunito",sans-serif!important;font-size:.9rem!important;font-weight:600!important;cursor:pointer!important;transition:all .3s cubic-bezier(.34,1.56,.64,1)!important;box-shadow:0 4px 24px rgba(0,0,0,.4)!important;text-decoration:none!important;user-select:none!important;pointer-events:auto!important}
+.mpg-back-btn *{padding:0!important;margin:0!important}
+.mpg-back-btn:hover{transform:translateY(-3px) scale(1.02)!important;background:rgba(16,21,61,.95)!important;border-color:rgba(167,139,250,.3)!important;box-shadow:0 8px 40px rgba(167,139,250,.15)!important;color:#fff!important}
+.mpg-back-btn:active{transform:scale(.97)!important}
+.mpg-back-btn svg{stroke:#a78bfa!important;transition:transform .3s ease!important;flex-shrink:0!important;width:20px!important;height:20px!important}
+.mpg-back-btn:hover svg{transform:translateX(-4px)!important}
+.mpg-back-btn span{white-space:nowrap!important}
+.mpg-back-btn::before{content:'';position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;border-radius:14px;background:linear-gradient(135deg,rgba(167,139,250,.1),transparent,rgba(167,139,250,.1));opacity:0;transition:opacity .4s ease;z-index:-1}
+.mpg-back-btn:hover::before{opacity:1}
+@media(max-width:768px){.mpg-back-btn{bottom:20px!important;left:20px!important;padding:10px 16px!important;font-size:.8rem!important;border-radius:10px!important;gap:8px!important}
+.mpg-back-btn svg{width:18px!important;height:18px!important}}
+@media(max-width:480px){.mpg-back-btn{bottom:16px!important;left:16px!important;padding:8px 14px!important;font-size:.7rem!important;border-radius:8px!important;gap:6px!important}
+.mpg-back-btn svg{width:16px!important;height:16px!important}
+.mpg-back-btn span{font-size:.7rem!important}}
 
-.mods-search::placeholder {
-    color: rgba(255, 255, 255, 0.2);
-}
+/* ============================================
+   MPG EDITOR - ПОЛНЫЙ СТИЛЬ
+   ============================================ */
+.editor-tile-wrapper{display:flex;align-items:center;justify-content:center;height:100%;padding:20px}
+.editor-tile{display:flex;align-items:center;gap:24px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:30px 40px;cursor:pointer;transition:all .3s ease;max-width:500px;width:100%;position:relative;overflow:hidden}
+.editor-tile:hover{background:rgba(255,255,255,.06);border-color:rgba(167,139,250,.25);transform:translateY(-3px);box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.editor-tile-icon{font-size:3.5rem;line-height:1;flex-shrink:0}
+.editor-tile-content{flex:1}
+.editor-tile-title{font-size:1.3rem;font-weight:700;color:rgba(255,255,255,.9);margin:0 0 4px 0}
+.editor-tile-description{font-size:.85rem;color:rgba(255,255,255,.4);margin:0 0 10px 0}
+.editor-tile-badge{display:inline-block;font-size:.6rem;font-weight:600;padding:3px 12px;border-radius:12px;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.15);text-transform:uppercase;letter-spacing:.5px}
+.editor-tile-arrow{color:rgba(255,255,255,.15);transition:all .3s ease;flex-shrink:0}
+.editor-tile:hover .editor-tile-arrow{color:rgba(167,139,250,.4);transform:translateX(4px)}
+.editor-tile::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 30%,rgba(167,139,250,.03) 0,transparent 70%);opacity:0;transition:opacity .4s ease;pointer-events:none}
+.editor-tile:hover::before{opacity:1}
+@media(max-width:768px){.editor-tile{flex-direction:column;text-align:center;padding:24px 20px;gap:16px}
+.editor-tile-icon{font-size:2.8rem}
+.editor-tile-title{font-size:1.1rem}
+.editor-tile-arrow{display:none}}
+@media(max-width:480px){.editor-tile{padding:20px 16px}
+.editor-tile-icon{font-size:2.2rem}
+.editor-tile-title{font-size:1rem}
+.editor-tile-description{font-size:.75rem}}
 
-/* Список модов */
-.mods-list-container {
-    min-height: 200px;
-}
+.mpg-editor{height:100%;display:flex;flex-direction:column;gap:16px;padding:4px 0}
+.mpg-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.mpg-header-info{display:flex;align-items:center;gap:14px}
+.mpg-header-icon{display:flex;align-items:center;justify-content:center;width:40px;height:40px;background:rgba(167,139,250,.1);border-radius:10px;color:#a78bfa;flex-shrink:0}
+.mpg-header-icon svg{width:24px;height:24px;stroke:#a78bfa;stroke-width:2;fill:none}
+.mpg-header-title{font-size:1.2rem;font-weight:600;color:rgba(255,255,255,.9);margin:0}
+.mpg-header-subtitle{font-size:.8rem;color:rgba(255,255,255,.35);margin:0}
+.mpg-header-actions{display:flex;gap:8px;flex-shrink:0}
+.mpg-header-actions .btn{padding:8px 16px;font-size:.8rem}
+@media(max-width:768px){.mpg-header{flex-direction:column;align-items:stretch}
+.mpg-header-actions{width:100%;justify-content:stretch}
+.mpg-header-actions .btn{flex:1;justify-content:center}}
+@media(max-width:480px){.mpg-header-title{font-size:1rem}
+.mpg-header-icon{font-size:1.5rem}}
 
-.mod-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 12px 18px;
-    margin-bottom: 8px;
-    transition: all 0.3s ease;
-}
+.mpg-status-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.05);font-size:.8rem;flex-shrink:0}
+.mpg-status{color:rgba(255,255,255,.6);font-weight:500;display:flex;align-items:center;gap:6px}
+.mpg-status.dirty{color:#fbbf24}
+.mpg-status.saving{color:#60a5fa}
+.mpg-status.saved{color:#4ade80}
+.mpg-status.error{color:#f87171}
+.mpg-status svg{stroke:#4ade80;flex-shrink:0}
+.mpg-status.dirty svg{stroke:#fbbf24}
+.mpg-status.error svg{stroke:#f87171}
+.mpg-status.saving svg{stroke:#60a5fa}
+.mpg-path{color:rgba(255,255,255,.2);font-size:.7rem;font-family:'Courier New',monospace;max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:768px){.mpg-status-bar{flex-direction:column;gap:4px;align-items:flex-start}
+.mpg-path{max-width:100%;font-size:.65rem}}
 
-.mod-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-}
+.mpg-tabs{display:flex;gap:6px;padding:6px;background:rgba(255,255,255,.03);border-radius:12px;border:1px solid rgba(255,255,255,.06);flex-shrink:0;margin-bottom:16px}
+.mpg-tab{flex:1;padding:10px 18px;border:none;border-radius:8px;background:transparent;color:rgba(255,255,255,.35);font-family:"Nunito",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.mpg-tab:hover{color:rgba(255,255,255,.6);background:rgba(255,255,255,.04)}
+.mpg-tab.active{background:rgba(167,139,250,.15);color:#c4b5fd;border:1px solid rgba(167,139,250,.15)}
+.mpg-tab .mpg-tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;font-size:.55rem;font-weight:700;background:rgba(255,255,255,.05);color:rgba(255,255,255,.2);transition:all .3s ease}
+.mpg-tab.active .mpg-tab-count{background:rgba(167,139,250,.12);color:#a78bfa}
+@media(max-width:768px){.mpg-tabs{flex-wrap:wrap;gap:4px;padding:4px;border-radius:10px}
+.mpg-tab{flex:1 1 calc(33.33% - 4px);font-size:.7rem;padding:8px 10px;gap:4px;border-radius:6px}
+.mpg-tab .mpg-tab-count{min-width:16px;height:16px;font-size:.5rem}}
+@media(max-width:480px){.mpg-tab{font-size:.6rem;padding:6px 6px;gap:2px}
+.mpg-tabs{gap:2px;padding:3px;border-radius:8px;margin-bottom:10px}
+.mpg-tab .mpg-tab-count{min-width:14px;height:14px;font-size:.45rem;padding:0 4px}}
 
-.mod-info {
-    flex: 1;
-    min-width: 0;
-}
+.mpg-tab-content{display:none;flex:1;min-height:0}
+.mpg-tab-content.active{display:grid!important;grid-template-columns:280px 1fr;gap:16px;height:100%}
+.mpg-tab-content .mpg-sidebar{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;min-height:200px;max-height:100%}
+.mpg-tab-content .mpg-editor-panel{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:200px;max-height:100%}
+.mpg-tab-content .mpg-sidebar-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.mpg-tab-content .mpg-sidebar-header h3{font-size:.8rem;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin:0}
+.mpg-tab-content .mpg-points-list{flex:1;overflow-y:auto;padding:8px}
+.mpg-tab-content .mpg-points-list::-webkit-scrollbar{width:4px}
+.mpg-tab-content .mpg-points-list::-webkit-scrollbar-thumb{background:rgba(167,139,250,.3);border-radius:10px}
+.mpg-point-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;cursor:pointer;transition:all .2s ease;margin-bottom:2px;border:1px solid transparent}
+.mpg-point-item:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.05)}
+.mpg-point-item.active{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2)}
+.mpg-point-item.active .mpg-point-id{background:rgba(167,139,250,.2);color:#a78bfa}
+.mpg-point-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.mpg-point-id{font-size:.6rem;font-weight:700;color:rgba(255,255,255,.2);background:rgba(255,255,255,.05);padding:2px 8px;border-radius:4px;flex-shrink:0}
+.mpg-point-title{font-size:.85rem;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.mpg-point-status{font-size:.7rem;margin:0 6px;flex-shrink:0}
+.mpg-point-entity-count{font-size:.55rem;color:rgba(255,255,255,.15);background:rgba(255,255,255,.03);padding:1px 8px;border-radius:10px;margin-left:4px}
+.mpg-point-actions{display:flex;gap:4px;flex-shrink:0}
+.mpg-point-delete{background:none;border:none;color:rgba(255,255,255,.1);cursor:pointer;padding:4px;border-radius:4px;transition:all .2s ease;display:flex;align-items:center;justify-content:center}
+.mpg-point-delete:hover{color:#f87171;background:rgba(248,113,113,.1)}
+.mpg-empty-list{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;color:rgba(255,255,255,.3);height:100%}
+.mpg-empty-list .mpg-empty-icon{font-size:2.5rem;margin-bottom:12px}
+.mpg-empty-list p{margin:0 0 12px 0;font-size:.9rem}
+.mpg-tab-content .mpg-editor-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,.3);padding:40px;text-align:center}
+.mpg-tab-content .mpg-editor-empty .mpg-empty-icon{font-size:3rem;margin-bottom:16px}
+.mpg-tab-content .mpg-editor-empty p{font-size:1rem;margin:0}
+.mpg-tab-content .mpg-editor-empty .mpg-empty-hint{font-size:.8rem;color:rgba(255,255,255,.15);margin-top:4px}
+.mpg-tab-content .mpg-editor-content{flex:1;overflow-y:auto;padding:16px 20px}
+.mpg-tab-content .mpg-editor-content::-webkit-scrollbar{width:4px}
+.mpg-tab-content .mpg-editor-content::-webkit-scrollbar-thumb{background:rgba(167,139,250,.3);border-radius:10px}
+.mpg-loading{display:flex;align-items:center;justify-content:center;padding:40px 20px;color:rgba(255,255,255,.3);font-size:.85rem;gap:12px;height:100%}
+.mpg-loading .spinner{width:24px;height:24px;border:2px solid rgba(255,255,255,.05);border-top-color:rgba(167,139,250,.5);border-radius:50%;animation:spin .8s linear infinite}
+@media(max-width:1024px){.mpg-tab-content.active{grid-template-columns:1fr;gap:12px;height:auto}
+.mpg-tab-content .mpg-sidebar{max-height:250px;flex-shrink:0;min-height:150px}
+.mpg-tab-content .mpg-editor-panel{min-height:350px;max-height:500px}}
+@media(max-width:768px){.mpg-tab-content .mpg-editor-content{padding:12px 14px}}
+@media(max-width:480px){.mpg-tab-content .mpg-editor-content{padding:10px 12px}}
 
-.mod-name {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+.mpg-tab-content#mpgTabConfig.active{display:block!important}
+.mpg-tab-content#mpgTabConfig .mpg-config-panel{display:flex;flex-direction:column;gap:16px;height:100%;overflow-y:auto;padding-right:4px}
+.mpg-tab-content#mpgTabConfig .mpg-config-panel::-webkit-scrollbar{width:4px}
+.mpg-tab-content#mpgTabConfig .mpg-config-panel::-webkit-scrollbar-thumb{background:rgba(167,139,250,.3);border-radius:10px}
+.mpg-config-section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:16px 20px}
+.mpg-config-section h4{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin:0 0 14px 0;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.mpg-config-files-list,.mpg-config-admins-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;min-height:40px}
+.mpg-config-file-item,.mpg-config-admin-item{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:.8rem;color:rgba(255,255,255,.7);transition:all .2s ease}
+.mpg-config-file-item:hover,.mpg-config-admin-item:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+.mpg-config-file-remove,.mpg-config-admin-remove{background:none;border:none;color:rgba(255,255,255,.15);cursor:pointer;padding:2px;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
+.mpg-config-file-remove:hover,.mpg-config-admin-remove:hover{color:#f87171;background:rgba(248,113,113,.1)}
+.mpg-config-add-file,.mpg-config-add-admin{display:flex;gap:8px}
+.mpg-config-add-file .mpg-input,.mpg-config-add-admin .mpg-input{flex:1}
+@media(max-width:768px){.mpg-config-add-file,.mpg-config-add-admin{flex-direction:column}
+.mpg-config-add-file .btn,.mpg-config-add-admin .btn{width:100%;justify-content:center}
+.mpg-config-file-item,.mpg-config-admin-item{width:100%;justify-content:space-between}}
+@media(max-width:480px){.mpg-config-section{padding:12px 14px}
+.mpg-config-file-item,.mpg-config-admin-item{font-size:.7rem;padding:4px 10px}}
 
-.mod-details {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 2px;
-}
+.mpg-editor-form{display:flex;flex-direction:column;gap:20px}
+.mpg-form-section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:16px 20px}
+.mpg-form-section h4{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;margin:0 0 14px 0;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.04)}
+.mpg-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.mpg-form-row:last-child{margin-bottom:0}
+.mpg-form-group{display:flex;flex-direction:column;gap:4px}
+.mpg-form-group label{font-size:.7rem;font-weight:500;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.3px}
+.mpg-form-group-full{grid-column:1/-1}
+.mpg-input,.mpg-select,.mpg-textarea{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 14px;color:#e5e5e5;font-size:.85rem;font-family:"Nunito",sans-serif;outline:none;transition:all .3s ease;box-sizing:border-box}
+.mpg-input:hover,.mpg-select:hover,.mpg-textarea:hover{border-color:rgba(255,255,255,.12)}
+.mpg-input:focus,.mpg-select:focus,.mpg-textarea:focus{border-color:rgba(167,139,250,.4);background:rgba(255,255,255,.06);box-shadow:0 0 0 3px rgba(167,139,250,.05)}
+.mpg-input::placeholder,.mpg-textarea::placeholder{color:rgba(255,255,255,.15)}
+.mpg-textarea{min-height:80px;resize:vertical;font-size:.8rem;line-height:1.5}
+.mpg-textarea-large{min-height:120px}
+.mpg-select{cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+.mpg-select option{background:rgba(16,21,61,.95);color:#e5e5e5;padding:8px}
+.mpg-select-multiple{background-image:none;padding-right:14px;min-height:60px}
+.mpg-tag-list{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0;min-height:42px;margin-bottom:6px}
+.mpg-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 12px;background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.12);border-radius:6px;font-size:.75rem;color:rgba(255,255,255,.8);transition:all .2s ease}
+.mpg-tag:hover{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.2)}
+.mpg-tag-remove{cursor:pointer;color:rgba(255,255,255,.25);font-size:1.1rem;line-height:1;transition:color .2s ease;padding:0 2px}
+.mpg-tag-remove:hover{color:#f87171}
+.mpg-add-entity{display:flex;gap:8px}
+.mpg-add-entity .mpg-select{flex:1}
+.mpg-add-entity .btn-sm{flex-shrink:0;padding:8px 12px}
+.btn-sm{padding:6px 12px;font-size:.7rem;border-radius:6px}
+.btn-sm svg{width:14px;height:14px}
 
-.mod-details span {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.3);
-}
+.mpg-confirm-modal .modal-content.modal-confirm{max-width:480px;border:1px solid rgba(248,113,113,.2)}
+.mpg-confirm-modal .modal-confirm-header{border-bottom:1px solid rgba(248,113,113,.1);background:rgba(248,113,113,.03);padding:20px 24px 16px 24px;display:flex;align-items:center;gap:14px}
+.mpg-confirm-modal .modal-confirm-icon{font-size:2rem;line-height:1;animation:shake .5s ease-in-out}
+.mpg-confirm-modal .modal-confirm-header h3{font-size:1.2rem;font-weight:700;color:#fff;margin:0;letter-spacing:.5px}
+.mpg-confirm-modal .modal-confirm-body{padding:24px}
+.mpg-confirm-modal .modal-confirm-text{font-size:1rem;color:rgba(255,255,255,.8);margin:0;line-height:1.6}
+.mpg-confirm-modal .modal-confirm-text strong{color:rgba(255,255,255,.95)}
+.mpg-confirm-modal .modal-confirm-footer{padding:16px 24px 20px 24px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:flex-end;gap:10px;background:rgba(255,255,255,.01)}
+.mpg-confirm-modal .modal-confirm-footer .btn{padding:10px 24px;font-size:.85rem;font-weight:600}
+.mpg-confirm-modal .modal-confirm-footer .btn-secondary{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.mpg-confirm-modal .modal-confirm-footer .btn-secondary:hover{background:rgba(255,255,255,.08);color:#fff}
+.mpg-confirm-modal .modal-confirm-footer .btn-danger{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.25);color:#f87171}
+.mpg-confirm-modal .modal-confirm-footer .btn-danger:hover{background:rgba(248,113,113,.25);border-color:rgba(248,113,113,.4);color:#fca5a5;transform:translateY(-1px);box-shadow:0 0 30px rgba(248,113,113,.1)}
+.mpg-confirm-modal .modal-confirm-footer .btn-danger svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
+@media(max-width:480px){.mpg-confirm-modal .modal-content.modal-confirm{max-width:100%;width:95%;margin:10px;border-radius:12px}
+.mpg-confirm-modal .modal-confirm-header{padding:16px 18px}
+.mpg-confirm-modal .modal-confirm-header h3{font-size:1rem}
+.mpg-confirm-modal .modal-confirm-icon{font-size:1.6rem}
+.mpg-confirm-modal .modal-confirm-body{padding:18px}
+.mpg-confirm-modal .modal-confirm-text{font-size:.9rem}
+.mpg-confirm-modal .modal-confirm-footer{padding:12px 18px 16px 18px;flex-direction:column-reverse}
+.mpg-confirm-modal .modal-confirm-footer .btn{width:100%;justify-content:center;padding:10px}}
+.mpg-confirm-modal .modal-content{transform:scale(.9) translateY(30px) rotate(-2deg);transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.mpg-confirm-modal.show .modal-content{transform:scale(1) translateY(0) rotate(0)}
 
-.mod-version {
-    color: rgba(255, 255, 255, 0.2) !important;
-}
+/* ============================================
+   ОБЩИЙ СКРОЛЛ
+   ============================================ */
+.content-area>div{height:100%;overflow-y:auto;padding-right:8px}
+.content-area>div::-webkit-scrollbar{width:6px}
+.content-area>div::-webkit-scrollbar-track{background:rgba(255,255,255,.05);border-radius:10px}
+.content-area>div::-webkit-scrollbar-thumb{background:rgba(167,139,250,.4);border-radius:10px}
+.content-area>div::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,.6)}
+#startPage{overflow:hidden!important}
 
-.mod-type {
-    padding: 1px 8px;
-    border-radius: 4px;
-    font-size: 0.6rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
+/* ============================================
+   КНОПКИ ОТКРЫТИЯ РАСПОЛОЖЕНИЯ МОДОВ
+   ============================================ */
 
-.mod-type.workshop {
-    background: rgba(96, 165, 250, 0.15);
-    color: #60a5fa !important;
-}
-
-.mod-type.custom {
-    background: rgba(251, 191, 36, 0.15);
-    color: #fbbf24 !important;
-}
-
-.mod-warning {
-    color: #fbbf24 !important;
-}
-
-.mod-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-/* Toggle switch */
-.mod-toggle {
-    position: relative;
-    width: 40px;
-    height: 22px;
-    cursor: pointer;
-}
-
-.mod-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 22px;
-    transition: all 0.3s ease;
-}
-
-.toggle-slider::before {
-    content: '';
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    left: 3px;
-    bottom: 3px;
-    background: #fff;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.mod-toggle input:checked + .toggle-slider {
-    background: rgba(74, 222, 128, 0.4);
-}
-
-.mod-toggle input:checked + .toggle-slider::before {
-    transform: translateX(18px);
-}
-
+/* Основная кнопка "Открыть папку" */
 .btn-mod-folder {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.3);
-    width: 30px;
-    height: 30px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(167, 139, 250, 0.08);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 8px;
+    color: rgba(167, 139, 250, 0.7);
+    font-family: "Nunito", sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-decoration: none;
+    user-select: none;
 }
 
 .btn-mod-folder:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.5);
+    background: rgba(167, 139, 250, 0.15);
+    border-color: rgba(167, 139, 250, 0.3);
+    color: #c4b5fd;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(167, 139, 250, 0.1);
 }
 
-/* Пустое состояние */
+.btn-mod-folder:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn-mod-folder svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.btn-mod-folder:hover svg {
+    transform: scale(1.1);
+}
+
+/* Компактная версия (для списка модов) */
+.btn-mod-folder-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+}
+
+.btn-mod-folder-sm:hover {
+    background: rgba(167, 139, 250, 0.1);
+    border-color: rgba(167, 139, 250, 0.2);
+    color: #a78bfa;
+    transform: translateY(-1px);
+}
+
+.btn-mod-folder-sm:active {
+    transform: scale(0.95);
+}
+
+.btn-mod-folder-sm svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+}
+
+/* Кнопка "Открыть все папки модов" (в тулбаре) */
+.btn-open-all-mods {
+    background: rgba(167, 139, 250, 0.08);
+    border: 1px solid rgba(167, 139, 250, 0.12);
+    color: rgba(167, 139, 250, 0.6);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    font-family: "Nunito", sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.btn-open-all-mods:hover {
+    background: rgba(167, 139, 250, 0.15);
+    border-color: rgba(167, 139, 250, 0.25);
+    color: #a78bfa;
+    transform: translateY(-1px);
+}
+
+.btn-open-all-mods:active {
+    transform: scale(0.97);
+}
+
+.btn-open-all-mods svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    flex-shrink: 0;
+}
+
+/* Кнопка открытия папки для серверных модов */
+.btn-server-folder {
+    background: rgba(251, 191, 36, 0.06);
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    color: rgba(251, 191, 36, 0.5);
+}
+
+.btn-server-folder:hover {
+    background: rgba(251, 191, 36, 0.12);
+    border-color: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+/* Кнопка открытия папки для клиентских модов (игра) */
+.btn-game-folder {
+    background: rgba(74, 222, 128, 0.06);
+    border: 1px solid rgba(74, 222, 128, 0.1);
+    color: rgba(74, 222, 128, 0.5);
+}
+
+.btn-game-folder:hover {
+    background: rgba(74, 222, 128, 0.12);
+    border-color: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+
+/* ============================================
+   ИКОНКА ПАПКИ В СПИСКЕ МОДОВ
+   ============================================ */
+.mod-folder-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border-radius: 4px;
+    background: transparent;
+    border: none;
+}
+
+.mod-folder-icon:hover {
+    color: #a78bfa;
+    background: rgba(167, 139, 250, 0.08);
+}
+
+.mod-folder-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* ============================================
+   АДАПТИВ
+   ============================================ */
+@media (max-width: 768px) {
+    .btn-mod-folder {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+    }
+    
+    .btn-mod-folder svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .btn-mod-folder-sm {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .btn-mod-folder-sm svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .btn-open-all-mods {
+        padding: 4px 10px;
+        font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-mod-folder {
+        padding: 4px 10px;
+        font-size: 0.65rem;
+        gap: 4px;
+    }
+    
+    .btn-mod-folder svg {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .btn-mod-folder-sm {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .btn-mod-folder-sm svg {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* ============================================
+   ПУСТЫЕ СОСТОЯНИЯ (из старого CSS)
+   ============================================ */
+
+/* Пустое состояние для модов */
 .empty-mods {
     text-align: center;
     padding: 50px 20px;
@@ -1284,3991 +1040,65 @@ main {
     margin-top: 4px;
 }
 
-/* Адаптив */
-@media (max-width: 768px) {
-    .mods-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .mods-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .mods-filter {
-        margin-left: 0;
-    }
-    
-    .mods-search {
-        width: 100%;
-    }
-    
-    .mod-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .mod-actions {
-        justify-content: flex-end;
-    }
+/* Пустое состояние для сервера */
+.server-empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: rgba(255, 255, 255, 0.3);
 }
 
-@media (max-width: 480px) {
-    .mods-stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-    }
-    
-    .stat-number {
-        font-size: 1.4rem;
-    }
-    
-    .mod-details {
-        gap: 8px;
-    }
-}
-
-/* ============================================
-   ОБЩИЙ СКРОЛЛ ДЛЯ ВСЕХ СТРАНИЦ
-   ============================================ */
-
-/* Контейнер контента */
-.content-area {
-    padding: 30px 35px;
-    color: #e5e5e5;
-    height: 100%;
-    overflow: hidden;  /* Оставляем hidden, скролл внутри страниц */
-}
-
-/* Все страницы внутри контента */
-.content-area > div {
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
-}
-
-/* Стилизация скроллбара для всех страниц */
-.content-area > div::-webkit-scrollbar {
-    width: 6px;
-}
-
-.content-area > div::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.content-area > div::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.4);
-    border-radius: 10px;
-}
-
-.content-area > div::-webkit-scrollbar-thumb:hover {
-    background: rgba(167, 139, 250, 0.6);
-}
-
-/* Стартовая страница - без скролла */
-#startPage {
-    overflow: hidden !important;
-}
-
-/* ============================================
-   ТРИ ТУМБЛЕРА ДЛЯ МОДОВ
-   ============================================ */
-
-.mod-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.toggle-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-}
-
-.toggle-label {
-    font-size: 0.55rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.toggle-label.server {
-    color: #fbbf24;
-}
-
-.toggle-label.server-mod {
-    color: #60a5fa;
-}
-
-.toggle-label.client {
-    color: #4ade80;
-}
-
-/* Базовый тумблер */
-.mod-toggle {
-    position: relative;
-    width: 32px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.mod-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 18px;
-    transition: all 0.3s ease;
-}
-
-.toggle-slider::before {
-    content: '';
-    position: absolute;
-    height: 12px;
-    width: 12px;
-    left: 3px;
-    bottom: 3px;
-    background: #fff;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.mod-toggle input:checked + .toggle-slider::before {
-    transform: translateX(14px);
-}
-
-/* SERVER - жёлтый */
-.mod-toggle-server .toggle-slider {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(251, 191, 36, 0.15);
-}
-
-.mod-toggle-server input:checked + .toggle-slider {
-    background: rgba(251, 191, 36, 0.3);
-    border-color: rgba(251, 191, 36, 0.4);
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.1);
-}
-
-.mod-toggle-server input:checked + .toggle-slider::before {
-    background: #fbbf24;
-}
-
-/* SERVER_MOD - синий */
-.mod-toggle-server-mod .toggle-slider {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(96, 165, 250, 0.15);
-}
-
-.mod-toggle-server-mod input:checked + .toggle-slider {
-    background: rgba(96, 165, 250, 0.3);
-    border-color: rgba(96, 165, 250, 0.4);
-    box-shadow: 0 0 15px rgba(96, 165, 250, 0.1);
-}
-
-.mod-toggle-server-mod input:checked + .toggle-slider::before {
-    background: #60a5fa;
-}
-
-/* CLIENT - зелёный */
-.mod-toggle-client .toggle-slider {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(74, 222, 128, 0.15);
-}
-
-.mod-toggle-client input:checked + .toggle-slider {
-    background: rgba(74, 222, 128, 0.3);
-    border-color: rgba(74, 222, 128, 0.4);
-    box-shadow: 0 0 15px rgba(74, 222, 128, 0.1);
-}
-
-.mod-toggle-client input:checked + .toggle-slider::before {
-    background: #4ade80;
-}
-
-/* Легенда тумблеров */
-.mods-legend {
-    display: flex;
-    gap: 16px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
+.server-empty-state .empty-icon {
+    font-size: 3rem;
     margin-bottom: 12px;
-    flex-wrap: wrap;
 }
 
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-
-.legend-dot.server {
-    background: #fbbf24;
-}
-
-.legend-dot.server-mod {
-    background: #60a5fa;
-}
-
-.legend-dot.client {
-    background: #4ade80;
-}
-
-/* Адаптив */
-@media (max-width: 768px) {
-    .mod-actions {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-    
-    .toggle-wrapper {
-        flex-direction: row;
-        gap: 4px;
-    }
-    
-    .mod-toggle {
-        width: 28px;
-        height: 16px;
-    }
-    
-    .mod-toggle input:checked + .toggle-slider::before {
-        transform: translateX(12px);
-    }
-    
-    .toggle-slider::before {
-        height: 10px;
-        width: 10px;
-        left: 2px;
-        bottom: 2px;
-    }
-}
-
-/* ============================================
-   КНОПКИ ДЛЯ СТРАНИЦЫ МОДОВ
-   ============================================ */
-
-.btn-primary {
-    background: rgba(167, 139, 250, 0.15);
-    border: 1px solid rgba(167, 139, 250, 0.25);
-    color: #a78bfa;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.btn-primary:hover {
-    background: rgba(167, 139, 250, 0.25);
-    border-color: rgba(167, 139, 250, 0.4);
-    color: #c4b5fd;
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px rgba(167, 139, 250, 0.1);
-}
-
-.btn-primary:active {
-    transform: translateY(0px);
-}
-
-.btn-primary svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    flex-shrink: 0;
-}
-
-.btn-primary.loading svg {
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* ============================================
-   КНОПКИ ДЛЯ МОДОВ (вместо тумблеров)
-   ============================================ */
-
-.mod-actions {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-/* Базовый стиль кнопки мода */
-.mod-btn {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 38px;
-    height: 38px;
-    padding: 4px 8px;
-    border: 2px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    color: rgba(255, 255, 255, 0.3);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    font-family: "Nunito", sans-serif;
-    font-weight: 600;
-    gap: 0px;
-    user-select: none;
-    line-height: 1;
-}
-
-.mod-btn .btn-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    transition: all 0.25s ease;
-}
-
-.mod-btn .btn-status {
-    font-size: 0.45rem;
-    font-weight: 400;
-    opacity: 0.5;
-    transition: all 0.25s ease;
-    letter-spacing: 0.3px;
-}
-
-/* Серверная кнопка (жёлтая) */
-.mod-btn-server {
-    border-color: rgba(251, 191, 36, 0.15);
-    color: rgba(251, 191, 36, 0.4);
-}
-
-.mod-btn-server:hover {
-    background: rgba(251, 191, 36, 0.08);
-    border-color: rgba(251, 191, 36, 0.25);
-    transform: translateY(-1px);
-}
-
-.mod-btn-server.active {
-    background: rgba(251, 191, 36, 0.15);
-    border-color: rgba(251, 191, 36, 0.5);
-    color: #fbbf24;
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.08);
-}
-
-.mod-btn-server.active .btn-status {
-    opacity: 1;
-    color: #fbbf24;
-}
-
-/* Мод сервера кнопка (синяя) */
-.mod-btn-server-mod {
-    border-color: rgba(96, 165, 250, 0.15);
-    color: rgba(96, 165, 250, 0.4);
-}
-
-.mod-btn-server-mod:hover {
-    background: rgba(96, 165, 250, 0.08);
-    border-color: rgba(96, 165, 250, 0.25);
-    transform: translateY(-1px);
-}
-
-.mod-btn-server-mod.active {
-    background: rgba(96, 165, 250, 0.15);
-    border-color: rgba(96, 165, 250, 0.5);
-    color: #60a5fa;
-    box-shadow: 0 0 20px rgba(96, 165, 250, 0.08);
-}
-
-.mod-btn-server-mod.active .btn-status {
-    opacity: 1;
-    color: #60a5fa;
-}
-
-/* Клиентская кнопка (зелёная) */
-.mod-btn-client {
-    border-color: rgba(74, 222, 128, 0.15);
-    color: rgba(74, 222, 128, 0.4);
-}
-
-.mod-btn-client:hover {
-    background: rgba(74, 222, 128, 0.08);
-    border-color: rgba(74, 222, 128, 0.25);
-    transform: translateY(-1px);
-}
-
-.mod-btn-client.active {
-    background: rgba(74, 222, 128, 0.15);
-    border-color: rgba(74, 222, 128, 0.5);
-    color: #4ade80;
-    box-shadow: 0 0 20px rgba(74, 222, 128, 0.08);
-}
-
-.mod-btn-client.active .btn-status {
-    opacity: 1;
-    color: #4ade80;
-}
-
-/* Легенда для кнопок (обновлённая) */
-.mods-legend {
-    display: flex;
-    gap: 16px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 8px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-}
-
-.legend-dot.server {
-    background: #fbbf24;
-}
-
-.legend-dot.server-mod {
-    background: #60a5fa;
-}
-
-.legend-dot.client {
-    background: #4ade80;
-}
-
-/* Адаптив для кнопок */
-@media (max-width: 768px) {
-    .mod-btn {
-        min-width: 32px;
-        height: 32px;
-        padding: 3px 6px;
-    }
-    
-    .mod-btn .btn-label {
-        font-size: 0.65rem;
-    }
-    
-    .mod-btn .btn-status {
-        font-size: 0.4rem;
-    }
-    
-    .mod-actions {
-        gap: 4px;
-    }
-}
-
-@media (max-width: 480px) {
-    .mod-btn {
-        min-width: 28px;
-        height: 28px;
-        padding: 2px 4px;
-        border-radius: 6px;
-    }
-    
-    .mod-btn .btn-label {
-        font-size: 0.55rem;
-    }
-    
-    .mod-btn .btn-status {
-        font-size: 0.35rem;
-    }
-}
-
-/* ============================================
-   СТРАНИЦА СЕРВЕРА
-   ============================================ */
-.server-content-wrapper {
-    max-width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
-    padding-bottom: 20px;
-    box-sizing: border-box;
-}
-
-.server-content-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.server-content-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.server-content-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.4);
-    border-radius: 10px;
-}
-
-.server-header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
-.server-header h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.server-subtitle {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 0.95rem;
-    margin-top: 4px;
-}
-
-/* Статистика */
-.server-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-/* Панель управления */
-.server-toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px 16px;
-}
-
-.server-filter {
-    margin-left: auto;
-}
-
-.server-search {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 8px 14px;
-    color: #fff;
-    font-size: 0.85rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    width: 200px;
-    transition: border-color 0.3s ease;
-}
-
-.server-search:focus {
-    border-color: rgba(139, 92, 246, 0.4);
-}
-
-.server-search::placeholder {
-    color: rgba(255, 255, 255, 0.2);
-}
-
-/* Список серверных модов */
-.server-mods-list-container {
-    min-height: 200px;
-}
-
-.server-mod-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 12px 18px;
-    margin-bottom: 8px;
-    transition: all 0.3s ease;
-}
-
-.server-mod-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.server-mod-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.server-mod-name {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.server-mod-details {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 2px;
-}
-
-.server-mod-details span {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.server-mod-version {
-    color: rgba(255, 255, 255, 0.2) !important;
-}
-
-.server-mod-type {
-    padding: 1px 8px;
-    border-radius: 4px;
-    font-size: 0.6rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.server-mod-type.workshop {
-    background: rgba(96, 165, 250, 0.15);
-    color: #60a5fa !important;
-}
-
-.server-mod-type.custom {
-    background: rgba(251, 191, 36, 0.15);
-    color: #fbbf24 !important;
-}
-
-.server-mod-type.unknown {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.3) !important;
-}
-
-.server-mod-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-/* Адаптив */
-@media (max-width: 768px) {
-    .server-stats {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .server-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .server-filter {
-        margin-left: 0;
-    }
-    
-    .server-search {
-        width: 100%;
-    }
-    
-    .server-mod-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .server-mod-actions {
-        justify-content: flex-end;
-    }
-}
-
-@media (max-width: 480px) {
-    .server-stats {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-/* Кнопка подключения мода */
-.btn-connect-mod {
-    background: rgba(74, 222, 128, 0.08);
-    border: 1px solid rgba(74, 222, 128, 0.15);
-    color: rgba(74, 222, 128, 0.6);
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-}
-
-.btn-connect-mod:hover {
-    background: rgba(74, 222, 128, 0.15);
-    border-color: rgba(74, 222, 128, 0.3);
-    color: #4ade80;
-    transform: translateY(-1px);
-}
-
-.btn-connect-mod:active {
-    transform: translateY(0px);
-}
-
-.btn-connect-mod svg {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-}
-
-/* ============================================
-   СТРАНИЦА ИГРЫ
-   ============================================ */
-.game-content-wrapper {
-    max-width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
-    padding-bottom: 20px;
-    box-sizing: border-box;
-}
-
-.game-content-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.game-content-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.game-content-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.4);
-    border-radius: 10px;
-}
-
-.game-header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
-.game-header h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.game-subtitle {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 0.95rem;
-    margin-top: 4px;
-}
-
-/* Панель управления */
-.game-toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px 16px;
-}
-
-.game-filter {
-    margin-left: auto;
-}
-
-.game-search {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 8px 14px;
-    color: #fff;
-    font-size: 0.85rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    width: 200px;
-    transition: border-color 0.3s ease;
-}
-
-.game-search:focus {
-    border-color: rgba(139, 92, 246, 0.4);
-}
-
-.game-search::placeholder {
-    color: rgba(255, 255, 255, 0.2);
-}
-
-/* Список клиентских модов */
-.game-mods-list-container {
-    min-height: 200px;
-}
-
-.game-mod-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 12px 18px;
-    margin-bottom: 8px;
-    transition: all 0.3s ease;
-}
-
-.game-mod-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.game-mod-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.game-mod-name {
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.game-mod-details {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 2px;
-}
-
-.game-mod-details span {
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.game-mod-version {
-    color: rgba(255, 255, 255, 0.2) !important;
-}
-
-.game-mod-type {
-    padding: 1px 8px;
-    border-radius: 4px;
-    font-size: 0.6rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.game-mod-type.workshop {
-    background: rgba(96, 165, 250, 0.15);
-    color: #60a5fa !important;
-}
-
-.game-mod-type.custom {
-    background: rgba(251, 191, 36, 0.15);
-    color: #fbbf24 !important;
-}
-
-.game-mod-type.unknown {
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.3) !important;
-}
-
-.game-mod-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-
-/* Адаптив */
-@media (max-width: 768px) {
-    .game-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .game-filter {
-        margin-left: 0;
-    }
-    
-    .game-search {
-        width: 100%;
-    }
-    
-    .game-mod-item {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .game-mod-actions {
-        justify-content: flex-end;
-    }
-}
-
-/* ============================================
-   ПЛАВАЮЩАЯ КНОПКА КОНСОЛИ
-   ============================================ */
-.console-float-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: rgba(167, 139, 250, 0.15);
-    border: 1px solid rgba(167, 139, 250, 0.3);
-    color: #a78bfa;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    z-index: 9998;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.console-float-btn:hover {
-    background: rgba(167, 139, 250, 0.25);
-    border-color: rgba(167, 139, 250, 0.5);
-    transform: scale(1.1);
-    box-shadow: 0 4px 30px rgba(167, 139, 250, 0.2);
-}
-
-.console-float-btn:active {
-    transform: scale(0.95);
-}
-
-.console-float-btn.active {
-    background: rgba(167, 139, 250, 0.3);
-    border-color: rgba(167, 139, 250, 0.6);
-    box-shadow: 0 0 40px rgba(167, 139, 250, 0.3);
-}
-
-.console-float-btn svg {
-    width: 28px;
-    height: 28px;
-    stroke-width: 2;
-}
-
-/* ============================================
-   ОКНО КОНСОЛИ
-   ============================================ */
-.console-window {
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
-    width: 600px;
-    max-width: calc(100vw - 60px);
-    height: 450px;
-    max-height: calc(100vh - 150px);
-    background: rgba(16, 21, 61, 0.85);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: translateY(20px) scale(0.95);
-    opacity: 0;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    pointer-events: none;
-}
-
-.console-window.show {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.console-window.hidden {
-    display: none;
-}
-
-/* Заголовок консоли */
-.console-window-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    flex-shrink: 0;
-}
-
-.console-window-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.console-window-title svg {
-    stroke: #a78bfa;
-}
-
-.console-window-actions {
-    display: flex;
-    gap: 6px;
-}
-
-.console-window-actions button {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.3);
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.console-window-actions button:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.console-clear-btn:hover {
-    color: #fbbf24 !important;
-    border-color: rgba(251, 191, 36, 0.2);
-}
-
-.console-close-btn:hover {
-    color: #f87171 !important;
-    border-color: rgba(248, 113, 113, 0.2);
-}
-
-/* Тело консоли */
-.console-window-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px 16px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    line-height: 1.6;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.console-window-body::-webkit-scrollbar {
-    width: 4px;
-}
-
-.console-window-body::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.console-window-body::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.2);
-    border-radius: 10px;
-}
-
-/* Строки консоли */
-.console-line {
-    padding: 2px 0;
-    color: rgba(255, 255, 255, 0.6);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-    white-space: pre-wrap;
-    word-break: break-all;
-    font-size: 0.75rem;
-}
-
-.console-line.console-info {
-    color: rgba(96, 165, 250, 0.6);
-}
-
-.console-line.console-success {
-    color: rgba(74, 222, 128, 0.6);
-}
-
-.console-line.console-warning {
-    color: rgba(251, 191, 36, 0.6);
-}
-
-.console-line.console-error {
-    color: rgba(248, 113, 113, 0.6);
-}
-
-.console-line.console-command {
-    color: rgba(167, 139, 250, 0.7);
-}
-
-/* Поле ввода */
-.console-window-input {
-    display: flex;
-    gap: 8px;
-    padding: 10px 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.02);
-    flex-shrink: 0;
-}
-
-.console-input-field {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 6px;
-    padding: 6px 12px;
-    color: #fff;
-    font-size: 0.8rem;
-    font-family: 'Courier New', monospace;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-.console-input-field:focus {
-    border-color: rgba(167, 139, 250, 0.3);
-}
-
-.console-input-field::placeholder {
-    color: rgba(255, 255, 255, 0.15);
-}
-
-.console-send-btn {
-    background: rgba(167, 139, 250, 0.12);
-    border: 1px solid rgba(167, 139, 250, 0.2);
-    color: #a78bfa;
-    padding: 6px 16px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-
-.console-send-btn:hover {
-    background: rgba(167, 139, 250, 0.2);
-    border-color: rgba(167, 139, 250, 0.35);
-}
-
-/* Адаптив */
-@media (max-width: 768px) {
-    .console-window {
-        width: calc(100vw - 24px);
-        max-width: calc(100vw - 24px);
-        right: 12px;
-        bottom: 80px;
-        height: 350px;
-        max-height: calc(100vh - 120px);
-    }
-    
-    .console-float-btn {
-        bottom: 20px;
-        right: 20px;
-        width: 48px;
-        height: 48px;
-    }
-    
-    .console-float-btn svg {
-        width: 24px;
-        height: 24px;
-    }
-}
-
-/* ============================================
-   СТАТУС ПОДКЛЮЧЕНИЯ МОДА
-   ============================================ */
-
-.mod-connected-badge {
-    display: inline-block;
-    font-size: 0.6rem;
-    font-weight: 600;
-    padding: 2px 10px;
-    border-radius: 10px;
-    background: rgba(74, 222, 128, 0.15);
-    color: #4ade80;
-    border: 1px solid rgba(74, 222, 128, 0.2);
-    margin-left: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.btn-connect-mod {
-    background: rgba(74, 222, 128, 0.08);
-    border: 1px solid rgba(74, 222, 128, 0.15);
-    color: rgba(74, 222, 128, 0.6);
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-}
-
-.btn-connect-mod:hover {
-    background: rgba(74, 222, 128, 0.15);
-    border-color: rgba(74, 222, 128, 0.3);
-    color: #4ade80;
-    transform: translateY(-1px);
-}
-
-.btn-connect-mod:active {
-    transform: translateY(0px);
-}
-
-.btn-connect-mod.connected {
-    background: rgba(248, 113, 113, 0.08);
-    border-color: rgba(248, 113, 113, 0.15);
-    color: rgba(248, 113, 113, 0.6);
-}
-
-.btn-connect-mod.connected:hover {
-    background: rgba(248, 113, 113, 0.15);
-    border-color: rgba(248, 113, 113, 0.3);
-    color: #f87171;
-}
-
-.btn-connect-mod:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn-connect-mod svg {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    flex-shrink: 0;
-}
-
-/* ============================================
-   КНОПКА ПОДКЛЮЧИТЬ ВСЕ МОДЫ
-   ============================================ */
-.btn-game-connect-all {
-    background: rgba(74, 222, 128, 0.12);
-    border: 1px solid rgba(74, 222, 128, 0.2);
-    color: #4ade80;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.btn-game-connect-all:hover {
-    background: rgba(74, 222, 128, 0.2);
-    border-color: rgba(74, 222, 128, 0.35);
-    color: #6ee7a0;
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px rgba(74, 222, 128, 0.1);
-}
-
-.btn-game-connect-all:active {
-    transform: translateY(0px);
-}
-
-.btn-game-connect-all.loading svg {
-    animation: spin 0.8s linear infinite;
-}
-
-.btn-game-connect-all:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn-game-connect-all svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    flex-shrink: 0;
-}
-
-/* ============================================
-   СТРАНИЦА STEAMCMD
-   ============================================ */
-
-.steamcmd-content-wrapper {
-    max-width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
-    padding-bottom: 20px;
-    box-sizing: border-box;
-}
-
-.steamcmd-content-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.steamcmd-content-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.steamcmd-content-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(102, 192, 244, 0.4);
-    border-radius: 10px;
-}
-
-.steamcmd-header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
-.steamcmd-header h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.steamcmd-subtitle {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 0.95rem;
-    margin-top: 4px;
-}
-
-/* Панель управления */
-.steamcmd-toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 12px 16px;
-}
-
-/* Консоль SteamCMD */
-.steamcmd-console {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 20px;
-}
-
-.steamcmd-console-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.steamcmd-console-body {
-    padding: 12px 16px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.75rem;
-    line-height: 1.6;
-    max-height: 300px;
-    overflow-y: auto;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.steamcmd-console-body::-webkit-scrollbar {
-    width: 4px;
-}
-
-.steamcmd-console-body::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.steamcmd-console-body::-webkit-scrollbar-thumb {
-    background: rgba(102, 192, 244, 0.2);
-    border-radius: 10px;
-}
-
-.steamcmd-console-body .console-line {
-    padding: 2px 0;
-    color: rgba(255, 255, 255, 0.6);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-    white-space: pre-wrap;
-    word-break: break-all;
-}
-
-.steamcmd-console-body .console-line.steamcmd-info {
-    color: rgba(102, 192, 244, 0.6);
-}
-
-.steamcmd-console-body .console-line.steamcmd-success {
-    color: rgba(74, 222, 128, 0.6);
-}
-
-.steamcmd-console-body .console-line.steamcmd-error {
-    color: rgba(248, 113, 113, 0.6);
-}
-
-.steamcmd-console-body .console-line.steamcmd-warning {
-    color: rgba(251, 191, 36, 0.6);
-}
-
-/* Информация */
-.steamcmd-info {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.info-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.info-label {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.3);
-}
-
-.info-value {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* Адаптив */
-@media (max-width: 768px) {
-    .steamcmd-toolbar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .steamcmd-info {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* ============================================
-   МОДАЛЬНОЕ ОКНО ДЛЯ НИКА
-   ============================================ */
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.modal-overlay.show {
-    opacity: 1;
-}
-
-.modal-content {
-    background: rgba(16, 21, 61, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    max-width: 450px;
-    width: 90%;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
-    transform: scale(0.9) translateY(20px);
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    overflow: hidden;
-}
-
-.modal-overlay.show .modal-content {
-    transform: scale(1) translateY(0);
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.modal-header h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.server-empty-state .empty-title {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #fff;
-    margin: 0;
-}
-
-.modal-header h3 svg {
-    stroke: #a78bfa;
-}
-
-.modal-close {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: rgba(255, 255, 255, 0.3);
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.25s ease;
-}
-
-.modal-close:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #f87171;
-    border-color: rgba(248, 113, 113, 0.2);
-}
-
-.modal-body {
-    padding: 20px 24px;
-}
-
-.modal-hint {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin-bottom: 16px;
-}
-
-.modal-input-group {
-    position: relative;
-}
-
-.modal-input-group label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
     color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.modal-input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #fff;
-    font-size: 1rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
-}
-
-.modal-input:focus {
-    border-color: rgba(139, 92, 246, 0.4);
-}
-
-.modal-input::placeholder {
-    color: rgba(255, 255, 255, 0.15);
-}
-
-.modal-char-count {
-    position: absolute;
-    bottom: 10px;
-    right: 14px;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.2);
-    pointer-events: none;
-}
-
-.modal-errors {
-    margin-top: 12px;
-    font-size: 0.85rem;
-    padding: 8px 12px;
-    background: rgba(248, 113, 113, 0.08);
-    border: 1px solid rgba(248, 113, 113, 0.15);
-    border-radius: 8px;
-    color: #f87171;
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 16px 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    background: rgba(255, 255, 255, 0.02);
-}
-
-.modal-footer .btn {
-    padding: 8px 20px;
-    font-size: 0.85rem;
-}
-
-.modal-footer .btn-primary {
-    background: rgba(167, 139, 250, 0.15);
-    border: 1px solid rgba(167, 139, 250, 0.25);
-    color: #a78bfa;
-}
-
-.modal-footer .btn-primary:hover {
-    background: rgba(167, 139, 250, 0.25);
-    border-color: rgba(167, 139, 250, 0.4);
-}
-
-.modal-footer .btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-/* Кнопка ника в тулбаре */
-.btn-nickname {
-    background: rgba(167, 139, 250, 0.08);
-    border: 1px solid rgba(167, 139, 250, 0.15);
-    color: rgba(167, 139, 250, 0.7);
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.btn-nickname:hover {
-    background: rgba(167, 139, 250, 0.15);
-    border-color: rgba(167, 139, 250, 0.3);
-    color: #c4b5fd;
-    transform: translateY(-1px);
-}
-
-.btn-nickname svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    flex-shrink: 0;
-}
-
-.btn-nickname #currentNicknameDisplay {
-    font-weight: 600;
-    color: #a78bfa;
-}
-
-/* Адаптив */
-@media (max-width: 480px) {
-    .modal-content {
-        max-width: 100%;
-        width: 95%;
-        margin: 10px;
-        border-radius: 12px;
-    }
-    
-    .modal-header {
-        padding: 14px 16px;
-    }
-    
-    .modal-body {
-        padding: 16px;
-    }
-    
-    .modal-footer {
-        padding: 12px 16px;
-        flex-wrap: wrap;
-    }
-    
-    .modal-footer .btn {
-        flex: 1;
-        justify-content: center;
-    }
-    
-    .btn-nickname {
-        font-size: 0.7rem;
-        padding: 6px 12px;
-    }
-}
-
-/* ============================================
-   НОВЫЕ ТИПЫ СООБЩЕНИЙ ДЛЯ КОНСОЛИ (RPT)
-   ============================================ */
-
-.console-line.console-start {
-    color: rgba(96, 165, 250, 0.8);
-    font-weight: 600;
-}
-
-.console-line.console-steam {
-    color: rgba(102, 192, 244, 0.7);
-}
-
-.console-line.console-mission {
-    color: rgba(251, 191, 36, 0.7);
-}
-
-.console-line.console-economy {
-    color: rgba(251, 146, 60, 0.7);
-}
-
-.console-line.console-network {
-    color: rgba(74, 222, 128, 0.7);
-}
-
-.console-line.console-save {
-    color: rgba(74, 222, 128, 0.9);
-    font-weight: 600;
-    background: rgba(74, 222, 128, 0.05);
-    border-radius: 4px;
-    padding: 2px 8px;
-    margin: 2px 0;
-}
-
-.console-line.console-player_join {
-    color: rgba(74, 222, 128, 0.6);
-}
-
-.console-line.console-player_leave {
-    color: rgba(248, 113, 113, 0.6);
-}
-
-.console-line.console-death {
-    color: rgba(248, 113, 113, 0.8);
-}
-
-.console-line.console-system {
-    color: rgba(167, 139, 250, 0.6);
-    font-style: italic;
-}
-
-/* Кнопка RPT в консоли */
-.console-window-actions .rpt-toggle-btn {
-    font-size: 10px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px;
-}
-
-.console-window-actions .rpt-toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    color: rgba(74, 222, 128, 0.8) !important;
-}
-
-.console-window-actions .rpt-toggle-btn[data-active="true"] {
-    color: rgba(74, 222, 128, 0.5);
-    border-color: rgba(74, 222, 128, 0.15);
-}
-
-.console-window-actions .rpt-toggle-btn[data-active="false"] {
-    color: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.03);
-}
-
-/* Бейдж для RPT логов */
-.rpt-badge {
-    display: inline-block;
-    font-size: 0.5rem;
-    font-weight: 700;
-    padding: 1px 6px;
-    border-radius: 4px;
-    background: rgba(74, 222, 128, 0.1);
-    color: rgba(74, 222, 128, 0.5);
-    border: 1px solid rgba(74, 222, 128, 0.1);
-    margin-left: 6px;
-    vertical-align: middle;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-/* ============================================
-   СТРАНИЦА РЕДАКТОРОВ
-   ============================================ */
-
-.editors-content-wrapper {
-    max-width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 8px;
-    padding-bottom: 20px;
-    box-sizing: border-box;
-}
-
-.editors-content-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-
-.editors-content-wrapper::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-.editors-content-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(96, 165, 250, 0.4);
-    border-radius: 10px;
-}
-
-.editors-header {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
-.editors-header h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.editors-subtitle {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 0.95rem;
-    margin-top: 4px;
-}
-
-/* Панель выбора редактора */
-.editors-toolbar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 16px 20px;
-}
-
-.editor-select-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-.editor-select-label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.5);
-    white-space: nowrap;
-}
-
-.editor-select {
-    flex: 1;
-    min-width: 200px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #fff;
-    font-size: 0.9rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.3s ease;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 40px;
-}
-
-.editor-select:focus {
-    border-color: rgba(96, 165, 250, 0.4);
-}
-
-.editor-select option {
-    background: rgba(16, 21, 61, 0.95);
-    color: #fff;
-    padding: 8px;
-}
-
-#openEditorBtn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-/* Информационная панель */
-.editors-info-panel {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    background: rgba(96, 165, 250, 0.04);
-    border: 1px solid rgba(96, 165, 250, 0.08);
-    border-radius: 12px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-}
-
-.info-panel-icon {
-    font-size: 1.4rem;
-    line-height: 1.4;
-    flex-shrink: 0;
-}
-
-.info-panel-text {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
-    line-height: 1.5;
-}
-
-.info-panel-text strong {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-/* ============================================
-   КОНТЕНТ РЕДАКТОРА
-   ============================================ */
-
-.editor-content-area {
-    margin-top: 12px;
-}
-
-/* Заголовок редактора */
-.editor-header {
-    margin-bottom: 20px;
-}
-
-.editor-header-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.editor-header-icon {
-    font-size: 2.2rem;
-    line-height: 1;
-}
-
-.editor-header-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-}
-
-.editor-header-subtitle {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.3);
-    margin: 0;
-}
-
-/* Сетка файлов */
-.editor-files-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-}
-
-.editor-file-tile {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    padding: 20px 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    min-height: 120px;
-    position: relative;
-}
-
-.editor-file-tile:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(96, 165, 250, 0.2);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-.editor-file-tile:active {
-    transform: scale(0.97);
-}
-
-.editor-file-icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
-    line-height: 1;
-}
-
-.editor-file-name {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.7);
-    font-family: 'Courier New', monospace;
-}
-
-.editor-file-badge {
-    position: absolute;
-    top: 8px;
-    right: 10px;
-    font-size: 0.5rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 2px 10px;
-    border-radius: 10px;
-    background: rgba(251, 191, 36, 0.12);
-    color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.15);
-}
-
-/* Плейсхолдер для редактора */
-.editor-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 50px 30px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px dashed rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    min-height: 250px;
-}
-
-.editor-placeholder-icon {
-    font-size: 3.5rem;
-    margin-bottom: 16px;
-    opacity: 0.6;
-}
-
-.editor-placeholder-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.7);
     margin: 0 0 8px 0;
 }
 
-.editor-placeholder-text {
+.server-empty-state .empty-text {
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.3);
-    line-height: 1.6;
-    max-width: 450px;
-    margin: 0 0 20px 0;
-}
-
-.editor-placeholder-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.25);
-    padding: 6px 16px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #fbbf24;
-    animation: pulse-dot 1.5s ease-in-out infinite;
-}
-
-.status-text {
-    color: #fbbf24;
-    font-weight: 500;
-}
-
-@keyframes pulse-dot {
-    0%, 100% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* ============================================
-   РЕДАКТОР ФАЙЛА (плейсхолдер при клике на плитку)
-   ============================================ */
-
-.file-editor-placeholder {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.file-editor-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.btn-back {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    font-family: "Nunito", sans-serif;
-}
-
-.btn-back:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-.file-editor-title {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.file-editor-icon {
-    font-size: 1.4rem;
-}
-
-.file-editor-status {
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 4px 14px;
-    border-radius: 12px;
-    background: rgba(251, 191, 36, 0.12);
-    color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.15);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.file-editor-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 30px;
-    min-height: 200px;
-    text-align: center;
-    gap: 16px;
-}
-
-.file-editor-placeholder-icon {
-    font-size: 3rem;
-    opacity: 0.4;
-}
-
-.file-editor-placeholder-text p {
-    margin: 4px 0;
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 0.95rem;
-}
-
-.file-editor-placeholder-text strong {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-/* ============================================
-   АДАПТИВ
-   ============================================ */
-
-@media (max-width: 768px) {
-    .editor-select-wrapper {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .editor-select-label {
-        margin-bottom: 4px;
-    }
-    
-    .editor-select {
-        min-width: auto;
-        width: 100%;
-    }
-    
-    .editors-header h1 {
-        font-size: 1.6rem;
-    }
-    
-    .editor-files-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-    }
-    
-    .editor-file-tile {
-        min-height: 100px;
-        padding: 16px 12px;
-    }
-    
-    .editor-file-icon {
-        font-size: 1.6rem;
-    }
-    
-    .editor-file-name {
-        font-size: 0.75rem;
-    }
-    
-    .file-editor-header {
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    
-    .file-editor-title {
-        order: 3;
-        flex-basis: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 480px) {
-    .editors-header h1 {
-        font-size: 1.3rem;
-    }
-    
-    .editors-header h1 svg {
-        width: 24px;
-        height: 24px;
-    }
-    
-    .editor-files-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .editor-file-tile {
-        min-height: 80px;
-        padding: 12px 8px;
-        border-radius: 8px;
-    }
-    
-    .editor-file-icon {
-        font-size: 1.3rem;
-        margin-bottom: 4px;
-    }
-    
-    .editor-file-name {
-        font-size: 0.65rem;
-    }
-    
-    .editor-file-badge {
-        font-size: 0.4rem;
-        padding: 1px 6px;
-        top: 4px;
-        right: 6px;
-    }
-    
-    .file-editor-body {
-        padding: 30px 20px;
-        min-height: 150px;
-    }
-    
-    .file-editor-placeholder-icon {
-        font-size: 2.2rem;
-    }
-    
-    .file-editor-placeholder-text p {
-        font-size: 0.8rem;
-    }
-}
-
-/* style.css - добавьте */
-
-.server-type-badge {
-    display: inline-block;
-    font-size: 0.55rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-left: 6px;
-    letter-spacing: 0.3px;
-}
-
-.server-type-badge.server {
-    background: rgba(251, 191, 36, 0.12);
-    color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.15);
-}
-
-.server-type-badge.server-mod {
-    background: rgba(96, 165, 250, 0.12);
-    color: #60a5fa;
-    border: 1px solid rgba(96, 165, 250, 0.15);
-}
-
-.server-type-badge.both {
-    background: rgba(251, 191, 36, 0.08);
-    color: #fbbf24;
-    border: 1px solid rgba(251, 191, 36, 0.1);
-}
-
-/* style.css - добавьте */
-
-.mod-not-connected-badge {
-    display: inline-block;
-    font-size: 0.6rem;
-    font-weight: 600;
-    padding: 2px 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    margin-left: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-/* style.css - добавьте */
-
-.btn-danger {
-    background: rgba(248, 113, 113, 0.12);
-    border: 1px solid rgba(248, 113, 113, 0.2);
-    color: #f87171;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    font-family: "Nunito", sans-serif;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.btn-danger:hover {
-    background: rgba(248, 113, 113, 0.2);
-    border-color: rgba(248, 113, 113, 0.35);
-    color: #fca5a5;
-    transform: translateY(-1px);
-    box-shadow: 0 0 25px rgba(248, 113, 113, 0.1);
-}
-
-.btn-danger:active {
-    transform: translateY(0px);
-}
-
-.btn-danger.loading {
-    opacity: 0.6;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.btn-danger:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn-danger svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    flex-shrink: 0;
-}
-
-/* style.css - добавьте в конец файла */
-
-/* ============================================
-   МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ ОЧИСТКИ
-   ============================================ */
-
-.clear-confirm-modal .modal-content.modal-confirm {
-    max-width: 480px;
-    border: 1px solid rgba(248, 113, 113, 0.2);
-}
-
-.modal-confirm-header {
-    border-bottom: 1px solid rgba(248, 113, 113, 0.1);
-    background: rgba(248, 113, 113, 0.03);
-    padding: 20px 24px 16px 24px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.modal-confirm-icon {
-    font-size: 2rem;
-    line-height: 1;
-    animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(-15deg); }
-    40% { transform: rotate(15deg); }
-    60% { transform: rotate(-10deg); }
-    80% { transform: rotate(10deg); }
-}
-
-.modal-confirm-header h3 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.modal-confirm-body {
-    padding: 24px;
-}
-
-.modal-confirm-text {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0 0 20px 0;
-    font-weight: 500;
-}
-
-.modal-confirm-details {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.confirm-detail-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.6);
-    transition: all 0.2s ease;
-}
-
-.confirm-detail-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.confirm-detail-icon {
-    font-size: 1.1rem;
-    flex-shrink: 0;
-    width: 24px;
-    text-align: center;
-}
-
-.confirm-detail-item strong {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.confirm-detail-warning {
-    border-color: rgba(248, 113, 113, 0.15);
-    background: rgba(248, 113, 113, 0.04);
-}
-
-.confirm-detail-warning .confirm-detail-icon {
-    animation: pulse-warning 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-warning {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-}
-
-.confirm-detail-warning strong {
-    color: #f87171;
-}
-
-.modal-confirm-footer {
-    padding: 16px 24px 20px 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.01);
-}
-
-.modal-confirm-footer .btn {
-    padding: 10px 24px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.modal-confirm-footer .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.modal-confirm-footer .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-}
-
-.modal-confirm-footer .btn-danger {
-    background: rgba(248, 113, 113, 0.15);
-    border: 1px solid rgba(248, 113, 113, 0.25);
-    color: #f87171;
-}
-
-.modal-confirm-footer .btn-danger:hover {
-    background: rgba(248, 113, 113, 0.25);
-    border-color: rgba(248, 113, 113, 0.4);
-    color: #fca5a5;
-    transform: translateY(-1px);
-    box-shadow: 0 0 30px rgba(248, 113, 113, 0.1);
-}
-
-.modal-confirm-footer .btn-danger:active {
-    transform: translateY(0px);
-}
-
-.modal-confirm-footer .btn-danger svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-}
-
-/* Адаптив для модала подтверждения */
-@media (max-width: 480px) {
-    .clear-confirm-modal .modal-content.modal-confirm {
-        max-width: 100%;
-        width: 95%;
-        margin: 10px;
-        border-radius: 12px;
-    }
-    
-    .modal-confirm-header {
-        padding: 16px 18px;
-    }
-    
-    .modal-confirm-header h3 {
-        font-size: 1rem;
-    }
-    
-    .modal-confirm-icon {
-        font-size: 1.6rem;
-    }
-    
-    .modal-confirm-body {
-        padding: 18px;
-    }
-    
-    .modal-confirm-text {
-        font-size: 0.9rem;
-    }
-    
-    .confirm-detail-item {
-        font-size: 0.75rem;
-        padding: 8px 12px;
-    }
-    
-    .modal-confirm-footer {
-        padding: 12px 18px 16px 18px;
-        flex-direction: column-reverse;
-    }
-    
-    .modal-confirm-footer .btn {
-        width: 100%;
-        justify-content: center;
-        padding: 10px;
-    }
-}
-
-/* Анимация появления модала */
-.clear-confirm-modal .modal-content {
-    transform: scale(0.9) translateY(30px) rotate(-2deg);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.clear-confirm-modal.show .modal-content {
-    transform: scale(1) translateY(0) rotate(0deg);
-}
-
-/* Свечение для кнопки "Да, очистить всё" */
-.modal-confirm-footer .btn-danger {
-    position: relative;
-    overflow: hidden;
-}
-
-.modal-confirm-footer .btn-danger::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at center, rgba(248, 113, 113, 0.05) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.modal-confirm-footer .btn-danger:hover::before {
-    opacity: 1;
-}
-
-/* ============================================
-   ПЛАВАЮЩАЯ КНОПКА "НАЗАД"
-   ============================================ */
-.mpg-back-btn {
-    position: fixed !important;
-    bottom: 18px !important;
-    left: 290px !important;
-    z-index: 99999 !important;
-    
-    /* Явно сбрасываем всё, что может мешать */
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    padding: 12px 20px !important;
-    margin: 0 !important;
-    
-    background: rgba(16, 21, 61, 0.85) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px !important;
-    
-    color: rgba(255, 255, 255, 0.8) !important;
-    font-family: "Nunito", sans-serif !important;
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    
-    cursor: pointer !important;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4) !important;
-    text-decoration: none !important;
-    user-select: none !important;
-    
-    /* Явно указываем, что это не ссылка */
-    pointer-events: auto !important;
-}
-
-/* Убираем наследование от родительских стилей кнопок */
-.mpg-back-btn * {
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Запрещаем подсветку родительского блока при наведении на кнопку */
-.mpg-editor .mpg-back-btn:hover ~ *,
-.mpg-editor .mpg-back-btn:hover {
-    /* ничего не меняем */
-}
-
-.mpg-back-btn:hover {
-    transform: translateY(-3px) scale(1.02) !important;
-    background: rgba(16, 21, 61, 0.95) !important;
-    border-color: rgba(167, 139, 250, 0.3) !important;
-    box-shadow: 0 8px 40px rgba(167, 139, 250, 0.15) !important;
-    color: #fff !important;
-}
-
-.mpg-back-btn:active {
-    transform: scale(0.97) !important;
-}
-
-.mpg-back-btn svg {
-    stroke: #a78bfa !important;
-    transition: transform 0.3s ease !important;
-    flex-shrink: 0 !important;
-    width: 20px !important;
-    height: 20px !important;
-}
-
-.mpg-back-btn:hover svg {
-    transform: translateX(-4px) !important;
-}
-
-.mpg-back-btn span {
-    white-space: nowrap !important;
-}
-
-/* Свечение при наведении */
-.mpg-back-btn::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, rgba(167, 139, 250, 0.1), transparent, rgba(167, 139, 250, 0.1));
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: -1;
-}
-
-.mpg-back-btn:hover::before {
-    opacity: 1;
-}
-
-/* Адаптив для кнопки "Назад" */
-@media (max-width: 768px) {
-    .mpg-back-btn {
-        bottom: 20px !important;
-        left: 20px !important;
-        padding: 10px 16px !important;
-        font-size: 0.8rem !important;
-        border-radius: 10px !important;
-        gap: 8px !important;
-    }
-    .mpg-back-btn svg {
-        width: 18px !important;
-        height: 18px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .mpg-back-btn {
-        bottom: 16px !important;
-        left: 16px !important;
-        padding: 8px 14px !important;
-        font-size: 0.7rem !important;
-        border-radius: 8px !important;
-        gap: 6px !important;
-    }
-    .mpg-back-btn svg {
-        width: 16px !important;
-        height: 16px !important;
-    }
-    .mpg-back-btn span {
-        font-size: 0.7rem !important;
-    }
-}
-/* ============================================
-   MPG EDITOR - ПОЛНЫЙ СТИЛЬ
-   ============================================ */
-
-/* --------------------------------------------
-   1. ПЛИТКА РЕДАКТОРА
-   -------------------------------------------- */
-
-.editor-tile-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding: 20px;
-}
-
-.editor-tile {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 30px 40px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    max-width: 500px;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-}
-
-.editor-tile:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(167, 139, 250, 0.25);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
-}
-
-.editor-tile-icon {
-    font-size: 3.5rem;
-    line-height: 1;
-    flex-shrink: 0;
-}
-
-.editor-tile-content {
-    flex: 1;
-}
-
-.editor-tile-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0 0 4px 0;
-}
-
-.editor-tile-description {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.4);
-    margin: 0 0 10px 0;
-}
-
-.editor-tile-badge {
-    display: inline-block;
-    font-size: 0.6rem;
-    font-weight: 600;
-    padding: 3px 12px;
-    border-radius: 12px;
-    background: rgba(167, 139, 250, 0.12);
-    color: #a78bfa;
-    border: 1px solid rgba(167, 139, 250, 0.15);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.editor-tile-arrow {
-    color: rgba(255, 255, 255, 0.15);
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-}
-
-.editor-tile:hover .editor-tile-arrow {
-    color: rgba(167, 139, 250, 0.4);
-    transform: translateX(4px);
-}
-
-.editor-tile::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle at 30% 30%, rgba(167, 139, 250, 0.03) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-}
-
-.editor-tile:hover::before {
-    opacity: 1;
-}
-
-/* Адаптив плитки */
-@media (max-width: 768px) {
-    .editor-tile {
-        flex-direction: column;
-        text-align: center;
-        padding: 24px 20px;
-        gap: 16px;
-    }
-    .editor-tile-icon { font-size: 2.8rem; }
-    .editor-tile-title { font-size: 1.1rem; }
-    .editor-tile-arrow { display: none; }
-}
-
-@media (max-width: 480px) {
-    .editor-tile { padding: 20px 16px; }
-    .editor-tile-icon { font-size: 2.2rem; }
-    .editor-tile-title { font-size: 1rem; }
-    .editor-tile-description { font-size: 0.75rem; }
-}
-
-/* --------------------------------------------
-   2. ПЛАВАЮЩАЯ КНОПКА "НАЗАД"
-   -------------------------------------------- */
-
-.mpg-back-btn {
-    position: fixed;
-    bottom: 30px;
-    left: 290px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 20px;
-    background: rgba(16, 21, 61, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.8);
-    font-family: "Nunito", sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    z-index: 999;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-    user-select: none;
-}
-
-.mpg-back-btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    background: rgba(16, 21, 61, 0.95);
-    border-color: rgba(167, 139, 250, 0.3);
-    box-shadow: 0 8px 40px rgba(167, 139, 250, 0.15);
-    color: #fff;
-}
-
-.mpg-back-btn:active { transform: scale(0.97); }
-
-.mpg-back-btn svg {
-    stroke: #a78bfa;
-    transition: transform 0.3s ease;
-    flex-shrink: 0;
-}
-
-.mpg-back-btn:hover svg { transform: translateX(-4px); }
-
-/* Адаптив кнопки назад */
-@media (max-width: 768px) {
-    .mpg-back-btn {
-        bottom: 20px;
-        left: 20px;
-        padding: 10px 16px;
-        font-size: 0.8rem;
-        border-radius: 10px;
-        gap: 8px;
-    }
-    .mpg-back-btn svg { width: 18px; height: 18px; }
-}
-
-@media (max-width: 480px) {
-    .mpg-back-btn {
-        bottom: 16px;
-        left: 16px;
-        padding: 8px 14px;
-        font-size: 0.7rem;
-        border-radius: 8px;
-        gap: 6px;
-    }
-    .mpg-back-btn svg { width: 16px; height: 16px; }
-    .mpg-back-btn span { font-size: 0.7rem; }
-}
-
-/* --------------------------------------------
-   3. ОСНОВНОЙ КОНТЕЙНЕР РЕДАКТОРА
-   -------------------------------------------- */
-
-.mpg-editor {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 4px 0;
-}
-
-/* --------------------------------------------
-   4. ЗАГОЛОВОК
-   -------------------------------------------- */
-
-.mpg-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    flex-shrink: 0;
-}
-
-.mpg-header-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.mpg-header-icon { font-size: 2rem; line-height: 1; }
-.mpg-header-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0;
-}
-.mpg-header-subtitle {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.35);
     margin: 0;
 }
 
-.mpg-header-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-.mpg-header-actions .btn {
-    padding: 8px 16px;
-    font-size: 0.8rem;
-}
-
-/* Адаптив заголовка */
-@media (max-width: 768px) {
-    .mpg-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .mpg-header-actions {
-        width: 100%;
-        justify-content: stretch;
-    }
-    .mpg-header-actions .btn { flex: 1; justify-content: center; }
-}
-
-@media (max-width: 480px) {
-    .mpg-header-title { font-size: 1rem; }
-    .mpg-header-icon { font-size: 1.5rem; }
-}
-
-/* --------------------------------------------
-   5. СТАТУС БАР
-   -------------------------------------------- */
-
-.mpg-status-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 0.8rem;
-    flex-shrink: 0;
-}
-
-.mpg-status { color: rgba(255, 255, 255, 0.6); font-weight: 500; }
-.mpg-status.dirty { color: #fbbf24; }
-.mpg-status.saving { color: #60a5fa; }
-.mpg-status.saved { color: #4ade80; }
-.mpg-status.error { color: #f87171; }
-
-.mpg-path {
-    color: rgba(255, 255, 255, 0.2);
-    font-size: 0.7rem;
-    font-family: 'Courier New', monospace;
-    max-width: 50%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-@media (max-width: 768px) {
-    .mpg-status-bar {
-        flex-direction: column;
-        gap: 4px;
-        align-items: flex-start;
-    }
-    .mpg-path { max-width: 100%; font-size: 0.65rem; }
-}
-
-/* --------------------------------------------
-   6. ВКЛАДКИ
-   -------------------------------------------- */
-
-.mpg-tabs {
-    display: flex;
-    gap: 6px;
-    padding: 6px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    flex-shrink: 0;
-    margin-bottom: 16px;
-}
-
-.mpg-tab {
-    flex: 1;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.35);
-    font-family: "Nunito", sans-serif;
+.server-empty-state .empty-hint {
     font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.mpg-tab:hover {
-    color: rgba(255, 255, 255, 0.6);
-    background: rgba(255, 255, 255, 0.04);
-}
-
-.mpg-tab.active {
-    background: rgba(167, 139, 250, 0.15);
-    color: #c4b5fd;
-    border: 1px solid rgba(167, 139, 250, 0.15);
-}
-
-.mpg-tab .mpg-tab-count {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
-    font-size: 0.55rem;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.05);
-    color: rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-}
-
-.mpg-tab.active .mpg-tab-count {
-    background: rgba(167, 139, 250, 0.12);
-    color: #a78bfa;
-}
-
-/* Адаптив вкладок */
-@media (max-width: 768px) {
-    .mpg-tabs {
-        flex-wrap: wrap;
-        gap: 4px;
-        padding: 4px;
-        border-radius: 10px;
-    }
-    .mpg-tab {
-        flex: 1 1 calc(33.33% - 4px);
-        font-size: 0.7rem;
-        padding: 8px 10px;
-        gap: 4px;
-        border-radius: 6px;
-    }
-    .mpg-tab .mpg-tab-count {
-        min-width: 16px;
-        height: 16px;
-        font-size: 0.5rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .mpg-tab {
-        font-size: 0.6rem;
-        padding: 6px 6px;
-        gap: 2px;
-    }
-    .mpg-tabs {
-        gap: 2px;
-        padding: 3px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-    }
-    .mpg-tab .mpg-tab-count {
-        min-width: 14px;
-        height: 14px;
-        font-size: 0.45rem;
-        padding: 0 4px;
-    }
-}
-
-/* --------------------------------------------
-   7. КОНТЕНТ ВКЛАДОК
-   -------------------------------------------- */
-
-.mpg-tab-content {
-    display: none;
-    flex: 1;
-    min-height: 0;
-}
-
-.mpg-tab-content.active {
-    display: grid !important;
-    grid-template-columns: 280px 1fr;
-    gap: 16px;
-    height: 100%;
-}
-
-/* Сайдбар и панель редактора */
-.mpg-tab-content .mpg-sidebar {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 200px;
-    max-height: 100%;
-}
-
-.mpg-tab-content .mpg-editor-panel {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 200px;
-    max-height: 100%;
-}
-
-/* Заголовок сайдбара */
-.mpg-tab-content .mpg-sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    flex-shrink: 0;
-}
-
-.mpg-tab-content .mpg-sidebar-header h3 {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
-}
-
-/* Список точек/групп */
-.mpg-tab-content .mpg-points-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-}
-
-.mpg-tab-content .mpg-points-list::-webkit-scrollbar { width: 4px; }
-.mpg-tab-content .mpg-points-list::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.3);
-    border-radius: 10px;
-}
-
-/* Элемент списка */
-.mpg-point-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 2px;
-    border: 1px solid transparent;
-}
-
-.mpg-point-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.05);
-}
-
-.mpg-point-item.active {
-    background: rgba(167, 139, 250, 0.1);
-    border-color: rgba(167, 139, 250, 0.2);
-}
-
-.mpg-point-item.active .mpg-point-id {
-    background: rgba(167, 139, 250, 0.2);
-    color: #a78bfa;
-}
-
-.mpg-point-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-}
-
-.mpg-point-id {
-    font-size: 0.6rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 2px 8px;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.mpg-point-title {
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-}
-
-.mpg-point-status { font-size: 0.7rem; margin: 0 6px; flex-shrink: 0; }
-.mpg-point-entity-count {
-    font-size: 0.55rem;
-    color: rgba(255, 255, 255, 0.15);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 1px 8px;
-    border-radius: 10px;
-    margin-left: 4px;
-}
-
-.mpg-point-actions { display: flex; gap: 4px; flex-shrink: 0; }
-
-.mpg-point-delete {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.1);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mpg-point-delete:hover {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.1);
-}
-
-/* Пустой список */
-.mpg-empty-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.3);
-    height: 100%;
-}
-
-.mpg-empty-list .mpg-empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
-.mpg-empty-list p { margin: 0 0 12px 0; font-size: 0.9rem; }
-
-/* Пустой редактор */
-.mpg-tab-content .mpg-editor-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: rgba(255, 255, 255, 0.3);
-    padding: 40px;
-    text-align: center;
-}
-
-.mpg-tab-content .mpg-editor-empty .mpg-empty-icon { font-size: 3rem; margin-bottom: 16px; }
-.mpg-tab-content .mpg-editor-empty p { font-size: 1rem; margin: 0; }
-.mpg-tab-content .mpg-editor-empty .mpg-empty-hint {
-    font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.15);
     margin-top: 4px;
 }
 
-/* Контент редактора */
-.mpg-tab-content .mpg-editor-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px 20px;
-}
-
-.mpg-tab-content .mpg-editor-content::-webkit-scrollbar { width: 4px; }
-.mpg-tab-content .mpg-editor-content::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.3);
-    border-radius: 10px;
-}
-
-/* Загрузка */
-.mpg-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
+/* Пустое состояние для игры (клиентские моды) */
+.game-empty-state {
+    text-align: center;
+    padding: 50px 20px;
     color: rgba(255, 255, 255, 0.3);
-    font-size: 0.85rem;
-    gap: 12px;
-    height: 100%;
 }
 
-.mpg-loading .spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-top-color: rgba(167, 139, 250, 0.5);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+.game-empty-state .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 12px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Адаптив контента вкладок */
-@media (max-width: 1024px) {
-    .mpg-tab-content.active {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        height: auto;
-    }
-    .mpg-tab-content .mpg-sidebar {
-        max-height: 250px;
-        flex-shrink: 0;
-        min-height: 150px;
-    }
-    .mpg-tab-content .mpg-editor-panel {
-        min-height: 350px;
-        max-height: 500px;
-    }
-}
-
-@media (max-width: 768px) {
-    .mpg-tab-content .mpg-editor-content { padding: 12px 14px; }
-}
-
-@media (max-width: 480px) {
-    .mpg-tab-content .mpg-editor-content { padding: 10px 12px; }
-}
-
-/* --------------------------------------------
-   8. КОНФИГ
-   -------------------------------------------- */
-
-.mpg-tab-content#mpgTabConfig.active {
-    display: block !important;
-}
-
-.mpg-tab-content#mpgTabConfig .mpg-config-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-.mpg-tab-content#mpgTabConfig .mpg-config-panel::-webkit-scrollbar { width: 4px; }
-.mpg-tab-content#mpgTabConfig .mpg-config-panel::-webkit-scrollbar-thumb {
-    background: rgba(167, 139, 250, 0.3);
-    border-radius: 10px;
-}
-
-.mpg-config-section {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 16px 20px;
-}
-
-.mpg-config-section h4 {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 14px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.mpg-config-files-list,
-.mpg-config-admins-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 10px;
-    min-height: 40px;
-}
-
-.mpg-config-file-item,
-.mpg-config-admin-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px 6px 14px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.7);
-    transition: all 0.2s ease;
-}
-
-.mpg-config-file-item:hover,
-.mpg-config-admin-item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-.mpg-config-file-remove,
-.mpg-config-admin-remove {
-    background: none;
-    border: none;
-    color: rgba(255, 255, 255, 0.15);
-    cursor: pointer;
-    padding: 2px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.mpg-config-file-remove:hover,
-.mpg-config-admin-remove:hover {
-    color: #f87171;
-    background: rgba(248, 113, 113, 0.1);
-}
-
-.mpg-config-add-file,
-.mpg-config-add-admin {
-    display: flex;
-    gap: 8px;
-}
-
-.mpg-config-add-file .mpg-input,
-.mpg-config-add-admin .mpg-input { flex: 1; }
-
-/* Адаптив конфига */
-@media (max-width: 768px) {
-    .mpg-config-add-file,
-    .mpg-config-add-admin {
-        flex-direction: column;
-    }
-    .mpg-config-add-file .btn,
-    .mpg-config-add-admin .btn {
-        width: 100%;
-        justify-content: center;
-    }
-    .mpg-config-file-item,
-    .mpg-config-admin-item {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-
-@media (max-width: 480px) {
-    .mpg-config-section { padding: 12px 14px; }
-    .mpg-config-file-item,
-    .mpg-config-admin-item {
-        font-size: 0.7rem;
-        padding: 4px 10px;
-    }
-}
-
-/* --------------------------------------------
-   9. ФОРМА РЕДАКТОРА
-   -------------------------------------------- */
-
-.mpg-editor-form { display: flex; flex-direction: column; gap: 20px; }
-
-.mpg-form-section {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    padding: 16px 20px;
-}
-
-.mpg-form-section h4 {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 14px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.mpg-form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-}
-
-.mpg-form-row:last-child { margin-bottom: 0; }
-
-.mpg-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.mpg-form-group label {
-    font-size: 0.7rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.mpg-form-group-full { grid-column: 1 / -1; }
-
-.mpg-input,
-.mpg-select,
-.mpg-textarea {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: #e5e5e5;
-    font-size: 0.85rem;
-    font-family: "Nunito", sans-serif;
-    outline: none;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-.mpg-input:hover,
-.mpg-select:hover,
-.mpg-textarea:hover {
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-.mpg-input:focus,
-.mpg-select:focus,
-.mpg-textarea:focus {
-    border-color: rgba(167, 139, 250, 0.4);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.05);
-}
-
-.mpg-input::placeholder,
-.mpg-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.15);
-}
-
-.mpg-textarea {
-    min-height: 80px;
-    resize: vertical;
-    font-size: 0.8rem;
-    line-height: 1.5;
-}
-
-.mpg-textarea-large { min-height: 120px; }
-
-.mpg-select {
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    padding-right: 36px;
-}
-
-.mpg-select option {
-    background: rgba(16, 21, 61, 0.95);
-    color: #e5e5e5;
-    padding: 8px;
-}
-
-.mpg-select-multiple {
-    background-image: none;
-    padding-right: 14px;
-    min-height: 60px;
-}
-
-/* --------------------------------------------
-   10. ТЕГИ
-   -------------------------------------------- */
-
-.mpg-tag-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 6px 0;
-    min-height: 42px;
-    margin-bottom: 6px;
-}
-
-.mpg-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px 4px 12px;
-    background: rgba(167, 139, 250, 0.10);
-    border: 1px solid rgba(167, 139, 250, 0.12);
-    border-radius: 6px;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
-    transition: all 0.2s ease;
-}
-
-.mpg-tag:hover {
-    background: rgba(167, 139, 250, 0.15);
-    border-color: rgba(167, 139, 250, 0.2);
-}
-
-.mpg-tag-remove {
-    cursor: pointer;
-    color: rgba(255, 255, 255, 0.25);
+.game-empty-state .empty-title {
     font-size: 1.1rem;
-    line-height: 1;
-    transition: color 0.2s ease;
-    padding: 0 2px;
-}
-
-.mpg-tag-remove:hover { color: #f87171; }
-
-.mpg-add-entity {
-    display: flex;
-    gap: 8px;
-}
-
-.mpg-add-entity .mpg-select { flex: 1; }
-.mpg-add-entity .btn-sm { flex-shrink: 0; padding: 8px 12px; }
-
-/* --------------------------------------------
-   11. КНОПКИ
-   -------------------------------------------- */
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.7rem;
-    border-radius: 6px;
-}
-
-.btn-sm svg { width: 14px; height: 14px; }
-
-/* --------------------------------------------
-   12. МОДАЛЬНОЕ ОКНО ПОДТВЕРЖДЕНИЯ
-   -------------------------------------------- */
-
-.mpg-confirm-modal .modal-content.modal-confirm {
-    max-width: 480px;
-    border: 1px solid rgba(248, 113, 113, 0.2);
-}
-
-.mpg-confirm-modal .modal-confirm-header {
-    border-bottom: 1px solid rgba(248, 113, 113, 0.1);
-    background: rgba(248, 113, 113, 0.03);
-    padding: 20px 24px 16px 24px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.mpg-confirm-modal .modal-confirm-icon {
-    font-size: 2rem;
-    line-height: 1;
-    animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(-15deg); }
-    40% { transform: rotate(15deg); }
-    60% { transform: rotate(-10deg); }
-    80% { transform: rotate(10deg); }
-}
-
-.mpg-confirm-modal .modal-confirm-header h3 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #fff;
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.mpg-confirm-modal .modal-confirm-body { padding: 24px; }
-.mpg-confirm-modal .modal-confirm-text {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
-    line-height: 1.6;
-}
-
-.mpg-confirm-modal .modal-confirm-text strong { color: rgba(255, 255, 255, 0.95); }
-
-.mpg-confirm-modal .modal-confirm-footer {
-    padding: 16px 24px 20px 24px;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.01);
-}
-
-.mpg-confirm-modal .modal-confirm-footer .btn {
-    padding: 10px 24px;
-    font-size: 0.85rem;
     font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 8px 0;
 }
 
-.mpg-confirm-modal .modal-confirm-footer .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
+.game-empty-state .empty-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.25);
+    margin: 0;
 }
 
-.mpg-confirm-modal .modal-confirm-footer .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-}
-
-.mpg-confirm-modal .modal-confirm-footer .btn-danger {
-    background: rgba(248, 113, 113, 0.15);
-    border: 1px solid rgba(248, 113, 113, 0.25);
-    color: #f87171;
-}
-
-.mpg-confirm-modal .modal-confirm-footer .btn-danger:hover {
-    background: rgba(248, 113, 113, 0.25);
-    border-color: rgba(248, 113, 113, 0.4);
-    color: #fca5a5;
-    transform: translateY(-1px);
-    box-shadow: 0 0 30px rgba(248, 113, 113, 0.1);
-}
-
-.mpg-confirm-modal .modal-confirm-footer .btn-danger svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-}
-
-/* Адаптив модала */
-@media (max-width: 480px) {
-    .mpg-confirm-modal .modal-content.modal-confirm {
-        max-width: 100%;
-        width: 95%;
-        margin: 10px;
-        border-radius: 12px;
-    }
-    .mpg-confirm-modal .modal-confirm-header {
-        padding: 16px 18px;
-    }
-    .mpg-confirm-modal .modal-confirm-header h3 {
-        font-size: 1rem;
-    }
-    .mpg-confirm-modal .modal-confirm-icon {
-        font-size: 1.6rem;
-    }
-    .mpg-confirm-modal .modal-confirm-body {
-        padding: 18px;
-    }
-    .mpg-confirm-modal .modal-confirm-text {
-        font-size: 0.9rem;
-    }
-    .mpg-confirm-modal .modal-confirm-footer {
-        padding: 12px 18px 16px 18px;
-        flex-direction: column-reverse;
-    }
-    .mpg-confirm-modal .modal-confirm-footer .btn {
-        width: 100%;
-        justify-content: center;
-        padding: 10px;
-    }
-}
-
-.mpg-confirm-modal .modal-content {
-    transform: scale(0.9) translateY(30px) rotate(-2deg);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.mpg-confirm-modal.show .modal-content {
-    transform: scale(1) translateY(0) rotate(0deg);
-}
-
-.mpg-header-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: rgba(167, 139, 250, 0.1);
-    border-radius: 10px;
-    color: #a78bfa;
-    flex-shrink: 0;
-}
-
-.mpg-header-icon svg {
-    width: 24px;
-    height: 24px;
-    stroke: #a78bfa;
-    stroke-width: 2;
-    fill: none;
-}
-
-.mpg-status svg {
-    stroke: #4ade80;
-    flex-shrink: 0;
-}
-
-.mpg-status.dirty svg {
-    stroke: #fbbf24;
-}
-
-.mpg-status.error svg {
-    stroke: #f87171;
-}
-
-.mpg-status.saving svg {
-    stroke: #60a5fa;
+.game-empty-state .empty-hint {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.15);
+    margin-top: 4px;
 }
 

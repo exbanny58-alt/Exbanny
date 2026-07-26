@@ -293,26 +293,6 @@ function addRptToggleButton() {
     const actions = header.querySelector('.console-window-actions');
     if (!actions) return;
     
-    const btn = document.createElement('button');
-    btn.id = 'rptToggleBtn';
-    btn.className = 'rpt-toggle-btn';
-    btn.style.cssText = `
-        background: rgba(74, 222, 128, 0.06);
-        border: 1px solid rgba(74, 222, 128, 0.12);
-        color: rgba(74, 222, 128, 0.5);
-        width: 32px;
-        height: 28px;
-        border-radius: 6px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        font-family: "Nunito", sans-serif;
-    `;
     btn.textContent = 'RPT';
     btn.title = 'Включить/выключить RPT логи';
     btn.dataset.active = 'true';

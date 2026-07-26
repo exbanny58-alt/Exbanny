@@ -6,7 +6,7 @@
   },
   "workshop_1559212036": {
     "server": false,
-    "server_mod": true,
+    "server_mod": false,
     "client": false
   },
   "workshop_2545327648": {
@@ -30,7 +30,7 @@
     "client": false
   },
   "workshop_3120779051": {
-    "server": true,
+    "server": false,
     "server_mod": false,
     "client": false
   },
@@ -41,12 +41,12 @@
   },
   "workshop_1828439124": {
     "server": false,
-    "server_mod": true,
+    "server_mod": false,
     "client": false
   },
   "workshop_2968284194": {
     "server": false,
-    "server_mod": true,
+    "server_mod": false,
     "client": false
   },
   "workshop_3739774497": {
@@ -55,7 +55,7 @@
     "client": false
   },
   "workshop_3422882242": {
-    "server": true,
+    "server": false,
     "server_mod": false,
     "client": false
   }
