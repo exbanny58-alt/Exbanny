@@ -3,8 +3,6 @@
 // ========================================
 
 const ThemeConfig = {
-    // Текущая активная тема
-    currentTheme: 'toggle-2',
     
     // Определения тем
     themes: {
@@ -98,6 +96,9 @@ const ThemeConfig = {
         this.currentTheme = themeId;
         console.log(`Тема применена: ${theme.name} (${themeId})`);
         
+        // Сохраняем тему в настройках
+        this.saveTheme(themeId);
+        
         // Отправить событие для других скриптов
         document.dispatchEvent(new CustomEvent('themeChanged', {
             detail: {
@@ -105,6 +106,49 @@ const ThemeConfig = {
                 theme: theme
             }
         }));
+    },
+    
+    /**
+     * Сохранить тему в настройки на сервере
+     * @param {string} themeId - ID темы для сохранения
+     */
+    async saveTheme(themeId) {
+        try {
+            const response = await fetch(`/api/settings/theme`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ value: themeId })
+            });
+            const data = await response.json();
+            if (data.success) {
+                console.log(`✅ Тема сохранена: ${themeId}`);
+            } else {
+                console.warn('⚠️ Не удалось сохранить тему');
+            }
+        } catch (error) {
+            console.error('❌ Ошибка сохранения темы:', error);
+        }
+    },
+    
+    /**
+     * Загрузить тему из настроек
+     * @returns {Promise<string|null>} ID темы или null
+     */
+    async loadTheme() {
+        try {
+            const response = await fetch('/api/settings/theme');
+            const data = await response.json();
+            if (data.value) {
+                console.log(`✅ Тема загружена: ${data.value}`);
+                return data.value;
+            }
+            return null;
+        } catch (error) {
+            console.error('❌ Ошибка загрузки темы:', error);
+            return null;
+        }
     },
     
     /**
@@ -147,15 +191,36 @@ const ThemeConfig = {
 };
 
 // ============================================
-// РАЗНОЦВЕТНЫЕ ИКОНКИ ПРИ НАВЕДЕНИИ
+// ИНИЦИАЛИЗАЦИЯ ТЕМЫ ПРИ ЗАГРУЗКЕ
 // ============================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Ждем небольшую задержку для полной загрузки DOM
+document.addEventListener('DOMContentLoaded', async function() {
+    // Загружаем сохранённую тему
+    const savedTheme = await ThemeConfig.loadTheme();
+    
+    if (savedTheme && ThemeConfig.themes[savedTheme]) {
+        // Применяем сохранённую тему
+        ThemeConfig.applyTheme(savedTheme);
+        
+        // Устанавливаем переключатель в нужное положение
+        const radio = document.querySelector(`#${savedTheme}`);
+        if (radio) {
+            radio.checked = true;
+        }
+    } else {
+        // Если тема не сохранена, применяем тему по умолчанию (toggle-2)
+        const defaultTheme = 'toggle-2';
+        ThemeConfig.applyTheme(defaultTheme);
+        const radio = document.querySelector(`#${defaultTheme}`);
+        if (radio) {
+            radio.checked = true;
+        }
+    }
+    
+    // Разноцветные иконки
     setTimeout(() => {
         const navItems = document.querySelectorAll('.nav-item a');
         
-        // Палитра ярких цветов
         const colors = [
             '#FF6B6B', '#FF4757', '#FF8A5C', '#FF6348', '#FF9F43',
             '#FECA57', '#FFD93D', '#00B894', '#00CEC9', '#55EFC4',
@@ -194,7 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
             item.addEventListener('mouseenter', function(e) {
                 const color = getUniqueRandomColor();
                 
-                // Анимируем иконку
                 if (icon) {
                     icon.style.color = color;
                     icon.style.stroke = color;
@@ -203,20 +267,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon.style.filter = `drop-shadow(0 0 8px ${color}40)`;
                 }
                 
-                // Анимируем текст
                 if (text) {
                     text.style.color = color;
                     text.style.transition = 'color 0.3s ease';
                     text.style.fontWeight = '600';
                 }
                 
-                // Добавляем свечение к родительскому элементу
                 item.style.transition = 'background 0.3s ease';
                 item.style.background = `${color}15`;
             });
             
             item.addEventListener('mouseleave', function() {
-                // Возвращаем иконку
                 if (icon) {
                     icon.style.color = '';
                     icon.style.stroke = '';
@@ -224,13 +285,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     icon.style.filter = '';
                 }
                 
-                // Возвращаем текст
                 if (text) {
                     text.style.color = '';
                     text.style.fontWeight = '';
                 }
                 
-                // Убираем фон
                 item.style.background = '';
             });
         });

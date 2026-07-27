@@ -2,10 +2,6 @@
    ОСНОВНЫЕ СТИЛИ ПРИЛОЖЕНИЯ
    ======================================== */
 
-/* ========================================
-   ГЛОБАЛЬНЫЕ НАСТРОЙКИ
-   ======================================== */
-
 *,
 ::before,
 ::after {
@@ -51,24 +47,21 @@
    ======================================== */
 
 .threeway-toggle {
-    --dot-size: 30px;
+    --dot-size: 20px;
     --dot-border-width: 5px;
-
     --dot-option-1-color: orange;
     --dot-option-1-label: "orange";
-
     --dot-option-2-color: rgb(163, 230, 53);
     --dot-option-2-label: "green";
-
     --dot-option-3-color: rgb(14, 165, 233);
     --dot-option-3-label: "blue";
 
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    right: 20px;
     display: block;
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 85px;
     z-index: 100;
     transition: scale 300ms ease-in-out;
 }
@@ -77,7 +70,6 @@
     scale: 1.25;
 }
 
-/* Подсказка при наведении */
 .threeway-toggle::before {
     content: var(--dot-label);
     position: absolute;
@@ -97,7 +89,6 @@
     transition-delay: 300ms, 0ms;
 }
 
-/* Треугольник */
 .threeway-toggle > svg {
     width: 100%;
     margin: 0;
@@ -109,7 +100,6 @@
     fill: transparent;
 }
 
-/* Кружок-указатель */
 .threeway-toggle::after {
     content: "";
     position: absolute;
@@ -126,7 +116,6 @@
     transition: all 300ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
-/* Невидимые радио-кнопки по углам треугольника */
 .threeway-toggle > input[type="radio"] {
     position: absolute;
     opacity: 0;
@@ -155,28 +144,24 @@
     bottom: 1rem;
 }
 
-/* Вариант 1 - верхний (оранжевая тема) */
 .threeway-toggle:has(input#toggle-1:checked) {
     --dot-left: 50%;
     --dot-top: 1.5rem;
     --dot-clr: var(--dot-option-1-color);
 }
 
-/* Вариант 2 - правый нижний (зеленая тема) */
 .threeway-toggle:has(input#toggle-2:checked) {
     --dot-left: calc(100% - 20px);
     --dot-top: calc(100% - 25px);
     --dot-clr: var(--dot-option-2-color);
 }
 
-/* Вариант 3 - левый нижний (синяя тема) */
 .threeway-toggle:has(input#toggle-3:checked) {
     --dot-left: 20px;
     --dot-top: calc(100% - 25px);
     --dot-clr: var(--dot-option-3-color);
 }
 
-/* Подписи при наведении на каждый вариант */
 .threeway-toggle:has(input#toggle-1:focus-visible),
 .threeway-toggle:has(input#toggle-1:hover) {
     --dot-label: var(--dot-option-1-label);
@@ -210,7 +195,6 @@ body {
     padding: 16px;
     position: relative;
     background-color: var(--clr-bg);
-    /* Сетка из точек на фоне */
     background-image: 
         radial-gradient(circle, rgba(var(--theme-accent-rgb), 0.08) 1px, transparent 1px),
         radial-gradient(circle, rgba(var(--theme-accent-rgb), 0.05) 1px, transparent 1px);
@@ -220,7 +204,6 @@ body {
     transition: border-color var(--transition-speed) ease-in-out;
 }
 
-/* Рамка по краям страницы */
 body::before {
     content: "";
     position: fixed;
@@ -235,7 +218,6 @@ body::before {
     transition: border-color var(--transition-speed) ease-in-out;
 }
 
-/* Вертикальная линия-разделитель между меню и контентом */
 body::after {
     content: "";
     position: fixed;
@@ -285,7 +267,6 @@ main {
     margin-top: auto;
 }
 
-/* Блоки меню */
 .menu-block,
 .menu-block-settings {
     margin-bottom: 16px;
@@ -308,15 +289,13 @@ main {
 
 .nav-item {
     position: relative;
-    margin-bottom: 8px;  /* ← Расстояние между пунктами */
+    margin-bottom: 8px;
 }
 
 .nav-item:last-child {
     margin-bottom: 0;
 }
 
-
-/* Разделитель между пунктами меню */
 .nav-item:not(:last-child)::after {
     content: "";
     position: absolute;
@@ -324,29 +303,20 @@ main {
     left: 14px;
     right: 14px;
     height: 1px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        var(--theme-accent),
-        transparent
-    );
+    background: linear-gradient(90deg, transparent, var(--theme-accent), transparent);
     opacity: 0.3;
     transition: background var(--transition-speed) ease, opacity var(--transition-speed) ease;
-
 }
 
-/* Ярче при наведении */
 .nav-item:hover::after,
 .nav-item:has(a.active)::after {
     opacity: 0.6;
 }
 
-/* Активный пункт подсвечивает разделитель снизу */
 .nav-item:has(a.active) + .nav-item::after {
     opacity: 0.5;
 }
 
-/* Ссылка в меню */
 .nav-item a {
     display: flex;
     align-items: center;
@@ -361,7 +331,6 @@ main {
     transform: translateY(-5px);
 }
 
-/* Индикатор активности (полоска слева) */
 .nav-item a::before {
     content: "";
     position: absolute;
@@ -390,7 +359,6 @@ main {
     color: var(--clr-txt);
 }
 
-/* Иконки в меню */
 .nav-item a .nav-icon {
     flex-shrink: 0;
     width: 20px;
@@ -412,7 +380,6 @@ main {
     font-weight: 500;
 }
 
-/* Кнопки управления (Запуск, Остановка и т.д.) */
 .control-btn {
     border: 1px solid transparent;
     transition: all var(--transition-speed) ease;
@@ -428,15 +395,9 @@ main {
     color: var(--theme-accent);
 }
 
-/* Разделитель между секциями меню */
 .menu-divider {
     height: 2px;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        var(--theme-accent),
-        transparent
-    );
+    background: linear-gradient(90deg, transparent, var(--theme-accent), transparent);
     margin: 16px 8px;
     opacity: 0.4;
     border-radius: 1px;
@@ -529,7 +490,6 @@ main {
     font-size: 1rem;
 }
 
-/* Анимированные точки подсказки */
 .start-hint {
     display: flex;
     gap: 8px;
@@ -660,7 +620,6 @@ main {
     margin: 0;
 }
 
-/* Панель инструментов */
 .server-toolbar,
 .game-toolbar,
 .mods-toolbar {
@@ -677,7 +636,6 @@ main {
     margin-left: auto;
 }
 
-/* Поле поиска */
 .server-search,
 .game-search,
 .mods-search {
@@ -723,7 +681,6 @@ main {
     border: 1px solid transparent;
 }
 
-/* Акцентная кнопка (цвет темы) */
 .btn-accent {
     background: var(--theme-hover);
     color: var(--theme-accent);
@@ -735,7 +692,6 @@ main {
     box-shadow: 0 0 15px var(--theme-shadow);
 }
 
-/* Нейтральная кнопка (белая/серая) */
 .btn-neutral {
     background: rgba(255, 255, 255, 0.05);
     color: var(--clr-txt);
@@ -748,7 +704,6 @@ main {
     color: #fff;
 }
 
-/* Вторичная кнопка (для "Обзор" в настройках) */
 .btn-secondary {
     background: rgba(255, 255, 255, 0.05);
     color: var(--clr-txt-secondary);
@@ -761,7 +716,6 @@ main {
     color: var(--clr-txt);
 }
 
-/* Кнопка сохранения */
 .btn-save-row {
     background: var(--theme-hover);
     color: var(--theme-accent);
@@ -773,7 +727,6 @@ main {
     box-shadow: 0 0 15px var(--theme-shadow);
 }
 
-/* Кнопка сброса */
 .btn-reset-row {
     background: rgba(255, 255, 255, 0.03);
     color: var(--clr-txt-secondary);
@@ -786,7 +739,6 @@ main {
     background: rgba(248, 113, 113, 0.1);
 }
 
-/* Кнопка "Обзор" */
 .browse-btn {
     flex-shrink: 0;
 }
@@ -821,7 +773,6 @@ main {
     }
 }
 
-/* Контейнеры для списков модов */
 .server-mods-list-container,
 .game-mods-list-container,
 .mods-list-container {
@@ -883,7 +834,6 @@ main {
     color: var(--clr-txt);
 }
 
-/* Статистика модов */
 .mods-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1001,7 +951,6 @@ main {
     padding: 16px 20px;
 }
 
-/* Группа полей ввода */
 .input-group {
     display: flex;
     gap: 8px;
@@ -1027,7 +976,6 @@ main {
     box-shadow: 0 0 0 3px rgba(var(--theme-accent-rgb), 0.15);
 }
 
-/* Действия с полем */
 .input-actions {
     display: flex;
     gap: 8px;
@@ -1104,5 +1052,390 @@ main {
     .mods-search {
         width: 100%;
         min-width: unset;
+    }
+}
+
+/* ========================================
+   СТИЛИ ДЛЯ СПИСКА МОДОВ (с поддержкой темы)
+   ======================================== */
+
+.mod-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: relative;
+    transition: all var(--transition-speed) ease;
+    border-bottom: 1px solid rgba(var(--theme-accent-rgb), 0.06);
+}
+
+.mod-item:last-child {
+    border-bottom: none;
+}
+
+.mod-item:hover {
+    background: var(--theme-hover);
+}
+
+/* Цветной разделитель с градиентом */
+.mod-item::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 10%;
+    right: 10%;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent, var(--theme-accent), transparent);
+    opacity: 0.1;
+    border-radius: 1px;
+    transition: all var(--transition-speed) ease;
+}
+
+.mod-item:hover::after {
+    opacity: 0.5;
+    left: 5%;
+    right: 5%;
+}
+
+/* Активные кнопки влияют на разделитель */
+.mod-item:has(.mod-btn-server.active)::after {
+    opacity: 0.4;
+    left: 5%;
+    right: 5%;
+}
+
+.mod-item:has(.mod-btn-server-mod.active)::after {
+    background: linear-gradient(90deg, transparent, #60a5fa, transparent);
+    opacity: 0.4;
+    left: 5%;
+    right: 5%;
+}
+
+.mod-item:has(.mod-btn-client.active)::after {
+    background: linear-gradient(90deg, transparent, #4ade80, transparent);
+    opacity: 0.4;
+    left: 5%;
+    right: 5%;
+}
+
+/* Информация о моде */
+.mod-info {
+    flex: 1;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mod-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--clr-txt);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mod-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.7rem;
+    color: var(--clr-txt-secondary);
+}
+
+.mod-folder {
+    font-family: 'Consolas', monospace;
+    font-size: 0.65rem;
+    opacity: 0.5;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.mod-version {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+}
+
+.mod-type {
+    padding: 1px 10px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.mod-type.workshop {
+    background: rgba(var(--theme-accent-rgb), 0.15);
+    color: var(--theme-accent);
+}
+
+.mod-type.custom {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.mod-warning {
+    color: #f87171;
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Действия с модом */
+.mod-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* Базовые кнопки мода */
+.mod-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--clr-txt-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.55rem;
+    font-weight: 500;
+    min-width: 48px;
+    line-height: 1.2;
+    gap: 1px;
+    -webkit-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mod-btn .btn-label {
+    font-size: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    opacity: 0.6;
+}
+
+.mod-btn .btn-status {
+    font-size: 0.6rem;
+    font-weight: 600;
+}
+
+.mod-btn:active {
+    transform: scale(0.95);
+}
+
+/* Серверный мод - использует тему */
+.mod-btn-server {
+    border-color: rgba(var(--theme-accent-rgb), 0.15);
+}
+
+.mod-btn-server .btn-status {
+    color: var(--theme-accent);
+}
+
+.mod-btn-server:hover {
+    border-color: rgba(var(--theme-accent-rgb), 0.4);
+    background: rgba(var(--theme-accent-rgb), 0.06);
+}
+
+.mod-btn-server.active {
+    border-color: var(--theme-accent);
+    background: rgba(var(--theme-accent-rgb), 0.12);
+    box-shadow: 0 0 15px var(--theme-shadow);
+}
+
+.mod-btn-server.active .btn-status {
+    color: var(--theme-accent);
+}
+
+/* СерверМод - синий (фиксированный) */
+.mod-btn-server-mod {
+    border-color: rgba(96, 165, 250, 0.15);
+}
+
+.mod-btn-server-mod .btn-status {
+    color: #60a5fa;
+}
+
+.mod-btn-server-mod:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    background: rgba(96, 165, 250, 0.06);
+}
+
+.mod-btn-server-mod.active {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.12);
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.08);
+}
+
+.mod-btn-server-mod.active .btn-status {
+    color: #60a5fa;
+}
+
+/* КлиентМод - зелёный (фиксированный) */
+.mod-btn-client {
+    border-color: rgba(74, 222, 128, 0.15);
+}
+
+.mod-btn-client .btn-status {
+    color: #4ade80;
+}
+
+.mod-btn-client:hover {
+    border-color: rgba(74, 222, 128, 0.4);
+    background: rgba(74, 222, 128, 0.06);
+}
+
+.mod-btn-client.active {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.12);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.08);
+}
+
+.mod-btn-client.active .btn-status {
+    color: #4ade80;
+}
+
+/* Кнопка открытия папки */
+.btn-mod-folder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--clr-txt-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-mod-folder:hover {
+    background: var(--theme-hover);
+    color: var(--theme-accent);
+    transform: scale(1.05);
+}
+
+.btn-mod-folder:active {
+    transform: scale(0.9);
+}
+
+.btn-mod-folder svg {
+    width: 14px;
+    height: 14px;
+    stroke: currentColor;
+    fill: none;
+}
+
+/* Пустой список */
+.empty-mods {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--clr-txt-secondary);
+    text-align: center;
+}
+
+.empty-mods p {
+    margin: 4px 0;
+    font-size: 1rem;
+}
+
+.empty-mods .empty-hint {
+    font-size: 0.85rem;
+    opacity: 0.5;
+    margin-top: 8px;
+}
+
+/* ========================================
+   АДАПТИВ ДЛЯ МОДОВ
+   ======================================== */
+
+@media (max-width: 768px) {
+    .mod-item {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px 16px;
+    }
+    
+    .mod-item::after {
+        left: 5%;
+        right: 5%;
+    }
+    
+    .mod-info {
+        min-width: unset;
+    }
+    
+    .mod-actions {
+        justify-content: flex-start;
+        margin-top: 4px;
+        gap: 4px;
+    }
+    
+    .mod-btn {
+        padding: 3px 8px;
+        min-width: 40px;
+        font-size: 0.5rem;
+        border-width: 1.5px;
+    }
+    
+    .mod-btn .btn-label {
+        font-size: 0.45rem;
+    }
+    
+    .mod-btn .btn-status {
+        font-size: 0.5rem;
+    }
+    
+    .mod-details {
+        font-size: 0.65rem;
+        gap: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mod-item {
+        padding: 10px 12px;
+    }
+    
+    .mod-name {
+        font-size: 0.85rem;
+    }
+    
+    .mod-actions {
+        gap: 3px;
+    }
+    
+    .mod-btn {
+        padding: 2px 6px;
+        min-width: 32px;
+        font-size: 0.45rem;
+    }
+    
+    .btn-mod-folder {
+        width: 26px;
+        height: 26px;
+    }
+    
+    .btn-mod-folder svg {
+        width: 12px;
+        height: 12px;
     }
 }

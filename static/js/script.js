@@ -2,14 +2,33 @@
 // MAIN APPLICATION SCRIPT
 // ========================================
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     
     // ========================================
     // INITIALIZE THEME FROM TOGGLE
     // ========================================
     
+    // Сначала загружаем сохранённую тему
+    const savedTheme = await ThemeConfig.loadTheme();
+    
     const toggleInputs = document.querySelectorAll('.threeway-toggle input[type="radio"]');
     
+    // Если есть сохранённая тема - устанавливаем переключатель
+    if (savedTheme && ThemeConfig.themes[savedTheme]) {
+        const radio = document.querySelector(`#${savedTheme}`);
+        if (radio) {
+            radio.checked = true;
+            ThemeConfig.applyTheme(savedTheme);
+        }
+    } else {
+        // Иначе тема по умолчанию
+        const checkedInput = document.querySelector('.threeway-toggle input[type="radio"]:checked');
+        if (checkedInput) {
+            ThemeConfig.applyTheme(checkedInput.id);
+        }
+    }
+    
+    // Обработчик изменения темы
     toggleInputs.forEach(input => {
         input.addEventListener('change', (e) => {
             if (e.target.checked) {
@@ -18,15 +37,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    const checkedInput = document.querySelector('.threeway-toggle input[type="radio"]:checked');
-    if (checkedInput) {
-        ThemeConfig.applyTheme(checkedInput.id);
-    }
-    
     document.addEventListener('themeChanged', (e) => {
         console.log('Theme changed event:', e.detail);
     });
-
+    
 // ========================================
     // INITIALIZE NAVIGATION
     // ========================================
@@ -692,3 +706,69 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('🧪 Тестовая кнопка добавлена!');
 });
+
+// В конце файла script.js, после тестовой кнопки:
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ НАСТРОЕК
+// ============================================
+
+// Загружаем настройки при открытии страницы
+document.addEventListener('DOMContentLoaded', async function() {
+    // Инициализируем менеджер настроек
+    await settingsManager.init();
+    
+    // Если открыта страница настроек - загружаем в UI
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'settings') {
+        settingsManager.loadToUI();
+    }
+    
+    // Привязываем обработчики для настроек
+    attachSettingsHandlers();
+});
+
+// ДОЛЖНО БЫТЬ (ПРАВИЛЬНО)
+// Сохраняем ссылку на оригинальную функцию
+const originalShowContent = showContent;
+
+// Переопределяем
+showContent = function(section, event) {
+    if (event) event.preventDefault();
+    
+    // Вызываем оригинальную функцию
+    originalShowContent(section, event);
+    
+    // Если открыли настройки - загружаем данные
+    if (section === 'settings') {
+        setTimeout(async () => {
+            await settingsManager.loadAll();
+            settingsManager.loadToUI();
+            attachSettingsHandlers();
+        }, 100);
+    }
+};
+
+// В конце script.js добавить:
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ МОДОВ
+// ============================================
+
+// Перехватываем showContent для загрузки модов
+const originalShowContentMods = showContent;
+showContent = function(section, event) {
+    if (event) event.preventDefault();
+    
+    // Вызываем оригинальную функцию
+    originalShowContentMods(section, event);
+    
+    // Если открыли страницу модов - инициализируем
+    if (section === 'mods') {
+        setTimeout(async () => {
+            if (typeof initModsPage !== 'undefined') {
+                await initModsPage();
+            }
+        }, 100);
+    }
+};

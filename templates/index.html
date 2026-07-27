@@ -200,8 +200,11 @@
     </svg>
 
     <!-- Scripts -->
-    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/theme-config.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<!-- ДОЛЖНО БЫТЬ (ПРАВИЛЬНО) -->
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+<script src="{{ url_for('static', filename='js/theme-config.js') }}"></script>
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mods.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
