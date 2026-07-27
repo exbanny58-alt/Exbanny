@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DayZ Менеджер</title>
     
-    <!-- Подключаем CSS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}" />
 </head>
 <body>
     <!-- Основной контейнер -->
@@ -14,12 +15,11 @@
         <!-- Боковое меню -->
         <nav class="main-menu">
             <div class="menu-top">
-                <!-- Блок с основными пунктами меню (с обводкой) -->
+                <!-- Блок с основными пунктами меню -->
                 <div class="menu-block">
                     <ul>
                         <li class="nav-item">
-                            <a href="#" onclick="showContent('server', event)">
-                                <!-- Иконка сервера -->
+                            <a href="#server" onclick="showContent('server', event)">
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
                                     <line x1="8" y1="21" x2="16" y2="21"/>
@@ -29,8 +29,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" onclick="showContent('game', event)">
-                                <!-- Иконка игры (геймпад) -->
+                            <a href="#game" onclick="showContent('game', event)">
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polygon points="5,3 19,12 5,21"/>
                                 </svg>
@@ -38,18 +37,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" onclick="showContent('mods', event)">
-                                <!-- Иконка папки -->
+                            <a href="#mods" onclick="showContent('mods', event)">
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
                                 </svg>
                                 <span class="nav-text">Управление модами</span>
                             </a>
                         </li>
-                        <!-- НОВЫЙ ПУНКТ: РЕДАКТОРЫ -->
                         <li class="nav-item">
-                            <a href="#" onclick="showContent('editors', event)">
-                                <!-- Иконка редакторов (куб) -->
+                            <a href="#editors" onclick="showContent('editors', event)">
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polygon points="12,2 2,7 12,12 22,7 12,2"/>
                                     <polyline points="2,17 12,22 22,17"/>
@@ -66,12 +62,11 @@
                 <!-- Декоративный разделитель -->
                 <div class="menu-divider"></div>
                 
-                <!-- НОВЫЙ БЛОК МЕНЮ С КНОПКАМИ УПРАВЛЕНИЯ -->
+                <!-- Блок с кнопками управления -->
                 <div class="menu-block">
                     <ul>
                         <li class="nav-item">
                             <a href="#" onclick="controlServer('start', event)" class="control-btn control-start">
-                                <!-- Иконка запуска -->
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polygon points="5,3 19,12 5,21"/>
                                 </svg>
@@ -80,7 +75,6 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" onclick="controlServer('restart', event)" class="control-btn control-restart">
-                                <!-- Иконка перезапуска -->
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="23,4 23,10 17,10"/>
                                     <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
@@ -92,7 +86,6 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" onclick="controlServer('stop', event)" class="control-btn control-stop">
-                                <!-- Иконка остановки -->
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                                 </svg>
@@ -101,7 +94,6 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" onclick="controlGame('start', event)" class="control-btn control-game-start">
-                                <!-- Иконка запуска игры -->
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polygon points="5,3 19,12 5,21"/>
                                 </svg>
@@ -110,7 +102,6 @@
                         </li>
                         <li class="nav-item">
                             <a href="#" onclick="controlGame('stop', event)" class="control-btn control-game-stop">
-                                <!-- Иконка остановки игры -->
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                                 </svg>
@@ -124,8 +115,7 @@
                 <div class="menu-block-settings">
                     <ul>
                         <li class="nav-item">
-                            <a href="#" onclick="showSettings(event)">
-                                <!-- Иконка настроек (шестеренка) -->
+                            <a href="#settings" onclick="showContent('settings', event)">
                                 <svg class="nav-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
                                     <circle cx="12" cy="12" r="3"/>
@@ -137,6 +127,7 @@
                 </div>
             </div>
         </nav>
+
         <!-- Основной контент -->
         <section class="content">
             <div class="content-area" id="contentArea">
@@ -158,20 +149,59 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Динамический контейнер для страниц -->
+                <div id="dynamicContent" style="display: none; width: 100%; height: 100%; overflow: auto;"></div>
             </div>
         </section>
     </main>
-    
-    
 
-<script src="/static/js/toast.js"></script>
-<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
-<script src="{{ url_for('static', filename='js/mods.js') }}"></script>
-<script src="{{ url_for('static', filename='js/server.js') }}"></script>
-<script src="{{ url_for('static', filename='js/game.js') }}"></script>
-<script src="{{ url_for('static', filename='js/controls.js') }}"></script>
-<script src="{{ url_for('static', filename='js/console.js') }}"></script>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-<script src="{{ url_for('static', filename='js/editors.js') }}"></script>
-<script src="{{ url_for('static', filename='js/mpg_editor.js') }}"></script>
+    <!-- 3-way Toggle в правом нижнем углу -->
+    <label class="threeway-toggle">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.37891 15.1999C3.46947 16.775 3.01489 17.5634 3.08281 18.2097C3.14206 18.7734 3.43792 19.2851 3.89648 19.6182C4.42204 20.0001 5.3309 20.0001 7.14853 20.0001H16.8515C18.6691 20.0001 19.5778 20.0001 20.1034 19.6182C20.5619 19.2851 20.8579 18.7734 20.9172 18.2097C20.9851 17.5634 20.5307 16.775 19.6212 15.1999L14.7715 6.79986C13.8621 5.22468 13.4071 4.43722 12.8135 4.17291C12.2957 3.94236 11.704 3.94236 11.1862 4.17291C10.5928 4.43711 10.1381 5.22458 9.22946 6.79845L4.37891 15.1999Z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="white" />
+        </svg>
+        <input type="radio" name="toggle" id="toggle-1">
+        <input type="radio" name="toggle" id="toggle-2" checked>
+        <input type="radio" name="toggle" id="toggle-3">
+    </label>
+
+    <!-- SVG Icons for Notifications -->
+    <svg class="notifications-svg-sprite" aria-hidden="true">
+        <defs>
+            <symbol id="clock" viewBox="0 0 32 32">
+                <circle r="15" cx="16" cy="16" fill="none" stroke="currentColor" stroke-width="2"/>
+                <polyline points="16,7 16,16 23,16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <symbol id="error" viewBox="0 0 32 32">
+                <circle r="15" cx="16" cy="16" fill="none" stroke="#f87171" stroke-width="2"/>
+                <line x1="10" y1="10" x2="22" y2="22" stroke="#f87171" stroke-width="2" stroke-linecap="round"/>
+                <line x1="22" y1="10" x2="10" y2="22" stroke="#f87171" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <symbol id="message" viewBox="0 0 32 32">
+                <polygon points="1,6 31,6 31,26 1,26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <polyline points="1,6 16,18 31,6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <symbol id="success" viewBox="0 0 32 32">
+                <circle r="15" cx="16" cy="16" fill="none" stroke="#4ade80" stroke-width="2"/>
+                <polyline points="9,18 13,22 23,12" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <symbol id="up" viewBox="0 0 32 32">
+                <circle r="15" cx="16" cy="16" fill="none" stroke="currentColor" stroke-width="2"/>
+                <polyline points="11,15 16,10 21,15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="16" y1="10" x2="16" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </symbol>
+            <symbol id="warning" viewBox="0 0 32 32">
+                <polygon points="16,1 31,31 1,31" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="16" y1="12" x2="16" y2="20" stroke="#fbbf24" stroke-width="2" stroke-linecap="round"/>
+                <line x1="16" y1="25" x2="16" y2="25" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/theme-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
 </html>

@@ -1,14 +1,77 @@
-// ============================================
-// ГЛАВНЫЙ СКРИПТ - НАВИГАЦИЯ И УПРАВЛЕНИЕ КОНТЕНТОМ
-// ============================================
+// ========================================
+// MAIN APPLICATION SCRIPT
+// ========================================
 
-// Контент для разных разделов
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // ========================================
+    // INITIALIZE THEME FROM TOGGLE
+    // ========================================
+    
+    const toggleInputs = document.querySelectorAll('.threeway-toggle input[type="radio"]');
+    
+    toggleInputs.forEach(input => {
+        input.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                ThemeConfig.applyTheme(e.target.id);
+            }
+        });
+    });
+    
+    const checkedInput = document.querySelector('.threeway-toggle input[type="radio"]:checked');
+    if (checkedInput) {
+        ThemeConfig.applyTheme(checkedInput.id);
+    }
+    
+    document.addEventListener('themeChanged', (e) => {
+        console.log('Theme changed event:', e.detail);
+    });
+
+// ========================================
+    // INITIALIZE NAVIGATION
+    // ========================================
+    
+    // ⚠️ УБИРАЕМ АВТОМАТИЧЕСКУЮ ЗАГРУЗКУ СТРАНИЦЫ ИЗ HASH
+    // Всегда показываем стартовый экран при загрузке
+    
+    // Убеждаемся, что стартовый экран виден
+    const startPage = document.getElementById('startPage');
+    if (startPage) {
+        startPage.style.display = 'flex';
+    }
+    
+    // Скрываем динамический контент
+    const container = document.getElementById('dynamicContent');
+    if (container) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+    }
+    
+    // Убираем активные пункты меню
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    // Очищаем hash в URL (если есть)
+    if (window.location.hash) {
+        history.pushState(null, null, ' ');
+    }
+    
+    console.log('✅ Приложение загружено — показан стартовый экран');
+    
+});
+
+
+// ========================================
+// SPA NAVIGATION
+// ========================================
+
 const pages = {
     server: `
         <div class="server-content-wrapper">
             <div class="server-header">
-                <h1>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <h1 style="display: flex; align-items: center; gap: 14px; justify-content: center;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                         <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
                         <line x1="8" y1="21" x2="16" y2="21"/>
                         <line x1="12" y1="17" x2="12" y2="21"/>
@@ -18,9 +81,8 @@ const pages = {
                 <p class="server-subtitle">Список модов, отмеченных как "СерверМод" или "Серверный"</p>
             </div>
 
-            <!-- Панель управления -->
             <div class="server-toolbar">
-                <button class="btn btn-primary" id="refreshServerModsBtn">
+                <button class="btn btn-accent" id="refreshServerModsBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23,4 23,10 17,10"/>
                         <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
@@ -30,7 +92,7 @@ const pages = {
                     Обновить список
                 </button>
                 
-                <button class="btn btn-danger" id="clearServerLinksBtn" onclick="clearServerLinks()" title="Очистить все подключения и удалить симлинки">
+                <button class="btn btn-neutral" id="clearServerLinksBtn" title="Очистить все подключения и удалить симлинки">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="3,6 5,6 21,6"/>
                         <path d="M19,6V20a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6M8,6V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
@@ -43,7 +105,6 @@ const pages = {
                 </div>
             </div>
 
-            <!-- Список серверных модов -->
             <div class="server-mods-list-container" id="serverModsContainer">
                 <div class="loading-mods">
                     <span class="spinner"></span>
@@ -55,8 +116,8 @@ const pages = {
     game: `
         <div class="game-content-wrapper">
             <div class="game-header">
-                <h1>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <h1 style="display: flex; align-items: center; gap: 14px; justify-content: center;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
                         <polygon points="5,3 19,12 5,21"/>
                     </svg>
                     Управление игрой
@@ -64,9 +125,8 @@ const pages = {
                 <p class="game-subtitle">Список модов, отмеченных как "КлиентМод"</p>
             </div>
 
-            <!-- Панель управления -->
             <div class="game-toolbar">
-                <button class="btn btn-primary" id="refreshGameModsBtn">
+                <button class="btn btn-accent" id="refreshGameModsBtn">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="23,4 23,10 17,10"/>
                         <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
@@ -76,7 +136,7 @@ const pages = {
                     Обновить список
                 </button>
                 
-                <button class="btn btn-nickname" id="changeNicknameBtn" title="Изменить ник в игре">
+                <button class="btn btn-neutral" id="changeNicknameBtn" title="Изменить ник в игре">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                         <circle cx="12" cy="7" r="4"/>
@@ -84,7 +144,7 @@ const pages = {
                     Ник: <span id="currentNicknameDisplay">player</span>
                 </button>
                 
-                <button class="btn btn-game-connect-all" id="connectAllGameModsBtn" title="Подключить все моды, которые используются на сервере">
+                <button class="btn btn-neutral" id="connectAllGameModsBtn" title="Подключить все моды, которые используются на сервере">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 5v14"/>
                         <path d="M5 12h14"/>
@@ -97,7 +157,6 @@ const pages = {
                 </div>
             </div>
 
-            <!-- Список клиентских модов -->
             <div class="game-mods-list-container" id="gameModsContainer">
                 <div class="loading-mods">
                     <span class="spinner"></span>
@@ -107,660 +166,529 @@ const pages = {
         </div>
     `,
     mods: `
-        <div id="modsPageContent" style="height: 100%;">
-            <div class="mods-content-wrapper" style="height: 100%; overflow-y: auto; padding-right: 8px; padding-bottom: 20px; box-sizing: border-box;">
-                <div class="mods-header">
-                    <h1>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
-                        </svg>
-                        Управление модами
-                    </h1>
-                </div>
+        <div class="mods-content-wrapper">
+            <div class="mods-header">
+                <h1 style="display: flex; align-items: center; gap: 14px; justify-content: center;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                        <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                    </svg>
+                    Управление модами
+                </h1>
+            </div>
 
-                <!-- Статистика -->
-                <div class="mods-stats" id="modsStats">
-                    <div class="stat-card">
-                        <span class="stat-number" id="totalModsCount">0</span>
-                        <span class="stat-label">Всего модов</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="workshopModsCount">0</span>
-                        <span class="stat-label">Из Workshop</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="customModsCount">0</span>
-                        <span class="stat-label">Кастомных</span>
-                    </div>
+            <div class="mods-stats" id="modsStats">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalModsCount">0</span>
+                    <span class="stat-label">Всего модов</span>
                 </div>
-
-                <!-- Панель управления -->
-                <div class="mods-toolbar">
-                    <button class="btn btn-primary" id="refreshModsBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="23,4 23,10 17,10"/>
-                            <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
-                            <polyline points="1,20 1,14 7,14"/>
-                            <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
-                        </svg>
-                        Обновить список
-                    </button>
-                    <button class="btn btn-secondary" id="openWorkshopBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
-                        </svg>
-                        Открыть Workshop
-                    </button>
-                    <button class="btn btn-secondary" id="openCustomModsBtn">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
-                        </svg>
-                        Открыть кастомные
-                    </button>
-                    <div class="mods-filter">
-                        <input type="text" id="modsSearchInput" placeholder="🔍 Поиск модов..." class="mods-search">
-                    </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="workshopModsCount">0</span>
+                    <span class="stat-label">Из Workshop</span>
                 </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="customModsCount">0</span>
+                    <span class="stat-label">Кастомных</span>
+                </div>
+            </div>
 
-                <!-- Список модов -->
-                <div class="mods-list-container" id="modsListContainer">
-                    <div class="loading-mods">
-                        <span class="spinner"></span>
-                        Загрузка модов...
-                    </div>
+            <div class="mods-toolbar">
+                <button class="btn btn-accent" id="refreshModsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23,4 23,10 17,10"/>
+                        <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                        <polyline points="1,20 1,14 7,14"/>
+                        <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                    </svg>
+                    Обновить список
+                </button>
+                <button class="btn btn-neutral" id="openWorkshopBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                    </svg>
+                    Открыть Workshop
+                </button>
+                <button class="btn btn-neutral" id="openCustomModsBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                    </svg>
+                    Открыть кастомные
+                </button>
+                <div class="mods-filter">
+                    <input type="text" id="modsSearchInput" placeholder="🔍 Поиск модов..." class="mods-search">
+                </div>
+            </div>
+
+            <div class="mods-list-container" id="modsListContainer">
+                <div class="loading-mods">
+                    <span class="spinner"></span>
+                    Загрузка модов...
                 </div>
             </div>
         </div>
     `,
     editors: `
-        <div class="editors-content-wrapper">
-            <div class="editors-header">
-                <h1>
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="12,2 2,7 12,12 22,7 12,2"/>
-                        <polyline points="2,17 12,22 22,17"/>
-                        <polyline points="2,12 12,17 22,12"/>
+        <div class="content-page">
+            <h2 style="text-align: center;">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 10px;">
+                    <polygon points="12,2 2,7 12,12 22,7 12,2"/>
+                    <polyline points="2,17 12,22 22,17"/>
+                    <polyline points="2,12 12,17 22,12"/>
+                </svg>
+                Редакторы
+            </h2>
+            <p style="text-align: center; color: var(--clr-txt-secondary);">Здесь будет контент редакторов</p>
+        </div>
+    `,
+    settings: `
+        <div class="settings-content-wrapper">
+            <div class="settings-header">
+                <h1 style="display: flex; align-items: center; gap: 14px; justify-content: center;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--theme-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                        <circle cx="12" cy="12" r="3"/>
                     </svg>
-                    Редакторы
+                    Настройки
                 </h1>
-                <p class="editors-subtitle">Выберите редактор для работы с файлами DayZ</p>
             </div>
-
-            <!-- Панель выбора редактора -->
-            <div class="editors-toolbar">
-                <div class="editor-select-wrapper">
-                    <label for="editorSelect" class="editor-select-label">Выберите редактор:</label>
-                    <select id="editorSelect" class="editor-select">
-                        <option value="">— Выберите редактор —</option>
-                    </select>
+            <div class="settings-body">
+                <!-- 1. ИСПОЛНЯЕМЫЙ ФАЙЛ СЕРВЕРА -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                <line x1="8" y1="21" x2="16" y2="21"/>
+                                <line x1="12" y1="17" x2="12" y2="21"/>
+                            </svg>
+                        </span>
+                        <div class="settings-card-title">
+                            <h3>Исполняемый файл сервера</h3>
+                            <p>Путь до DayZServer_x64.exe</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="input-group">
+                            <input type="text" id="server-exe-path" class="settings-input" placeholder="C:\\DayZServer\\DayZServer_x64.exe" readonly>
+                            <button type="button" class="btn btn-secondary browse-btn" data-target="server-exe-path" data-field="server_exe" data-type="file">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                                </svg>
+                                Обзор
+                            </button>
+                        </div>
+                        <div class="input-actions">
+                            <button type="button" class="btn btn-save-row save-single-btn" data-target="server-exe-path" data-field="server_exe">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                    <polyline points="17,21 17,13 7,13 7,21"/>
+                                    <polyline points="7,3 7,8 15,8"/>
+                                </svg>
+                                Сохранить
+                            </button>
+                            <button type="button" class="btn btn-reset-row reset-single-btn" data-target="server-exe-path" data-field="server_exe">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1,4 1,10 7,10"/>
+                                    <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                    <polyline points="23,20 23,14 17,14"/>
+                                    <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                                </svg>
+                                Сбросить
+                            </button>
+                        </div>
+                        <div class="row-status" id="status-server_exe"></div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Место для контента редактора -->
-            <div class="editor-content-area" id="editorContentArea">
-                <!-- Сюда будет подгружаться контент выбранного редактора -->
+                <!-- 2. ИСПОЛНЯЕМЫЙ ФАЙЛ ИГРЫ -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="5,3 19,12 5,21"/>
+                            </svg>
+                        </span>
+                        <div class="settings-card-title">
+                            <h3>Исполняемый файл игры</h3>
+                            <p>Путь до DayZ_x64.exe (клиент игры)</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="input-group">
+                            <input type="text" id="game-exe-path" class="settings-input" placeholder="C:\\Program Files (x86)\\Steam\\steamapps\\common\\DayZ\\DayZ_x64.exe" readonly>
+                            <button type="button" class="btn btn-secondary browse-btn" data-target="game-exe-path" data-field="game_exe" data-type="file">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                                </svg>
+                                Обзор
+                            </button>
+                        </div>
+                        <div class="input-actions">
+                            <button type="button" class="btn btn-save-row save-single-btn" data-target="game-exe-path" data-field="game_exe">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                    <polyline points="17,21 17,13 7,13 7,21"/>
+                                    <polyline points="7,3 7,8 15,8"/>
+                                </svg>
+                                Сохранить
+                            </button>
+                            <button type="button" class="btn btn-reset-row reset-single-btn" data-target="game-exe-path" data-field="game_exe">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1,4 1,10 7,10"/>
+                                    <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                    <polyline points="23,20 23,14 17,14"/>
+                                    <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                                </svg>
+                                Сбросить
+                            </button>
+                        </div>
+                        <div class="row-status" id="status-game_exe"></div>
+                    </div>
+                </div>
+
+                <!-- 3. ПАПКА WORKSHOP -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                            </svg>
+                        </span>
+                        <div class="settings-card-title">
+                            <h3>Папка Workshop</h3>
+                            <p>Путь до !Workshop (мастерская Steam)</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="input-group">
+                            <input type="text" id="workshop-path" class="settings-input" placeholder="C:\\DayZServer\\!Workshop" readonly>
+                            <button type="button" class="btn btn-secondary browse-btn" data-target="workshop-path" data-field="workshop" data-type="folder">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                                </svg>
+                                Обзор
+                            </button>
+                        </div>
+                        <div class="input-actions">
+                            <button type="button" class="btn btn-save-row save-single-btn" data-target="workshop-path" data-field="workshop">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                    <polyline points="17,21 17,13 7,13 7,21"/>
+                                    <polyline points="7,3 7,8 15,8"/>
+                                </svg>
+                                Сохранить
+                            </button>
+                            <button type="button" class="btn btn-reset-row reset-single-btn" data-target="workshop-path" data-field="workshop">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1,4 1,10 7,10"/>
+                                    <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                    <polyline points="23,20 23,14 17,14"/>
+                                    <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                                </svg>
+                                Сбросить
+                            </button>
+                        </div>
+                        <div class="row-status" id="status-workshop"></div>
+                    </div>
+                </div>
+
+                <!-- 4. ПАПКА СВОИХ МОДОВ -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="settings-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </span>
+                        <div class="settings-card-title">
+                            <h3>Папка своих модов</h3>
+                            <p>Путь до кастомных модификаций (не из Workshop)</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="input-group">
+                            <input type="text" id="custom-mods-path" class="settings-input" placeholder="C:\\DayZServer\\@MyMods" readonly>
+                            <button type="button" class="btn btn-secondary browse-btn" data-target="custom-mods-path" data-field="custom_mods" data-type="folder">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22,19a2,2,0,0,1-2,2H4a2,2,0,0,1-2-2V5A2,2,0,0,1,4,3H9l2,3h9a2,2,0,0,1,2,2Z"/>
+                                </svg>
+                                Обзор
+                            </button>
+                        </div>
+                        <div class="input-actions">
+                            <button type="button" class="btn btn-save-row save-single-btn" data-target="custom-mods-path" data-field="custom_mods">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M19,21H5a2,2,0,0,1-2-2V5A2,2,0,0,1,5,3H16l5,5V19A2,2,0,0,1,19,21Z"/>
+                                    <polyline points="17,21 17,13 7,13 7,21"/>
+                                    <polyline points="7,3 7,8 15,8"/>
+                                </svg>
+                                Сохранить
+                            </button>
+                            <button type="button" class="btn btn-reset-row reset-single-btn" data-target="custom-mods-path" data-field="custom_mods">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1,4 1,10 7,10"/>
+                                    <path d="M21,12a9,9,0,0,0-5.5-8.2,9,9,0,0,0-11,3.7"/>
+                                    <polyline points="23,20 23,14 17,14"/>
+                                    <path d="M3,12a9,9,0,0,0,5.5,8.2,9,9,0,0,0,11-3.7"/>
+                                </svg>
+                                Сбросить
+                            </button>
+                        </div>
+                        <div class="row-status" id="status-custom_mods"></div>
+                    </div>
+                </div>
             </div>
         </div>
     `
 };
 
-// Текущий активный раздел
-let currentPage = null;
-
-// Флаг, был ли первый клик
-let isFirstClick = true;
-
-// Массив пунктов меню в порядке сверху вниз
-const menuOrder = ['server', 'game', 'mods', 'editors', 'settings'];
-
-// Получить HTML стартовой страницы
-function getStartPageHTML() {
-    return `
-        <div id="startPage" class="start-page">
-            <div class="start-content">
-                <div class="start-logo">
-                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <polyline points="9 12 11 14 15 10"/>
-                    </svg>
-                </div>
-                <h1>DayZ Менеджер</h1>
-                <p>Выберите раздел в меню слева</p>
-                <div class="start-hint">
-                    <span class="hint-dot"></span>
-                    <span class="hint-dot"></span>
-                    <span class="hint-dot"></span>
-                </div>
-            </div>
-        </div>
-    `;
+// ПРОСТАЯ ФУНКЦИЯ ДЛЯ SPA
+function showContent(section, event) {
+    if (event) event.preventDefault();
+    
+    // Получаем контейнер
+    const container = document.getElementById('dynamicContent');
+    const startPage = document.getElementById('startPage');
+    
+    // Проверяем, открыта ли уже эта страница
+    const currentSection = getCurrentSection();
+    
+    // Если кликнули на уже активную страницу - закрываем её
+    if (currentSection === section && container.style.display === 'block') {
+        // Закрываем страницу - показываем стартовый экран
+        container.style.display = 'none';
+        container.innerHTML = '';
+        if (startPage) startPage.style.display = 'flex';
+        
+        // Убираем активный класс у всех пунктов меню
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Очищаем hash
+        if (window.location.hash) {
+            history.pushState(null, null, ' ');
+        }
+        
+        console.log(`Closed: ${section}`);
+        return;
+    }
+    
+    // Скрываем стартовую страницу
+    if (startPage) startPage.style.display = 'none';
+    
+    // Получаем контент
+    const content = pages[section];
+    if (!content) {
+        console.error(`Страница "${section}" не найдена`);
+        return;
+    }
+    
+    // Меняем содержимое контейнера
+    container.innerHTML = content;
+    container.style.display = 'block';
+    container.scrollTop = 0;
+    
+    // Обновляем активный пункт меню
+    document.querySelectorAll('.nav-item a').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${section}`) {
+            link.classList.add('active');
+        }
+    });
+    
+    // Обновляем URL
+    if (window.location.hash !== `#${section}`) {
+        window.location.hash = section;
+    }
+    
+    console.log(`Navigated to: ${section}`);
 }
 
-// Определить направление анимации
-function getAnimationDirection(targetPage) {
-    if (!currentPage) {
-        return 'in';
+// Вспомогательная функция для получения текущей открытой страницы
+function getCurrentSection() {
+    const container = document.getElementById('dynamicContent');
+    if (!container || container.style.display === 'none' || !container.innerHTML) {
+        return null;
     }
     
-    const currentIndex = menuOrder.indexOf(currentPage);
-    const targetIndex = menuOrder.indexOf(targetPage);
-    
-    if (currentIndex === -1 || targetIndex === -1) {
-        return 'in';
+    // Проверяем активный пункт меню
+    const activeLink = document.querySelector('.nav-item a.active');
+    if (activeLink) {
+        const href = activeLink.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            return href.substring(1);
+        }
     }
+    return null;
+}
+
+// Обработчик для кнопок "Назад/Вперед"
+window.addEventListener('hashchange', () => {
+    const hash = window.location.hash.replace('#', '');
+    const container = document.getElementById('dynamicContent');
+    const startPage = document.getElementById('startPage');
     
-    if (targetIndex < currentIndex) {
-        return 'down';
-    } else if (targetIndex > currentIndex) {
-        return 'up';
+    if (hash && pages[hash]) {
+        // Открываем страницу (без toggle-поведения, только навигация)
+        if (startPage) startPage.style.display = 'none';
+        const content = pages[hash];
+        container.innerHTML = content;
+        container.style.display = 'block';
+        container.scrollTop = 0;
+        
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${hash}`) {
+                link.classList.add('active');
+            }
+        });
     } else {
-        return 'in';
+        // Возврат на стартовую
+        container.style.display = 'none';
+        container.innerHTML = '';
+        if (startPage) startPage.style.display = 'flex';
+        
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.classList.remove('active');
+        });
+    }
+});
+
+// ========================================
+// SERVER CONTROLS
+// ========================================
+
+function controlServer(action, event) {
+    if (event) event.preventDefault();
+    console.log(`Server action: ${action}`);
+    
+    switch(action) {
+        case 'start':
+            fetch('/api/server/start', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => console.log('Server start:', data))
+                .catch(err => console.error('Server start error:', err));
+            break;
+        case 'stop':
+            fetch('/api/server/stop', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => console.log('Server stop:', data))
+                .catch(err => console.error('Server stop error:', err));
+            break;
+        case 'restart':
+            fetch('/api/server/restart', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => console.log('Server restart:', data))
+                .catch(err => console.error('Server restart error:', err));
+            break;
     }
 }
 
-// Универсальная функция смены контента с анимацией
-function switchContent(newHtml, page, direction, isFirst) {
-    const contentArea = document.getElementById('contentArea');
+function controlGame(action, event) {
+    if (event) event.preventDefault();
+    console.log(`Game action: ${action}`);
     
-    if (isFirst) {
-        contentArea.classList.add('slide-up');
-        
-        setTimeout(() => {
-            contentArea.innerHTML = newHtml;
-            contentArea.classList.remove('slide-up');
-            contentArea.classList.add('slide-in-down');
-            
-            setTimeout(() => {
-                contentArea.classList.remove('slide-in-down');
-                initPageAfterLoad(page);
-            }, 350);
-        }, 300);
-        return;
-    }
-    
-    if (direction === 'in') {
-        contentArea.innerHTML = newHtml;
-        contentArea.classList.add('slide-in-up');
-        setTimeout(() => {
-            contentArea.classList.remove('slide-in-up');
-            initPageAfterLoad(page);
-        }, 350);
-        return;
-    }
-    
-    contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
-    
-    setTimeout(() => {
-        contentArea.innerHTML = newHtml;
-        contentArea.classList.remove('slide-up', 'slide-down');
-        contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
-        
-        setTimeout(() => {
-            contentArea.classList.remove('slide-in-down', 'slide-in-up');
-            initPageAfterLoad(page);
-        }, 350);
-        
-    }, 300);
-}
-
-// Инициализация страницы после загрузки
-function initPageAfterLoad(page) {
-    // ============================================
-    // СТРАНИЦА МОДОВ
-    // ============================================
-    if (page === 'mods') {
-        let attempts = 0;
-        const maxAttempts = 10;
-        
-        function tryInitMods() {
-            attempts++;
-            const container = document.getElementById('modsListContainer');
-            
-            if (container) {
-                if (typeof initModsPage === 'function') {
-                    initModsPage();
-                }
-                return;
-            }
-            
-            if (attempts < maxAttempts) {
-                setTimeout(tryInitMods, 200);
-            } else {
-                console.warn('Не удалось найти modsListContainer после ' + maxAttempts + ' попыток');
-            }
-        }
-        
-        setTimeout(tryInitMods, 100);
-    }
-    
-    // ============================================
-    // СТРАНИЦА СЕРВЕРА
-    // ============================================
-    if (page === 'server') {
-        let attempts = 0;
-        const maxAttempts = 10;
-        
-        function tryInitServer() {
-            attempts++;
-            const container = document.getElementById('serverModsContainer');
-            
-            if (container) {
-                if (typeof initServerPage === 'function') {
-                    initServerPage();
-                }
-                
-                if (typeof setupServerModsSearch === 'function') {
-                    setupServerModsSearch();
-                }
-                
-                const refreshBtn = document.getElementById('refreshServerModsBtn');
-                if (refreshBtn) {
-                    const newRefreshBtn = refreshBtn.cloneNode(true);
-                    refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
-                    
-                    newRefreshBtn.addEventListener('click', () => {
-                        if (typeof refreshServerMods === 'function') {
-                            refreshServerMods();
-                        }
-                    });
-                }
-                return;
-            }
-            
-            if (attempts < maxAttempts) {
-                setTimeout(tryInitServer, 200);
-            } else {
-                console.warn('Не удалось найти serverModsContainer после ' + maxAttempts + ' попыток');
-            }
-        }
-        
-        setTimeout(tryInitServer, 100);
-    }
-
-    // ============================================
-    // СТРАНИЦА КЛИЕНТА
-    // ============================================   
-    if (page === 'game') {
-        let attempts = 0;
-        const maxAttempts = 10;
-        
-        function tryInitGame() {
-            attempts++;
-            const container = document.getElementById('gameModsContainer');
-            
-            if (container) {
-                if (typeof initGamePage === 'function') {
-                    initGamePage();
-                }
-                
-                if (typeof setupGameModsSearch === 'function') {
-                    setupGameModsSearch();
-                }
-                
-                const refreshBtn = document.getElementById('refreshGameModsBtn');
-                if (refreshBtn) {
-                    const newRefreshBtn = refreshBtn.cloneNode(true);
-                    refreshBtn.parentNode.replaceChild(newRefreshBtn, refreshBtn);
-                    
-                    newRefreshBtn.addEventListener('click', () => {
-                        if (typeof refreshGameMods === 'function') {
-                            refreshGameMods();
-                        }
-                    });
-                }
-                return;
-            }
-            
-            if (attempts < maxAttempts) {
-                setTimeout(tryInitGame, 200);
-            } else {
-                console.warn('Не удалось найти gameModsContainer после ' + maxAttempts + ' попыток');
-            }
-        }
-        
-        setTimeout(tryInitGame, 100);
-    }
-
-    // ============================================
-    // СТРАНИЦА РЕДАКТОРОВ
-    // ============================================   
-    if (page === 'editors') {
-        let attempts = 0;
-        const maxAttempts = 10;
-        
-        function tryInitEditors() {
-            attempts++;
-            const select = document.getElementById('editorSelect');
-            
-            if (select) {
-                if (typeof initEditorsPage === 'function') {
-                    initEditorsPage();
-                }
-                return;
-            }
-            
-            if (attempts < maxAttempts) {
-                setTimeout(tryInitEditors, 200);
-            } else {
-                console.warn('Не удалось инициализировать страницу редакторов');
-            }
-        }
-        
-        setTimeout(tryInitEditors, 100);
+    switch(action) {
+        case 'start':
+            fetch('/api/game/start', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => console.log('Game start:', data))
+                .catch(err => console.error('Game start error:', err));
+            break;
+        case 'stop':
+            fetch('/api/game/stop', { method: 'POST' })
+                .then(r => r.json())
+                .then(data => console.log('Game stop:', data))
+                .catch(err => console.error('Game stop error:', err));
+            break;
     }
 }
 
-// Показать стартовую страницу
-function showStartPage(direction = 'in') {
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    document.querySelectorAll('.nav-item a').forEach(link => {
-        const icon = link.querySelector('.nav-icon');
-        const text = link.querySelector('.nav-text');
-        if (icon) icon.style.color = '';
-        if (text) text.style.color = '';
-    });
-    
-    const html = getStartPageHTML();
-    switchContent(html, 'start', direction, false);
-    currentPage = null;
-}
-
-// Показать контент
-function showContent(page, event) {
-    const clickedItem = event.target.closest('.nav-item');
-    if (!clickedItem) return;
-    
-    if (clickedItem.classList.contains('active')) {
-        const direction = currentPage ? getAnimationDirection('start') : 'in';
-        showStartPage(direction);
-        return;
-    }
-    
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    clickedItem.classList.add('active');
-    const direction = getAnimationDirection(page);
-    const html = pages[page] || '<h1>Страница не найдена</h1>';
-    
-    switchContent(html, page, direction, isFirstClick);
-    
-    if (isFirstClick) {
-        isFirstClick = false;
-    }
-    
-    currentPage = page;
-    
-    document.querySelectorAll('.nav-item a').forEach(link => {
-        const icon = link.querySelector('.nav-icon');
-        const text = link.querySelector('.nav-text');
-        if (icon) icon.style.color = '';
-        if (text) text.style.color = '';
-    });
-}
-
-// Показать настройки
 function showSettings(event) {
-    const clickedItem = event.target.closest('.nav-item');
-    if (!clickedItem) return;
-    
-    if (clickedItem.classList.contains('active')) {
-        const direction = currentPage ? getAnimationDirection('start') : 'in';
-        showStartPage(direction);
-        return;
-    }
-    
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    clickedItem.classList.add('active');
-    const direction = getAnimationDirection('settings');
-    const contentArea = document.getElementById('contentArea');
-    
-    if (isFirstClick) {
-        contentArea.classList.add('slide-up');
-        
-        setTimeout(() => {
-            fetch('/settings-content')
-                .then(response => response.text())
-                .then(html => {
-                    contentArea.innerHTML = html;
-                    if (typeof loadSettings === 'function') {
-                        loadSettings();
-                    }
-                    if (typeof attachSettingsHandlers === 'function') {
-                        attachSettingsHandlers();
-                    }
-                    contentArea.classList.remove('slide-up');
-                    contentArea.classList.add('slide-in-down');
-                    setTimeout(() => {
-                        contentArea.classList.remove('slide-in-down');
-                    }, 350);
-                })
-                .catch(() => {
-                    contentArea.innerHTML = `
-                        <div class="settings-content-wrapper">
-                            <div class="settings-header">
-                                <h1>⚙️ Настройки</h1>
-                                <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
-                            </div>
-                            <div class="settings-body">
-                                <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
-                                    Загрузка настроек...
-                                </p>
-                            </div>
-                        </div>
-                    `;
-                    contentArea.classList.remove('slide-up');
-                    contentArea.classList.add('slide-in-down');
-                    setTimeout(() => {
-                        contentArea.classList.remove('slide-in-down');
-                    }, 350);
-                });
-        }, 300);
-        
-        isFirstClick = false;
-        currentPage = 'settings';
-        return;
-    }
-    
-    if (direction === 'in') {
-        fetch('/settings-content')
-            .then(response => response.text())
-            .then(html => {
-                contentArea.innerHTML = html;
-                if (typeof loadSettings === 'function') {
-                    loadSettings();
-                }
-                if (typeof attachSettingsHandlers === 'function') {
-                    attachSettingsHandlers();
-                }
-                contentArea.classList.add('slide-in-up');
-                setTimeout(() => {
-                    contentArea.classList.remove('slide-in-up');
-                }, 350);
-            })
-            .catch(() => {
-                contentArea.innerHTML = `
-                    <div class="settings-content-wrapper">
-                        <div class="settings-header">
-                            <h1>⚙️ Настройки</h1>
-                            <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
-                        </div>
-                        <div class="settings-body">
-                            <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
-                                Загрузка настроек...
-                            </p>
-                        </div>
-                    </div>
-                `;
-                contentArea.classList.add('slide-in-up');
-                setTimeout(() => {
-                    contentArea.classList.remove('slide-in-up');
-                }, 350);
-            });
-        
-        currentPage = 'settings';
-        return;
-    }
-    
-    contentArea.classList.add(direction === 'up' ? 'slide-up' : 'slide-down');
-    
-    setTimeout(() => {
-        fetch('/settings-content')
-            .then(response => response.text())
-            .then(html => {
-                contentArea.innerHTML = html;
-                if (typeof loadSettings === 'function') {
-                    loadSettings();
-                }
-                if (typeof attachSettingsHandlers === 'function') {
-                    attachSettingsHandlers();
-                }
-                
-                contentArea.classList.remove('slide-up', 'slide-down');
-                contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
-                
-                setTimeout(() => {
-                    contentArea.classList.remove('slide-in-down', 'slide-in-up');
-                }, 350);
-            })
-            .catch(() => {
-                contentArea.innerHTML = `
-                    <div class="settings-content-wrapper">
-                        <div class="settings-header">
-                            <h1>⚙️ Настройки</h1>
-                            <p class="settings-subtitle">Укажите пути к файлам и папкам DayZ</p>
-                        </div>
-                        <div class="settings-body">
-                            <p style="color: rgba(255,255,255,0.5); text-align: center; padding: 40px;">
-                                Загрузка настроек...
-                            </p>
-                        </div>
-                    </div>
-                `;
-                contentArea.classList.remove('slide-up', 'slide-down');
-                contentArea.classList.add(direction === 'up' ? 'slide-in-down' : 'slide-in-up');
-                setTimeout(() => {
-                    contentArea.classList.remove('slide-in-down', 'slide-in-up');
-                }, 350);
-            });
-            
-    }, 300);
-    
-    currentPage = 'settings';
-    
-    document.querySelectorAll('.nav-item a').forEach(link => {
-        const icon = link.querySelector('.nav-icon');
-        const text = link.querySelector('.nav-text');
-        if (icon) icon.style.color = '';
-        if (text) text.style.color = '';
-    });
+    if (event) event.preventDefault();
+    showContent('settings');
 }
 
-// ============================================
-// РАЗНОЦВЕТНЫЕ ИКОНКИ ПРИ НАВЕДЕНИИ
-// ============================================
+// ========================================
+// ТЕСТОВАЯ КНОПКА ДЛЯ УВЕДОМЛЕНИЙ.ТЕСТ
+// ========================================
+
 document.addEventListener('DOMContentLoaded', function() {
-    const navItems = document.querySelectorAll('.nav-item a');
+    // Создаем кнопку
+    const testBtn = document.createElement('div');
+    testBtn.innerHTML = '🧪';
+    testBtn.style.cssText = `
+        position: fixed;
+        bottom: 160px;
+        right: 30px;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--theme-accent, #4ade80);
+        color: #1a1a2e;
+        font-size: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    `;
     
-    const colors = [
-        '#FF6B6B', '#FF4757', '#FF8A5C', '#FF6348', '#FF9F43',
-        '#FECA57', '#FFD93D', '#00B894', '#00CEC9', '#55EFC4',
-        '#0984E3', '#45B7D1', '#74B9FF', '#6C5CE7', '#A29BFE',
-        '#7BED9F', '#70A1FF', '#FFAF40', '#FF4D4D', '#D980FA'
-    ];
+    // Подсказка
+    const tooltip = document.createElement('span');
+    tooltip.textContent = '🧪 Тест уведомлений';
+    tooltip.style.cssText = `
+        position: absolute;
+        right: 70px;
+        background: rgba(30, 30, 50, 0.95);
+        backdrop-filter: blur(10px);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    `;
+    testBtn.appendChild(tooltip);
     
-    let lastColor = null;
-    let lastColor2 = null;
+    // Ховер для подсказки
+    testBtn.addEventListener('mouseenter', () => {
+        tooltip.style.opacity = '1';
+        testBtn.style.transform = 'scale(1.1)';
+    });
+    testBtn.addEventListener('mouseleave', () => {
+        tooltip.style.opacity = '0';
+        testBtn.style.transform = 'scale(1)';
+    });
     
-    function getRandomColor() {
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-    
-    function getUniqueRandomColor() {
-        let newColor;
-        let attempts = 0;
-        do {
-            newColor = getRandomColor();
-            attempts++;
-            if (attempts > 50) break;
-        } while (newColor === lastColor || newColor === lastColor2);
-        
-        lastColor2 = lastColor;
-        lastColor = newColor;
-        return newColor;
-    }
-    
-    navItems.forEach(item => {
-        const icon = item.querySelector('.nav-icon');
-        const text = item.querySelector('.nav-text');
-        
-        item.addEventListener('mouseenter', function() {
-            const color = getUniqueRandomColor();
-            if (icon) {
-                icon.style.color = color;
-                icon.style.transition = 'color 0.3s ease, transform 0.3s ease';
-            }
-            if (text) {
-                text.style.color = color;
-                text.style.transition = 'color 0.3s ease';
-            }
-        });
-        
-        item.addEventListener('mouseleave', function() {
-            if (icon) {
-                icon.style.color = '';
-            }
-            if (text) {
-                text.style.color = '';
-            }
+    // Клик — показываем уведомление
+    testBtn.addEventListener('click', function() {
+        // Массив разных типов для разнообразия
+        const types = [
+            { type: 'success', title: '✅ Успех!', subtitle: 'Операция выполнена успешно' },
+            { type: 'error', title: '❌ Ошибка!', subtitle: 'Что-то пошло не так' },
+            { type: 'warning', title: '⚠️ Предупреждение', subtitle: 'Проверьте настройки' },
+            { type: 'info', title: 'ℹ️ Информация', subtitle: 'Новое обновление доступно' }
+        ];
+        const random = types[Math.floor(Math.random() * types.length)];
+        Notifications.show({
+            type: random.type,
+            title: random.title,
+            subtitle: random.subtitle,
+            actions: ['OK']
         });
     });
-});
-
-// ============================================
-// ПРЕДВАРИТЕЛЬНАЯ ЗАГРУЗКА МОДОВ ПРИ СТАРТЕ
-// ============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof loadModsState === 'function') {
-        loadModsState().then(() => {
-            if (typeof loadModsFromCache === 'function') {
-                console.log('⚡ Загрузка кеша модов...');
-                loadModsFromCache().then((loaded) => {
-                    if (loaded) {
-                        console.log('✅ Кеш модов загружен');
-                        setTimeout(() => {
-                            if (typeof backgroundScanAndCache === 'function') {
-                                console.log('🔄 Фоновая проверка обновлений...');
-                                backgroundScanAndCache();
-                            }
-                        }, 3000);
-                    } else {
-                        console.log('🚀 Кеша нет, запуск фонового сканирования...');
-                        if (typeof scanMods === 'function') {
-                            scanMods(false);
-                        }
-                    }
-                });
-            }
-        });
-    }
-});
-
-// ============================================
-// ИНИЦИАЛИЗАЦИЯ КОНСОЛИ ПРИ СТАРТЕ
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(() => {
-        if (typeof initConsole === 'function') {
-            initConsole();
-        }
-    }, 500);
+    
+    // Добавляем на страницу
+    document.body.appendChild(testBtn);
+    
+    console.log('🧪 Тестовая кнопка добавлена!');
 });
