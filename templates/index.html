@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPA - Сервер</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Верхнее меню -->
+    <nav class="navbar">
+        <a href="/" class="brand">My<span>Site</span></a>
+        <ul class="nav-links">
+            <li><a href="#server" class="active" data-page="server">Сервер</a></li>
+            <li><a href="#client" data-page="client">Клиент</a></li>
+            <li><a href="#mods" data-page="mods">Моды</a></li>
+            <li><a href="#editors" data-page="editors">Редакторы</a></li>
+            <li><a href="#settings" data-page="settings">Настройки</a></li>
+        </ul>
+    </nav>
+
+    <!-- Контейнер для динамической загрузки -->
+    <div id="app" class="content">
+        <div id="page-content"></div>
+    </div>
+
+    <!-- Футер -->
+    <div class="footer">
+        &copy; 2026 Все права защищены
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

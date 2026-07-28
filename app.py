@@ -1,11 +1,11 @@
-# app.py - ДОЛЖНО БЫТЬ (ПРАВИЛЬНО)
-from flask import Flask
-from routes import init_routes
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# Регистрируем все роуты из routes.py
-init_routes(app)
+@app.route('/')
+def index():
+    """Главная страница SPA"""
+    return render_template('index.html')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
