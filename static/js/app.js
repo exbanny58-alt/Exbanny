@@ -10,6 +10,7 @@ const app = {
             this.config = await response.json();
             this.render();
             EffectsManager.init();
+            ColorPicker.init();
         } catch (error) {
             console.error('Ошибка загрузки конфига:', error);
         }
@@ -21,6 +22,7 @@ const app = {
         this.renderSettingsSubnav();
         this.renderTabs();
         this.showHome();
+        setTimeout(() => ColorPicker.applyColors(), 100);
     },
 
     renderLogo() {
@@ -69,12 +71,14 @@ const app = {
         document.getElementById('content').innerHTML = this.config.homePage.content;
         this.currentPage = 'home';
         this.hideSettingsSubnav();
+        this.closeColorPickerIfOpen();
 
         document.querySelectorAll('.side-tab').forEach(tab => {
             tab.classList.remove('active');
         });
 
         document.querySelector('.settings-btn').classList.remove('active');
+        
         setTimeout(() => EffectsManager.applyToContent(), 50);
     },
 
@@ -97,9 +101,15 @@ const app = {
             document.querySelectorAll('.side-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            this.loadSettingsContent();
+            // По умолчанию показываем "Общие"
+            this.currentSettingsTab = 'general';
+            document.querySelectorAll('.subnav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.settingsTab === 'general');
+            });
+            this.loadSettingsContent('general');
         } else {
             this.hideSettingsSubnav();
+            this.closeColorPickerIfOpen();
             document.querySelector('.settings-btn').classList.remove('active');
             const page = this.config.pages.find(p => p.id === pageId);
             if (page) {
@@ -119,6 +129,12 @@ const app = {
         document.getElementById('settingsSubnav').classList.remove('visible');
     },
 
+    closeColorPickerIfOpen() {
+        if (ColorPicker.isOpen) {
+            ColorPicker.close();
+        }
+    },
+
     switchSettingsTab(tabName) {
         this.currentSettingsTab = tabName;
 
@@ -126,14 +142,24 @@ const app = {
             tab.classList.toggle('active', tab.dataset.settingsTab === tabName);
         });
 
-        this.loadSettingsContent();
+        // Если нажали на "Цвета" — открываем попап, страница не меняется
+        if (tabName === 'colors') {
+            ColorPicker.open();
+            // Контент не меняем, оставляем текущий
+            return;
+        }
+
+        // Для других вкладок закрываем попап и загружаем контент
+        ColorPicker.close();
+        this.loadSettingsContent(tabName);
     },
 
-    loadSettingsContent() {
-        const content = document.getElementById('content');
+    loadSettingsContent(tabName) {
+        // Если tabName не передан, используем currentSettingsTab
+        const tab = tabName || this.currentSettingsTab;
         
-        if (this.currentSettingsTab === 'general') {
-            content.innerHTML = `
+        if (tab === 'general') {
+            document.getElementById('content').innerHTML = `
                 <div class='settings-page'>
                     <div class='settings-header'>
                         <div class='settings-icon'>
@@ -148,7 +174,7 @@ const app = {
                         <p>Здесь будут общие настройки приложения</p>
                     </div>
                 </div>`;
-        } else if (this.currentSettingsTab === 'effects') {
+        } else if (tab === 'effects') {
             const effects = EffectsManager.effects;
             const currentEffect = EffectsManager.currentEffect;
             let optionsHtml = '';
@@ -165,7 +191,7 @@ const app = {
                     </div>`;
             });
 
-            content.innerHTML = `
+            document.getElementById('content').innerHTML = `
                 <div class='settings-page effects-page'>
                     <div class='settings-content effects-content'>
                         <p>Выберите анимацию переключения между страницами</p>
@@ -175,13 +201,16 @@ const app = {
                     </div>
                 </div>`;
 
-            document.querySelectorAll('.effect-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    const effectId = option.dataset.effect;
-                    EffectsManager.setEffect(effectId);
-                    this.loadSettingsContent();
+            setTimeout(() => {
+                document.querySelectorAll('.effect-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        const effectId = option.dataset.effect;
+                        EffectsManager.setEffect(effectId);
+                        // Перезагружаем содержимое чтобы обновить активное состояние
+                        this.loadSettingsContent('effects');
+                    });
                 });
-            });
+            }, 0);
         }
         
         setTimeout(() => EffectsManager.applyToContent(), 50);
@@ -189,6 +218,7 @@ const app = {
 
     goHome() {
         this.showHome();
+        ColorPicker.close();
     }
 };
 

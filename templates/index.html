@@ -24,6 +24,14 @@
         </div>
 
         <div class="top-panel-right">
+            <button class="music-btn" title="Музыкальный плеер">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18V5l12-2v13"/>
+                    <circle cx="6" cy="18" r="3"/>
+                    <circle cx="18" cy="16" r="3"/>
+                    <path d="M9 9l12-2"/>
+                </svg>
+            </button>
             <button class="settings-btn" title="Настройки"></button>
         </div>
     </header>
@@ -44,8 +52,10 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

@@ -1,3 +1,7 @@
 {
-    "effect": "fadeBlurIn",
+    "effect": "flipIn",
+    "colors": {
+        "accent": "#c81e1e",
+        "glowIntensity": 100
+    }
 }
