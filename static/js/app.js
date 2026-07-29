@@ -1,130 +1,220 @@
-class SpaApp {
-    constructor() {
-        this.currentPage = 'server';
-        this.container = document.getElementById('page-content');
-        this.contentDiv = document.querySelector('.content');
-        this.navLinks = document.querySelectorAll('.nav-links a');
-        this.pagesData = null;
-        this.init();
-    }
+// SPA приложение DayzM
+const app = {
+    config: null,
+    currentPage: null,
+    currentSettingsTab: 'general',
 
     async init() {
-        // Загружаем страницы из JSON
         try {
-            const response = await fetch('/static/data/pages.json');
-            this.pagesData = await response.json();
+            const response = await fetch('/api/config');
+            this.config = await response.json();
+            this.render();
+            // Инициализируем менеджер эффектов ПОСЛЕ рендеринга
+            EffectsManager.init();
         } catch (error) {
-            console.error('Ошибка загрузки страниц:', error);
-            this.showError('Не удалось загрузить данные');
-            return;
+            console.error('Ошибка загрузки конфига:', error);
         }
+    },
 
-        // Настройка навигации
-        this.navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const page = link.dataset.page;
-                this.navigateTo(page);
-            });
+    render() {
+        this.renderLogo();
+        this.renderSettingsButton();
+        this.renderSettingsSubnav();
+        this.renderTabs();
+        this.showHome();
+    },
 
-            link.addEventListener('mouseenter', () => {
-                if (!link.classList.contains('active')) {
-                    link.style.color = '#ffffff';
-                    link.style.borderBottomColor = '#666';
-                }
-            });
+    renderLogo() {
+        document.querySelector('.logo .dayz').textContent = this.config.app.logo.text;
+        document.querySelector('.logo .m').textContent = this.config.app.logo.accent;
+        document.title = this.config.app.title;
+    },
 
-            link.addEventListener('mouseleave', () => {
-                if (!link.classList.contains('active')) {
-                    link.style.color = '';
-                    link.style.borderBottomColor = '';
-                }
+    renderSettingsButton() {
+        const btn = document.querySelector('.settings-btn');
+        if (this.config.settings && this.config.settings.icon) {
+            btn.innerHTML = this.config.settings.icon;
+        }
+        btn.addEventListener('click', () => this.togglePage('settings'));
+    },
+
+    renderSettingsSubnav() {
+        document.querySelectorAll('.subnav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.settingsTab;
+                this.switchSettingsTab(tabName);
             });
         });
+    },
 
-        // Обработка кнопки "Назад"
-        window.addEventListener('popstate', (event) => {
-            const page = event.state?.page || 'server';
-            this.loadPage(page, false);
+    renderTabs() {
+        const nav = document.querySelector('.side-tabs');
+        nav.innerHTML = '';
+
+        this.config.pages.forEach(page => {
+            const button = document.createElement('button');
+            button.className = 'side-tab';
+            button.dataset.pageId = page.id;
+            button.innerHTML = `
+                <span class="tab-icon">${page.icon}</span>
+                ${page.name}
+            `;
+            button.addEventListener('click', () => this.togglePage(page.id));
+            nav.appendChild(button);
         });
 
-        // Загрузка начальной страницы
-        const initialPage = window.location.hash.replace('#', '') || 'server';
-        this.navigateTo(initialPage, false);
+        // Запускаем индикатор загрузки
+        SideLoader.init();
+    },
 
-        // Клик вне меню
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.nav-links')) {
-                this.navLinks.forEach(link => {
-                    if (!link.classList.contains('active')) {
-                        link.style.color = '';
-                        link.style.borderBottomColor = '';
-                    }
-                });
+    showHome() {
+        document.getElementById('content').innerHTML = this.config.homePage.content;
+        this.currentPage = 'home';
+        this.hideSettingsSubnav();
+
+        document.querySelectorAll('.side-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        document.querySelector('.settings-btn').classList.remove('active');
+        
+        // Применяем эффект к домашней странице
+        setTimeout(() => EffectsManager.applyToContent(), 50);
+    },
+
+    togglePage(pageId) {
+        if (this.currentPage === pageId) {
+            this.showHome();
+        } else {
+            this.openPage(pageId);
+        }
+    },
+
+    openPage(pageId) {
+        document.querySelectorAll('.side-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.pageId === pageId);
+        });
+
+        if (pageId === 'settings') {
+            this.showSettingsSubnav();
+            document.querySelector('.settings-btn').classList.add('active');
+            document.querySelectorAll('.side-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            this.loadSettingsContent();
+        } else {
+            this.hideSettingsSubnav();
+            document.querySelector('.settings-btn').classList.remove('active');
+            const page = this.config.pages.find(p => p.id === pageId);
+            if (page) {
+                document.getElementById('content').innerHTML = page.content;
+                // Применяем эффект после загрузки контента
+                setTimeout(() => EffectsManager.applyToContent(), 50);
             }
+        }
+
+        this.currentPage = pageId;
+    },
+    
+    showSettingsSubnav() {
+        document.getElementById('settingsSubnav').classList.add('visible');
+    },
+
+    hideSettingsSubnav() {
+        document.getElementById('settingsSubnav').classList.remove('visible');
+    },
+
+    switchSettingsTab(tabName) {
+        this.currentSettingsTab = tabName;
+
+        document.querySelectorAll('.subnav-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.settingsTab === tabName);
         });
-    }
 
-    navigateTo(page, addToHistory = true) {
-        if (page === this.currentPage) return;
-        this.currentPage = page;
-        this.setActiveLink(page);
-        this.loadPage(page, addToHistory);
-    }
+        this.loadSettingsContent();
+    },
 
-    setActiveLink(page) {
-        this.navLinks.forEach(link => {
-            link.classList.remove('active');
-            link.style.color = '';
-            link.style.borderBottomColor = '';
-        });
+    loadSettingsContent() {
+        if (this.currentSettingsTab === 'general') {
+            document.getElementById('content').innerHTML = `
+                <div class='settings-page'>
+                    <div class='settings-header'>
+                        <div class='settings-icon'>
+                            <svg viewBox='0 0 24 24' fill='none' stroke='#7acc7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+                                <circle cx='12' cy='12' r='3'></circle>
+                                <path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'></path>
+                            </svg>
+                        </div>
+                        <h1>Общие настройки</h1>
+                    </div>
+                    <div class='settings-content'>
+                        <p>Здесь будут общие настройки приложения</p>
+                    </div>
+                </div>`;
+        } else if (this.currentSettingsTab === 'colors') {
+            document.getElementById('content').innerHTML = `
+                <div class='settings-page'>
+                    <div class='settings-header'>
+                        <div class='settings-icon'>
+                            <svg viewBox='0 0 24 24' fill='none' stroke='#7acc7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+                                <circle cx='12' cy='12' r='10'></circle>
+                                <path d='M12 2a10 10 0 0 1 0 20'></path>
+                                <path d='M12 2a10 10 0 0 0 0 20'></path>
+                            </svg>
+                        </div>
+                        <h1>Цвета</h1>
+                    </div>
+                    <div class='settings-content'>
+                        <p>Здесь будут настройки цветовой схемы</p>
+                    </div>
+                </div>`;
+        } else if (this.currentSettingsTab === 'effects') {
+            const effects = EffectsManager.effects;
+            const currentEffect = EffectsManager.currentEffect;
+            let optionsHtml = '';
+            
+            Object.entries(effects).forEach(([id, effect]) => {
+                const isActive = currentEffect === id;
+                optionsHtml += `
+                    <div class="effect-option ${isActive ? 'active' : ''}" data-effect="${id}">
+                        <div class="effect-radio"></div>
+                        <div class="effect-info">
+                            <span class="effect-name">${effect.name}</span>
+                            <span class="effect-desc">${effect.description}</span>
+                        </div>
+                    </div>`;
+            });
 
-        const activeLink = document.querySelector(`.nav-links a[data-page="${page}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
+            document.getElementById('content').innerHTML = `
+                <div class='settings-page effects-page'>
+                    <div class='settings-content effects-content'>
+                        <p>Выберите анимацию переключения между страницами</p>
+                        <div class='effects-list'>
+                            ${optionsHtml}
+                        </div>
+                    </div>
+                </div>`;
+
+            // Вешаем обработчики на эффекты
+            document.querySelectorAll('.effect-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const effectId = option.dataset.effect;
+                    EffectsManager.setEffect(effectId);
+                    this.loadSettingsContent(); // Перезагружаем для обновления активного состояния
+                });
+            });
         }
-    }
-
-    loadPage(page, addToHistory = true) {
-        if (!this.pagesData || !this.pagesData.pages) {
-            this.showError('Данные не загружены');
-            return;
-        }
-
-        const pageData = this.pagesData.pages[page];
         
-        if (!pageData) {
-            this.showError('Страница не найдена');
-            return;
-        }
+        // Применяем эффект к странице настроек
+        setTimeout(() => EffectsManager.applyToContent(), 50);
+    },
 
-        // Обновляем контент
-        this.container.innerHTML = pageData.template;
-        document.title = `SPA - ${pageData.title}`;
-        
-        // Обновляем URL
-        if (addToHistory && history.pushState) {
-            history.pushState({ page: page }, pageData.title, `#${page}`);
-        }
-
-        // Анимация
-        this.contentDiv.classList.remove('fade-in');
-        setTimeout(() => {
-            this.contentDiv.classList.add('fade-in');
-        }, 10);
+    goHome() {
+        this.showHome();
     }
-
-    showError(message) {
-        this.container.innerHTML = `
-            <div style="color: #ff6b6b;">
-                <h1>❌ Ошибка</h1>
-                <p>${message}</p>
-                <p class="sub">Попробуйте обновить страницу</p>
-            </div>
-        `;
-    }
-}
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-    new SpaApp();
+    app.init();
+    document.querySelector('.logo').addEventListener('click', () => app.goHome());
 });

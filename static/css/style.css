@@ -1,4 +1,31 @@
-/* Сброс стилей и базовые настройки */
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap');
+
+/* ============================================
+   ROOT VARIABLES
+   ============================================ */
+:root {
+    --bg-primary: #1a1d1a;
+    --bg-top-panel: #1e211e;
+    --bg-side-panel: #1c1f1c;
+    --bg-card: #212421;
+    --text-primary: #b0b5b0;
+    --text-secondary: #7d827d;
+    --text-heading: #c8cdc8;
+    --border-color: #2a2f2a;
+    --border-hover: #3a423a;
+    --accent: #7acc7a;
+    --accent-dim: #5a9e5a;
+    --accent-glow: rgba(122, 204, 122, 0.12);
+    --accent-glow-strong: rgba(122, 204, 122, 0.2);
+    --accent-bright: #8ddb8d;
+    --accent-bg: rgba(122, 204, 122, 0.06);
+    --loader-color: #7acc7a;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
 * {
     margin: 0;
     padding: 0;
@@ -6,117 +33,889 @@
 }
 
 body {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100vh;
+    font-family: 'Montserrat', 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #161916;
+    color: var(--text-primary);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    border: 1px solid var(--border-color);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #2a302a;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-dim);
+    opacity: 0.5;
+}
+
+/* ============================================
+   TOP PANEL
+   ============================================ */
+.top-panel {
+    background-color: var(--bg-top-panel);
+    height: 56px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+}
+
+.top-panel-left {
+    display: flex;
+    align-items: center;
+    gap: 150px;
+}
+
+/* --- Logo --- */
+.logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #c8cdc8;
+    letter-spacing: 2px;
+    text-shadow: 0 0 30px var(--accent-glow);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+    padding: 6px 16px;
+    border: 1px solid var(--accent-dim);
+    border-radius: 8px;
+    box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.logo:hover {
+    text-shadow: 0 0 40px var(--accent-glow-strong);
+    color: #dde0dd;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px var(--accent-glow-strong);
+}
+
+.logo .dayz {
+    color: #d4d8d4;
+    font-weight: 600;
+}
+
+.logo .m {
+    color: var(--accent-dim);
+    font-weight: 300;
+}
+
+.top-panel-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- Settings Subnav --- */
+.settings-subnav {
+    display: none;
+    gap: 4px;
+}
+
+.settings-subnav.visible {
+    display: flex;
+}
+
+.subnav-tab {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: none;
+    color: var(--text-secondary);
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    box-shadow: 0 0 8px var(--accent-glow);
+    position: relative;
+}
+
+.subnav-tab:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -3.5px;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background-color: var(--accent-dim);
+    opacity: 0.3;
+}
+
+.subnav-tab:hover {
+    background-color: #242924;
+    color: #c0c8c0;
+    border-color: var(--border-hover);
+    box-shadow: 0 0 16px var(--accent-glow-strong);
+}
+
+.subnav-tab.active {
+    background-color: #1e241e;
+    color: #d0d8d0;
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 20px var(--accent-glow-strong), inset 0 0 16px var(--accent-bg);
+}
+
+/* --- Settings Button --- */
+.settings-btn {
+    background-color: #262b26;
+    border: 1px solid var(--border-color);
+    color: #aaaaaa;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    padding: 8px;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.settings-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.settings-btn:hover {
+    background-color: #2a302a;
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 20px var(--accent-glow-strong);
+}
+
+.settings-btn:hover svg {
+    stroke: var(--accent);
+}
+
+.settings-btn:active {
+    background-color: #2d352d;
+    transform: scale(0.96);
+}
+
+.settings-btn.active {
+    background-color: #1e241e;
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 20px var(--accent-glow-strong);
+}
+
+.settings-btn.active svg {
+    stroke: var(--accent);
+}
+
+/* ============================================
+   MAIN LAYOUT
+   ============================================ */
+.main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    padding: 0;
+    gap: 0;
+}
+
+/* ============================================
+   SIDE PANEL (Левая панель)
+   ============================================ */
+.side-panel {
+    background-color: var(--bg-side-panel);
+    width: 240px;
+    min-width: 240px;
+    border: 1px solid var(--accent-dim);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
+    z-index: 90;
+    padding: 20px 0 0 0;
+    margin: 12px 0 12px 12px;
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
 }
 
-/* --- Верхнее меню --- */
-.navbar {
-    background-color: #2a2a2a;
-    padding: 1rem 2rem;
+.side-tabs {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #3a3a3a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0 12px;
 }
 
-.navbar .brand {
+/* --- Side Tabs --- */
+.side-tab {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: none;
+    width: 100%;
+    text-align: left;
+    letter-spacing: 0.3px;
+    position: relative;
+    font-family: 'Montserrat', sans-serif;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.side-tab:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background-color: var(--accent-dim);
+    opacity: 0.2;
+}
+
+.side-tab:hover {
+    background-color: #242924;
+    color: #c0c8c0;
+    border-color: var(--border-hover);
+    box-shadow: 0 0 16px var(--accent-glow-strong);
+}
+
+.side-tab.active {
+    background-color: #1e241e;
+    color: #d0d8d0;
+    font-weight: 500;
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 20px var(--accent-glow-strong), inset 0 0 20px var(--accent-bg);
+}
+
+.tab-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.tab-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.side-tab.active .tab-icon svg {
+    stroke: var(--accent);
+}
+
+.side-tab.active .tab-icon {
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+/* --- Side Loading Indicator --- */
+.side-loading {
+    margin-top: auto;
+    padding: 20px 24px;
+}
+
+.side-loading .counter {
+    text-align: center;
+    position: relative;
+}
+
+.side-loading .counter p {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.side-loading .counter h1 {
+    color: var(--text-heading);
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.side-loading .counter hr {
+    background: var(--accent-dim);
+    border: none;
+    height: 1px;
+    width: 0%;
+    margin: 0 auto;
+    transition: width 0.05s linear;
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+
+/* ============================================
+   CONTENT AREA (Основной блок контента)
+   ============================================ */
+.content-area {
+    flex: 1;
+    background-color: var(--bg-primary);
+    padding: 32px 40px;
+    overflow-y: auto;
+    margin: 12px 12px 12px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--accent-dim);
+    box-shadow: inset 0 0 30px var(--accent-glow);
+}
+
+/* ============================================
+   CONTENT CARDS
+   ============================================ */
+.content-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.content-card:hover {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.content-card h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-heading);
     font-size: 1.5rem;
     font-weight: 600;
-    color: #f0f0f0;
-    letter-spacing: 1px;
-    text-decoration: none;
+    margin-bottom: 12px;
+    letter-spacing: 0.3px;
 }
 
-.navbar .brand span {
-    color: #888;
+.content-card h1::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    background: var(--accent-dim);
+    margin-top: 10px;
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--accent-glow);
 }
 
-.nav-links {
-    display: flex;
-    gap: 1.5rem;
-    list-style: none;
-    flex-wrap: wrap;
-}
-
-.nav-links a {
-    color: #cccccc;
-    text-decoration: none;
-    font-size: 1rem;
-    padding: 0.5rem 0.25rem;
-    border-bottom: 2px solid transparent;
-    transition: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
-    cursor: pointer;
-    border-bottom-color: transparent !important;
-}
-
-/* Полностью отключаем все псевдоклассы */
-.nav-links a:hover,
-.nav-links a:active,
-.nav-links a:focus,
-.nav-links a:visited {
-    color: #cccccc !important;
-    border-bottom-color: transparent !important;
-}
-
-/* Только активный класс управляет стилями */
-.nav-links a.active {
-    color: #ffffff !important;
-    border-bottom-color: #aaaaaa !important;
-}
-
-/* Состояние фокуса для клавиатуры */
-.nav-links a:focus-visible {
-    outline: 2px solid #888 !important;
-    outline-offset: 2px !important;
-    border-radius: 2px !important;
-}
-
-/* --- Основной контент --- */
-.content {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    text-align: center;
-}
-
-.content h1 {
-    font-size: 3rem;
-    font-weight: 300;
-    margin-bottom: 0.5rem;
-    color: #f0f0f0;
-}
-
-.content p {
-    font-size: 1.2rem;
-    color: #aaaaaa;
-    max-width: 600px;
-    line-height: 1.6;
-}
-
-.content .sub {
-    margin-top: 1.5rem;
-    color: #777;
+.content-card p {
+    color: #999;
+    line-height: 1.7;
     font-size: 0.95rem;
 }
 
-/* --- Анимация для контента --- */
-.content.fade-in {
-    animation: fadeIn 0.3s ease-in-out;
+.content-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
+.content-card .card-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    background-color: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid rgba(122, 204, 122, 0.25);
+}
+
+/* ============================================
+   GRID & STATS
+   ============================================ */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stat-box {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+    text-shadow: 0 0 20px var(--accent-glow);
+}
+
+.stat-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    font-weight: 400;
+}
+
+/* ============================================
+   WELCOME SCREEN
+   ============================================ */
+.welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: 40px 20px;
+    animation: fadeIn 0.6s ease;
+}
+
+.welcome-logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 5rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    margin-bottom: 12px;
+    text-shadow: 0 0 60px var(--accent-glow-strong);
+    animation: logoPulse 3s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        text-shadow: 0 0 60px var(--accent-glow-strong);
+    }
+    50% {
+        text-shadow: 0 0 80px var(--accent-glow-strong), 0 0 120px rgba(122, 204, 122, 0.08);
+    }
+}
+
+.welcome-dayz {
+    color: #d4d8d4;
+    font-weight: 600;
+}
+
+.welcome-m {
+    color: var(--accent-dim);
+    font-weight: 300;
+}
+
+.welcome-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    letter-spacing: 3px;
+    font-weight: 300;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+}
+
+/* ============================================
+   LOADER (3D Spinner)
+   ============================================ */
+.loader {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    perspective: 800px;
+}
+
+.inner {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.inner.one {
+    left: 0%;
+    top: 0%;
+    animation: rotate-one 1s linear infinite;
+    border-bottom: 3px solid var(--loader-color);
+}
+
+.inner.two {
+    right: 0%;
+    top: 0%;
+    animation: rotate-two 1s linear infinite;
+    border-right: 3px solid var(--loader-color);
+}
+
+.inner.three {
+    right: 0%;
+    bottom: 0%;
+    animation: rotate-three 1s linear infinite;
+    border-top: 3px solid var(--loader-color);
+}
+
+@keyframes rotate-one {
+    0% {
+        transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+    }
+    100% {
+        transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+    }
+}
+
+@keyframes rotate-two {
+    0% {
+        transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+    }
+    100% {
+        transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+    }
+}
+
+@keyframes rotate-three {
+    0% {
+        transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+    }
+    100% {
+        transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+    }
+}
+
+/* ============================================
+   SETTINGS PAGE
+   ============================================ */
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    animation: fadeIn 0.4s ease;
+}
+
+.settings-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.settings-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-bg);
+    border: 1px solid rgba(122, 204, 122, 0.25);
+    border-radius: 14px;
+}
+
+.settings-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.settings-page h1 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-heading);
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.settings-content {
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+}
+
+.settings-content > p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+}
+
+/* ============================================
+   EFFECTS PAGE (Только список)
+   ============================================ */
+.effects-page {
+    justify-content: flex-start;
+    padding-top: 40px;
+}
+
+.effects-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.effects-content > p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.effects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.effect-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    color: var(--text-secondary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.effect-option:hover {
+    border-color: var(--accent-dim);
+    color: #c0c8c0;
+    box-shadow: 0 0 16px var(--accent-glow-strong);
+    transform: translateX(4px);
+}
+
+.effect-option.active {
+    border-color: var(--accent-dim);
+    color: #d0d8d0;
+    background-color: #1e241e;
+    box-shadow: 0 0 20px var(--accent-glow-strong), inset 0 0 16px var(--accent-bg);
+    transform: translateX(4px);
+}
+
+.effect-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.effect-option.active .effect-radio {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.effect-option.active .effect-radio::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.effect-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.effect-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.effect-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 300;
+}
+
+.effect-option.active .effect-name {
+    color: #d0d8d0;
+}
+
+.effect-option.active .effect-desc {
+    color: var(--accent);
+}
+/* ============================================
+   TRANSITION ANIMATIONS
+   ============================================ */
+
+/* 1. Плавное появление с размытием */
+@keyframes fadeBlurIn {
+    0% {
+        opacity: 0;
+        filter: blur(6px);
+        transform: translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+/* 2. Слайд справа с пружиной */
+@keyframes slideSpringRight {
+    0% {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    60% {
+        opacity: 1;
+        transform: translateX(-4px);
+    }
+    80% {
+        transform: translateX(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 3. Слайд снизу с подскоком */
+@keyframes slideBounceUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-8px);
+    }
+    70% {
+        transform: translateY(3px);
+    }
+    85% {
+        transform: translateY(-2px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 4. Масштаб с пружиной */
+@keyframes scaleSpring {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.03);
+    }
+    70% {
+        transform: scale(0.98);
+    }
+    85% {
+        transform: scale(1.01);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 5. Глубина с поворотом */
+@keyframes depth3D {
+    0% {
+        opacity: 0;
+        transform: perspective(600px) rotateX(3deg) translateY(10px) translateZ(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(600px) rotateX(0) translateY(0) translateZ(0);
+    }
+}
+
+/* 6. Россыпь (частицы собираются) */
+@keyframes assembleIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.92);
+        filter: blur(3px);
+    }
+    40% {
+        opacity: 0.6;
+        filter: blur(1px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+/* 7. Вылет с разворотом */
+@keyframes flipIn {
+    0% {
+        opacity: 0;
+        transform: perspective(400px) rotateY(8deg) translateX(15px);
+    }
+    100% {
+        opacity: 1;
+        transform: perspective(400px) rotateY(0) translateX(0);
+    }
+}
+
+/* 8. Волна (снизу вверх с затуханием) */
+@keyframes waveIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+        clip-path: inset(0 0 100% 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* ============================================
+   LEGACY ANIMATIONS (для совместимости)
+   ============================================ */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -128,32 +927,46 @@ body {
     }
 }
 
-/* --- Футер --- */
-.footer {
-    text-align: center;
-    padding: 1.5rem;
-    color: #555;
-    font-size: 0.85rem;
-    border-top: 1px solid #2a2a2a;
-    background-color: #141414;
-}
-
-/* --- Адаптивность --- */
-@media (max-width: 600px) {
-    .navbar {
-        flex-direction: column;
-        gap: 0.75rem;
-        padding: 1rem;
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
     }
-    .nav-links {
-        gap: 1rem;
-        justify-content: center;
-    }
-    .nav-links a {
-        padding: 0.5rem 0.75rem;
-    }
-    .content h1 {
-        font-size: 2.2rem;
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes depthIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

@@ -3,33 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPA - Сервер</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <title>DayzM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 
-    <!-- Верхнее меню -->
-    <nav class="navbar">
-        <a href="/" class="brand">My<span>Site</span></a>
-        <ul class="nav-links">
-            <li><a href="#server" class="active" data-page="server">Сервер</a></li>
-            <li><a href="#client" data-page="client">Клиент</a></li>
-            <li><a href="#mods" data-page="mods">Моды</a></li>
-            <li><a href="#editors" data-page="editors">Редакторы</a></li>
-            <li><a href="#settings" data-page="settings">Настройки</a></li>
-        </ul>
-    </nav>
+    <!-- Верхняя матовая панель -->
+    <header class="top-panel">
+        <div class="top-panel-left">
+            <div class="logo">
+                <span class="dayz"></span><span class="m"></span>
+            </div>
 
-    <!-- Контейнер для динамической загрузки -->
-    <div id="app" class="content">
-        <div id="page-content"></div>
+            <!-- Подменю настроек -->
+            <nav class="settings-subnav" id="settingsSubnav">
+                <button class="subnav-tab active" data-settings-tab="general">Общие</button>
+                <button class="subnav-tab" data-settings-tab="colors">Цвета</button>
+                <button class="subnav-tab" data-settings-tab="effects">Эффекты</button>
+            </nav>
+        </div>
+
+        <div class="top-panel-right">
+            <button class="settings-btn" title="Настройки"></button>
+        </div>
+    </header>
+
+    <!-- Основной контейнер: левая панель + контент -->
+    <div class="main-container">
+
+        <!-- Левая матовая панель -->
+        <aside class="side-panel">
+            <nav class="side-tabs">
+                <!-- Вкладки генерируются через JS -->
+            </nav>
+        </aside>
+
+        <!-- Контент -->
+        <main class="content-area" id="content">
+            <!-- Контент подгружается через JS -->
+        </main>
     </div>
 
-    <!-- Футер -->
-    <div class="footer">
-        &copy; 2026 Все права защищены
-    </div>
-
-    <script src="/static/js/app.js"></script>
+    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
