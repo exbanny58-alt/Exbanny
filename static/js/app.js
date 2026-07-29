@@ -9,7 +9,6 @@ const app = {
             const response = await fetch('/api/config');
             this.config = await response.json();
             this.render();
-            // Инициализируем менеджер эффектов ПОСЛЕ рендеринга
             EffectsManager.init();
         } catch (error) {
             console.error('Ошибка загрузки конфига:', error);
@@ -63,7 +62,6 @@ const app = {
             nav.appendChild(button);
         });
 
-        // Запускаем индикатор загрузки
         SideLoader.init();
     },
 
@@ -77,8 +75,6 @@ const app = {
         });
 
         document.querySelector('.settings-btn').classList.remove('active');
-        
-        // Применяем эффект к домашней странице
         setTimeout(() => EffectsManager.applyToContent(), 50);
     },
 
@@ -108,7 +104,6 @@ const app = {
             const page = this.config.pages.find(p => p.id === pageId);
             if (page) {
                 document.getElementById('content').innerHTML = page.content;
-                // Применяем эффект после загрузки контента
                 setTimeout(() => EffectsManager.applyToContent(), 50);
             }
         }
@@ -135,8 +130,10 @@ const app = {
     },
 
     loadSettingsContent() {
+        const content = document.getElementById('content');
+        
         if (this.currentSettingsTab === 'general') {
-            document.getElementById('content').innerHTML = `
+            content.innerHTML = `
                 <div class='settings-page'>
                     <div class='settings-header'>
                         <div class='settings-icon'>
@@ -149,23 +146,6 @@ const app = {
                     </div>
                     <div class='settings-content'>
                         <p>Здесь будут общие настройки приложения</p>
-                    </div>
-                </div>`;
-        } else if (this.currentSettingsTab === 'colors') {
-            document.getElementById('content').innerHTML = `
-                <div class='settings-page'>
-                    <div class='settings-header'>
-                        <div class='settings-icon'>
-                            <svg viewBox='0 0 24 24' fill='none' stroke='#7acc7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-                                <circle cx='12' cy='12' r='10'></circle>
-                                <path d='M12 2a10 10 0 0 1 0 20'></path>
-                                <path d='M12 2a10 10 0 0 0 0 20'></path>
-                            </svg>
-                        </div>
-                        <h1>Цвета</h1>
-                    </div>
-                    <div class='settings-content'>
-                        <p>Здесь будут настройки цветовой схемы</p>
                     </div>
                 </div>`;
         } else if (this.currentSettingsTab === 'effects') {
@@ -185,7 +165,7 @@ const app = {
                     </div>`;
             });
 
-            document.getElementById('content').innerHTML = `
+            content.innerHTML = `
                 <div class='settings-page effects-page'>
                     <div class='settings-content effects-content'>
                         <p>Выберите анимацию переключения между страницами</p>
@@ -195,17 +175,15 @@ const app = {
                     </div>
                 </div>`;
 
-            // Вешаем обработчики на эффекты
             document.querySelectorAll('.effect-option').forEach(option => {
                 option.addEventListener('click', () => {
                     const effectId = option.dataset.effect;
                     EffectsManager.setEffect(effectId);
-                    this.loadSettingsContent(); // Перезагружаем для обновления активного состояния
+                    this.loadSettingsContent();
                 });
             });
         }
         
-        // Применяем эффект к странице настроек
         setTimeout(() => EffectsManager.applyToContent(), 50);
     },
 
