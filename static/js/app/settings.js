@@ -193,37 +193,70 @@ app.renderPathsSettings = function() {
 };
 
 app.renderPathsList = function(pathsList) {
-    // HTML страницы
     const pageHtml = `
-        <div class='settings-page'>
-            <div class='settings-header'>
-                <div class='settings-icon'>
-                    <svg viewBox='0 0 24 24' fill='none' stroke='var(--accent)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-                        <path d='M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z'/>
-                        <path d='M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4'/>
-                        <line x1='8' y1='3' x2='8' y2='9'/>
-                        <line x1='16' y1='3' x2='16' y2='9'/>
-                        <line x1='3' y1='15' x2='21' y2='15'/>
-                    </svg>
-                </div>
-                <h1>Пути к папкам</h1>
-            </div>
+        <div class='settings-page paths-page'>
             <div class='settings-content'>
-                <p style='color: var(--text-secondary); font-size: 0.9rem; letter-spacing: 0.5px; margin-bottom: 24px; text-align: left;'>
-                    Настройка путей к системным директориям и ресурсам сервера.
-                </p>
-                <div class='paths-container' style='display: flex; flex-direction: column; gap: 14px;'>
+                <!-- Шапка -->
+                <div style='display: flex; align-items: center; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 2px solid var(--accent-dim);'>
+                    <div class='settings-icon' style='width: 56px; height: 56px; flex-shrink: 0; background: var(--accent-bg); border: 2px solid var(--accent); border-radius: 14px; display: flex; align-items: center; justify-content: center;'>
+                        <svg viewBox='0 0 24 24' fill='none' stroke='var(--accent)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='width: 28px; height: 28px;'>
+                            <path d='M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z'/>
+                            <path d='M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4'/>
+                            <line x1='8' y1='3' x2='8' y2='9'/>
+                            <line x1='16' y1='3' x2='16' y2='9'/>
+                            <line x1='3' y1='15' x2='21' y2='15'/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 style='font-family: Montserrat, sans-serif; color: var(--text-heading); font-size: 1.5rem; font-weight: 600; letter-spacing: 0.5px; margin: 0;'>
+                        </h1>
+                        <p style='color: var(--text-secondary); font-size: 0.85rem; margin: 4px 0 0 0;'>
+                            Настройка системных директорий и ресурсов сервера
+                        </p>
+                    </div>
+                </div>
+
+                <div class='paths-container' style='display: flex; flex-direction: column; gap: 12px;'>
                     <div id='pathsListContainer'></div>
                 </div>
-                <div style='display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);'>
-                    <button class='paths-save-btn' style='padding: 10px 28px; border-radius: 8px; border: 2px solid var(--accent); background: var(--accent-bg); color: var(--accent); font-family: Montserrat, sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.25s ease;'>
+
+                <div style='display: flex; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);'>
+                    <button class='paths-save-btn' style='
+                        padding: 8px 20px;
+                        border-radius: 8px;
+                        border: 1.5px solid var(--accent);
+                        background: var(--accent-bg);
+                        color: var(--accent);
+                        font-family: Montserrat, sans-serif;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    '>
                         💾 Сохранить пути
                     </button>
-                    <button class='paths-reset-btn' style='padding: 10px 28px; border-radius: 8px; border: 2px solid rgba(255,70,70,0.3); background: rgba(255,70,70,0.08); color: #ff6b6b; font-family: Montserrat, sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: all 0.25s ease;'>
+                    <button class='paths-reset-btn' style='
+                        padding: 8px 20px;
+                        border-radius: 8px;
+                        border: 1.5px solid rgba(255,70,70,0.3);
+                        background: rgba(255,70,70,0.08);
+                        color: #ff6b6b;
+                        font-family: Montserrat, sans-serif;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    '>
                         ↺ Сбросить
                     </button>
-                    <span style='margin-left: auto; padding: 8px 16px; border-radius: 20px; background: var(--accent-bg); border: 1px solid rgba(122,204,122,0.2); color: var(--accent); font-size: 0.7rem; font-weight: 500; letter-spacing: 0.5px;'>
-                        ⏳ В разработке
+                    <span style='margin-left: auto; padding: 6px 16px; border-radius: 16px; background: var(--accent-bg); border: 1px solid var(--accent); color: var(--accent); font-size: 0.65rem; font-weight: 500; letter-spacing: 0.5px;'>
+                        ⚡ Готово
                     </span>
                 </div>
             </div>
@@ -232,22 +265,99 @@ app.renderPathsList = function(pathsList) {
 
     document.getElementById('content').innerHTML = pageHtml;
 
-    // Генерируем строки путей
+    // Генерируем строки путей с улучшенным дизайном
     let pathsHtml = '';
     pathsList.forEach((path, index) => {
         pathsHtml += `
-            <div class='path-row' style='display: flex; align-items: center; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 16px; transition: all 0.3s ease;'>
-                <div style='min-width: 140px;'>
-                    <label style='font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); letter-spacing: 0.3px;'>${path.label}</label>
+            <div class='path-row' style='
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 14px 20px;
+                transition: all 0.3s ease;
+                position: relative;
+            '>
+                <div style='
+                    min-width: 150px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                '>
+                    <span style='
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 8px;
+                        background: var(--accent-bg);
+                        border: 1px solid var(--accent-dim);
+                        font-size: 0.7rem;
+                        font-weight: 700;
+                        color: var(--accent);
+                        flex-shrink: 0;
+                    '>${index + 1}</span>
+                    <label style='
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        color: var(--text-heading);
+                        letter-spacing: 0.3px;
+                        white-space: nowrap;
+                    '>${path.label}</label>
                 </div>
                 <div style='flex: 1; display: flex; align-items: center; gap: 10px;'>
-                    <input type='text' class='path-input' data-path-id='${path.id}' value='${path.path}' placeholder='${path.placeholder}' style='flex: 1; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 14px; color: var(--text-primary); font-family: Montserrat, sans-serif; font-size: 0.85rem; outline: none; transition: all 0.25s ease;'>
-                    <button class='path-browse-btn' data-path-id='${path.id}' style='padding: 8px 18px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent-bg); color: var(--accent); font-family: Montserrat, sans-serif; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.25s ease; white-space: nowrap;'>
+                    <input type='text' 
+                           class='path-input' 
+                           data-path-id='${path.id}' 
+                           value='${path.path}' 
+                           placeholder='${path.placeholder}' 
+                           style='
+                               flex: 1;
+                               background: var(--bg-primary);
+                               border: 1px solid var(--border-color);
+                               border-radius: 8px;
+                               padding: 10px 16px;
+                               color: var(--text-primary);
+                               font-family: "Courier New", monospace;
+                               font-size: 0.85rem;
+                               outline: none;
+                               transition: all 0.3s ease;
+                               min-width: 0;
+                           '>
+                    <button class='path-browse-btn' 
+                            data-path-id='${path.id}' 
+                            style='
+                                padding: 10px 20px;
+                                border-radius: 8px;
+                                border: 1px solid var(--accent);
+                                background: var(--accent-bg);
+                                color: var(--accent);
+                                font-family: Montserrat, sans-serif;
+                                font-size: 0.75rem;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.3s ease;
+                                white-space: nowrap;
+                                display: flex;
+                                align-items: center;
+                                gap: 6px;
+                            '>
                         📂 Обзор
                     </button>
                 </div>
-                <div style='width: 20px; text-align: center; opacity: 0.3;'>
-                    <span style='font-size: 0.7rem; color: var(--text-secondary);'>${index + 1}</span>
+                <div style='
+                    width: 24px;
+                    text-align: center;
+                    opacity: 0.2;
+                '>
+                    <span style='
+                        font-size: 0.6rem;
+                        color: var(--text-secondary);
+                        font-weight: 700;
+                    '>${String(index + 1).padStart(2, '0')}</span>
                 </div>
             </div>
         `;
@@ -257,24 +367,55 @@ app.renderPathsList = function(pathsList) {
 
     // ===== СОБЫТИЯ =====
     setTimeout(() => {
+        // Hover эффекты для строк
+        document.querySelectorAll('.path-row').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.borderColor = 'var(--accent)';
+                row.style.boxShadow = '0 0 24px var(--accent-glow-strong), inset 0 0 20px var(--accent-bg)';
+                row.style.transform = 'translateX(4px)';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.borderColor = 'var(--border-color)';
+                row.style.boxShadow = 'none';
+                row.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Фокус на инпутах
+        document.querySelectorAll('.path-input').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.style.borderColor = 'var(--accent)';
+                input.style.boxShadow = '0 0 20px var(--accent-glow-strong)';
+                input.style.background = 'var(--bg-card)';
+            });
+            input.addEventListener('blur', () => {
+                input.style.borderColor = 'var(--border-color)';
+                input.style.boxShadow = 'none';
+                input.style.background = 'var(--bg-primary)';
+            });
+        });
+
+        // Кнопки "Обзор" — подсветка
         document.querySelectorAll('.path-browse-btn').forEach((btn) => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.background = 'var(--accent)';
+                btn.style.color = 'var(--bg-primary)';
+                btn.style.boxShadow = '0 0 30px var(--accent-glow-strong)';
+                btn.style.transform = 'scale(1.05)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.background = 'var(--accent-bg)';
+                btn.style.color = 'var(--accent)';
+                btn.style.boxShadow = 'none';
+                btn.style.transform = 'scale(1)';
+            });
             btn.addEventListener('click', () => {
                 const pathId = btn.dataset.pathId;
                 Notifications.info('🔍 Выбор папки', `Путь "${pathId}": функция в разработке`);
             });
         });
 
-        document.querySelectorAll('.path-input').forEach(input => {
-            input.addEventListener('focus', () => {
-                input.style.borderColor = 'var(--accent)';
-                input.style.boxShadow = '0 0 16px var(--accent-glow)';
-            });
-            input.addEventListener('blur', () => {
-                input.style.borderColor = 'var(--border-color)';
-                input.style.boxShadow = 'none';
-            });
-        });
-
+        // Кнопка "Сохранить"
         document.querySelector('.paths-save-btn')?.addEventListener('click', () => {
             const paths = {};
             document.querySelectorAll('.path-input').forEach(input => {
@@ -299,6 +440,7 @@ app.renderPathsList = function(pathsList) {
             });
         });
 
+        // Кнопка "Сбросить"
         document.querySelector('.paths-reset-btn')?.addEventListener('click', () => {
             fetch('/api/paths/reset', {
                 method: 'POST'
@@ -307,7 +449,7 @@ app.renderPathsList = function(pathsList) {
             .then(data => {
                 if (data.success) {
                     Notifications.info('↺ Пути сброшены к дефолтным');
-                    this.renderPathsSettings(); // Перезагружаем
+                    this.renderPathsSettings();
                 } else {
                     Notifications.error('❌ Ошибка сброса: ' + data.error);
                 }
@@ -364,7 +506,7 @@ app.renderDatabaseSettings = function() {
                         </svg>
                     </div>
                     <div>
-                        <h1 style='font-family: Montserrat, sans-serif; color: var(--text-heading); font-size: 1.5rem; font-weight: 600; letter-spacing: 0.5px; margin: 0;'>База данных</h1>
+                        <h1 style='font-family: Montserrat, sans-serif; color: var(--text-heading); font-size: 1.5rem; font-weight: 600; letter-spacing: 0.5px; margin: 0;'></h1>
                         <p style='color: var(--text-secondary); font-size: 0.85rem; margin: 4px 0 0 0;'>Просмотр и управление <code style='background: var(--bg-primary); padding: 2px 10px; border-radius: 4px; color: var(--accent); font-size: 0.75rem;'>config/dayzm.db</code></p>
                     </div>
                 </div>

@@ -46,7 +46,6 @@ def init_db():
         )
     ''')
     
-    # ===== НОВАЯ ТАБЛИЦА: СТРАНИЦЫ =====
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pages (
             id TEXT PRIMARY KEY,
@@ -56,6 +55,18 @@ def init_db():
             is_home INTEGER DEFAULT 0,
             sort_order INTEGER DEFAULT 0,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS playlist (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            artist TEXT,
+            file_path TEXT,
+            file_name TEXT,
+            sort_order INTEGER DEFAULT 0,
+            added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     

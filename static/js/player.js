@@ -34,9 +34,9 @@ const Player = {
     bassConfig: {
         kickRange: {
             min: 80,
-            max: 200
+            max: 100
         },
-        sensitivity: 0.2,
+        sensitivity: 0.19,
         smoothing: 0.15,
         minThreshold: 0.05,
         flashDuration: 80,
@@ -802,7 +802,7 @@ const Player = {
             // Игнорируем ошибки
         }
     },
-    
+
     getBandEnergy(range) {
         let sum = 0;
         const count = range.end - range.start;
@@ -820,16 +820,21 @@ const Player = {
         this.bassState.currentIntensity = 0;
         
         const toggle = this.elements.toggle;
-        toggle.style.transform = '';
-        toggle.style.boxShadow = '';
+        const ring = toggle.querySelector('.bass-ring');
+        
+        // Плавное затухание через transition
+        toggle.style.transition = 'all 0.08s ease';
+        toggle.style.transform = 'scale(1)';
+        toggle.style.boxShadow = '0 0 24px var(--accent-glow)';
         toggle.style.borderColor = '';
         toggle.classList.remove('bass-active', 'bass-strong');
         
-        const ring = toggle.querySelector('.bass-ring');
         if (ring) {
-            ring.style.transform = '';
-            ring.style.opacity = '';
+            ring.style.transition = 'all 0.08s ease';
+            ring.style.transform = 'scale(1)';
+            ring.style.opacity = '0';
             ring.style.borderColor = '';
+            ring.style.boxShadow = '';
         }
         
         if (this.bassState.flashTimeout) {
@@ -838,8 +843,7 @@ const Player = {
         }
         
         this.bassState.isFlashing = false;
-    },
-    
+    },    
     stopBassAnalysis() {
         if (this.bassInterval) {
             clearInterval(this.bassInterval);
@@ -853,42 +857,60 @@ const Player = {
         const toggle = this.elements.toggle;
         const ring = toggle.querySelector('.bass-ring');
         
-        const isStrong = intensity > 0.3;
-        const isVeryStrong = intensity > 0.55;
+        // Сразу сбрасываем предыдущий таймер
+        if (this.bassState.flashTimeout) {
+            clearTimeout(this.bassState.flashTimeout);
+            this.bassState.flashTimeout = null;
+            // Мгновенно сбрасываем к обычному состоянию
+            this.instantDecay();
+        }
         
-        const scale = 1 + intensity * 0.3;
-        const glowIntensity = intensity * 60;
+        const isStrong = intensity > 0.2;
+        const isVeryStrong = intensity > 0.4;
+        
+        const scale = 1 + intensity * 0.2;
+        const glowIntensity = intensity * 40;
         
         const root = document.documentElement;
         const accent = getComputedStyle(root).getPropertyValue('--accent').trim() || '#7acc7a';
         
-        let color = accent;
+        let color = '#4ade80';
+        let glowColor = 'rgba(74, 222, 128, 0.3)';
+        let innerGlow = 'rgba(74, 222, 128, 0.1)';
+        
         if (isVeryStrong) {
-            color = '#973434';
+            color = '#f87171';
+            glowColor = 'rgba(248, 113, 113, 0.5)';
+            innerGlow = 'rgba(248, 113, 113, 0.2)';
         } else if (isStrong) {
-            color = accent;
+            color = '#fbbf24';
+            glowColor = 'rgba(251, 191, 36, 0.4)';
+            innerGlow = 'rgba(251, 191, 36, 0.15)';
         }
         
+        // Мгновенное применение
         toggle.style.transition = 'none';
         toggle.style.transform = `scale(${scale})`;
-        toggle.style.boxShadow = `0 0 ${20 + glowIntensity}px ${color}, 0 0 ${40 + glowIntensity * 2}px ${color}44`;
-        toggle.style.borderColor = isVeryStrong ? '#ffffff' : (isStrong ? accent : color);
-        
-        if (ring) {
-            ring.style.transition = 'none';
-            const ringScale = 1 + intensity * 1.0;
-            ring.style.transform = `scale(${ringScale})`;
-            ring.style.opacity = Math.min(1, intensity * 2.0);
-            ring.style.borderColor = isVeryStrong ? '#ffffff' : color;
-        }
-        
+        toggle.style.boxShadow = `0 0 ${15 + glowIntensity}px ${glowColor}, inset 0 0 ${10 + glowIntensity}px ${innerGlow}`;
+        toggle.style.borderColor = isVeryStrong ? '#ffffff' : color;
         toggle.classList.add('bass-active');
+        
         if (isStrong) {
             toggle.classList.add('bass-strong');
         } else {
             toggle.classList.remove('bass-strong');
         }
         
+        if (ring) {
+            ring.style.transition = 'none';
+            const ringScale = 1 + intensity * 0.7;
+            ring.style.transform = `scale(${ringScale})`;
+            ring.style.opacity = Math.min(1, intensity * 2.0);
+            ring.style.borderColor = color;
+            ring.style.boxShadow = `inset 0 0 ${15 + glowIntensity}px ${innerGlow}, 0 0 ${15 + glowIntensity}px ${glowColor}`;
+        }
+        
+        // Разрешаем transition для плавного затухания
         requestAnimationFrame(() => {
             toggle.style.transition = '';
             if (ring) {
@@ -896,21 +918,13 @@ const Player = {
             }
         });
         
-        if (this.bassState.flashTimeout) {
-            clearTimeout(this.bassState.flashTimeout);
-        }
-        
-        this.bassState.isFlashing = true;
+        // Быстрое затухание — 60ms максимум
+        const duration = Math.max(40, 60 - intensity * 30);
         this.bassState.flashTimeout = setTimeout(() => {
-            if (this.bassState.currentIntensity < 0.03) {
-                this.instantDecay();
-            } else {
-                this.bassState.isFlashing = false;
-            }
+            this.instantDecay();
             this.bassState.flashTimeout = null;
-        }, this.bassConfig.flashDuration);
+        }, duration);
     },
-    
     // ===== УПРАВЛЕНИЕ ПЛЕЙЛИСТОМ =====
     
     loadTrack(index) {
@@ -939,42 +953,63 @@ const Player = {
         }, 150);
     },
     
+    // ============================================
+    // ДОБАВЛЕНИЕ ТРЕКОВ С ЗАГРУЗКОЙ НА СЕРВЕР
+    // ============================================
+
     addTracks(files) {
+        let uploaded = 0;
+        const total = files.length;
+        
         for (const file of files) {
             if (!file.type.startsWith('audio/')) continue;
-            const url = URL.createObjectURL(file);
-            let title = file.name.replace(/\.[^.]+$/, '');
-            let artist = 'Неизвестный';
             
-            try {
-                if (window.jsmediatags) {
-                    window.jsmediatags.read(file, {
-                        onSuccess: (result) => {
-                            if (result.tags.title) title = result.tags.title;
-                            if (result.tags.artist) artist = result.tags.artist;
-                            this.updatePlaylistUI();
-                        },
-                        onError: () => {}
-                    });
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/api/playlist/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const track = {
+                        url: data.url,
+                        title: data.title || file.name.replace(/\.[^.]+$/, ''),
+                        artist: data.artist || 'Неизвестный',
+                        file_name: data.file_name,
+                        file_path: data.url,
+                        id: Date.now() + Math.random() // временный ID
+                    };
+                    
+                    this.playlist.push(track);
+                    uploaded++;
+                    
+                    if (uploaded === total || uploaded === files.length) {
+                        this.elements.badge.textContent = this.playlist.length;
+                        this.elements.playlistCount.textContent = this.playlist.length;
+                        this.updatePlaylistUI();
+                        this.savePlaylist();
+                        
+                        if (this.playlist.length > 0 && this.currentTrackIndex === -1) {
+                            this.loadTrack(0);
+                        }
+                        
+                        if (typeof Notifications !== 'undefined') {
+                            Notifications.success(`✅ Загружено ${uploaded} треков`);
+                        }
+                    }
                 }
-            } catch (e) {}
-            
-            this.playlist.push({ url, title, artist });
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки файла:', error);
+                if (typeof Notifications !== 'undefined') {
+                    Notifications.error(`❌ Ошибка загрузки: ${file.name}`);
+                }
+            });
         }
-        
-        if (this.playlist.length > 0 && this.currentTrackIndex === -1) {
-            this.loadTrack(0);
-        }
-        
-        this.elements.badge.textContent = this.playlist.length;
-        this.elements.playlistCount.textContent = this.playlist.length;
-        this.updatePlaylistUI();
-        this.savePlaylist();
-        
-        // Сбрасываем idle-таймер
-        this.resetIdleTimer();
     },
-    
     updatePlaylistUI() {
         const list = this.elements.playlistList;
         const emptyMsg = this.elements.emptyMsg;
@@ -1032,9 +1067,30 @@ const Player = {
         });
     },
     
+    // ============================================
+    // УДАЛЕНИЕ ТРЕКА
+    // ============================================
+
     removeTrack(index) {
         const track = this.playlist[index];
-        URL.revokeObjectURL(track.url);
+        
+        // Удаляем с сервера
+        if (track.id) {
+            fetch(`/api/playlist/delete/${track.id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ Трек удалён с сервера');
+                }
+            })
+            .catch(error => {
+                console.warn('⚠️ Ошибка удаления трека:', error);
+            });
+        }
+        
+        // Удаляем из плейлиста
         this.playlist.splice(index, 1);
         
         if (index === this.currentTrackIndex) {
@@ -1052,7 +1108,6 @@ const Player = {
                 this.elements.progressSlider.value = 0;
                 this.elements.currentTime.textContent = '0:00';
                 this.elements.totalTime.textContent = '0:00';
-                // Включаем idle
                 this.resetIdleTimer();
             }
         } else if (index < this.currentTrackIndex) {
@@ -1064,7 +1119,7 @@ const Player = {
         this.updatePlaylistUI();
         this.savePlaylist();
     },
-    
+
     togglePlay() {
         if (!this.audio.src && this.playlist.length > 0) {
             this.loadTrack(0);
@@ -1129,25 +1184,95 @@ const Player = {
         }
     },
     
-    loadPlaylist() {
+// ============================================
+// ЗАГРУЗКА ПЛЕЙЛИСТА ИЗ БД
+// ============================================
+
+loadPlaylist() {
+    fetch('/api/playlist/load')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.playlist.length > 0) {
+                const validTracks = data.playlist.filter(t => t.exists);
+                const invalidTracks = data.playlist.filter(t => !t.exists);
+                
+                if (invalidTracks.length > 0) {
+                    console.warn(`⚠️ ${invalidTracks.length} треков не найдены на диске`);
+                    if (typeof Notifications !== 'undefined') {
+                        Notifications.warning(
+                            '⚠️ Некоторые треки не найдены',
+                            `${invalidTracks.length} треков отсутствуют на диске. Они будут пропущены.`
+                        );
+                    }
+                }
+                
+                this.playlist = validTracks.map(track => ({
+                    url: track.file_path,
+                    title: track.title,
+                    artist: track.artist,
+                    id: track.id,
+                    file_name: track.file_name,
+                    file_path: track.file_path
+                }));
+                
+                this.updatePlaylistUI();
+                this.elements.badge.textContent = this.playlist.length;
+                this.elements.playlistCount.textContent = this.playlist.length;
+                
+                if (this.playlist.length > 0) {
+                    this.loadTrack(0);
+                }
+                
+                console.log(`✅ Загружено ${this.playlist.length} треков из БД`);
+            } else {
+                console.log('📭 Плейлист в БД пуст');
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Ошибка загрузки плейлиста:', error);
+        });
+},
+
+    loadPlaylistFromLocal() {
         try {
             const saved = localStorage.getItem('dayzm_playlist');
             if (saved) {
                 const data = JSON.parse(saved);
+                // Восстанавливаем только названия, файлы уже не существуют
                 this.playlist = [];
                 this.updatePlaylistUI();
             }
         } catch (e) {}
     },
-    
-    savePlaylist() {
-        try {
-            const data = this.playlist.map(t => ({ title: t.title, artist: t.artist }));
-            localStorage.setItem('dayzm_playlist', JSON.stringify(data));
-        } catch (e) {}
-    }
-};
 
+    // ============================================
+    // СОХРАНЕНИЕ ПЛЕЙЛИСТА В БД
+    // ============================================
+
+    savePlaylist() {
+        const playlistData = this.playlist.map(track => ({
+            title: track.title || 'Без названия',
+            artist: track.artist || 'Неизвестный',
+            file_path: track.file_path || track.url || '',
+            file_name: track.file_name || ''
+        }));
+        
+        fetch('/api/playlist/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playlist: playlistData })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('✅ Плейлист сохранён в БД');
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Ошибка сохранения плейлиста:', error);
+        });
+    }
+}    
 document.addEventListener('DOMContentLoaded', () => {
     Player.init();
 });
