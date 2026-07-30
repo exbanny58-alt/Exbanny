@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/transitions.css') }}">
     <style>
-        /* Серверные CSS переменные — применяются мгновенно */
         :root {
             --accent: {{ css_vars['--accent'] }};
             --accent-dim: {{ css_vars['--accent-dim'] }};
@@ -21,49 +20,18 @@
     </style>
 </head>
 <body>
-    <body>
-    <!-- ============================================ -->
-    <!-- SVG SPRITE ДЛЯ УВЕДОМЛЕНИЙ                   -->
-    <!-- ============================================ -->
-    <svg class="notifications-svg-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
-        <defs>
-            <!-- Success -->
-            <symbol id="success" viewBox="0 0 32 32">
-                <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/>
-                <path d="M10 16 L14 20 L22 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </symbol>
-            <!-- Error -->
-            <symbol id="error" viewBox="0 0 32 32">
-                <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/>
-                <line x1="10" y1="10" x2="22" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="22" y1="10" x2="10" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            </symbol>
-            <!-- Warning -->
-            <symbol id="warning" viewBox="0 0 32 32">
-                <path d="M16 4 L2 28 L30 28 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <line x1="16" y1="18" x2="16" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="16" cy="24" r="1.5" fill="currentColor"/>
-            </symbol>
-            <!-- Info / Message -->
-            <symbol id="message" viewBox="0 0 32 32">
-                <path d="M16 4C8.5 4 2.5 9.5 2.5 16C2.5 20.5 5 24.5 9 27L8 30L12 27.5C13.5 28 15 28.5 16 28.5C23.5 28.5 29.5 23 29.5 16C29.5 9 23.5 4 16 4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-                <circle cx="11" cy="16" r="1.5" fill="currentColor"/>
-                <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
-                <circle cx="21" cy="16" r="1.5" fill="currentColor"/>
-            </symbol>
-        </defs>
-    </svg>
-    <!-- Верхняя матовая панель -->
+    <!-- Верхняя панель -->
     <header class="top-panel">
         <div class="top-panel-left">
             <div class="logo">
-                <span class="dayz">{{ config.app.logo.text }}</span><span class="m">{{ config.app.logo.accent }}</span>
+                <span class="dayz">Dayz</span><span class="m">M</span>
             </div>
-
             <nav class="settings-subnav" id="settingsSubnav">
                 <button class="subnav-tab active" data-settings-tab="general">Общие</button>
                 <button class="subnav-tab" data-settings-tab="colors">Цвета</button>
                 <button class="subnav-tab" data-settings-tab="effects">Эффекты</button>
+                <button class="subnav-tab" data-settings-tab="paths">Пути</button>
+                <button class="subnav-tab" data-settings-tab="database">БД</button>  <!-- ← НОВОЕ -->
             </nav>
         </div>
 
@@ -76,17 +44,21 @@
                     <path d="M9 9l12-2"/>
                 </svg>
             </button>
-            <button class="settings-btn" title="Настройки">{{ config.settings.icon|safe }}</button>
+            <button class="settings-btn" title="Настройки">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#7d827d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+            </button>
         </div>
     </header>
 
     <!-- Основной контейнер -->
     <div class="main-container">
-
         <!-- Левая панель -->
         <aside class="side-panel">
             <nav class="side-tabs">
-                {% for page in config.pages %}
+                {% for page in pages %}
                 <button class="side-tab" data-page-id="{{ page.id }}">
                     <span class="tab-icon">{{ page.icon|safe }}</span>
                     {{ page.name }}
@@ -97,11 +69,11 @@
 
         <!-- Контент -->
         <main class="content-area" id="content">
-            {{ config.homePage.content|safe }}
+            {{ home_page.content|safe if home_page else '' }}
         </main>
     </div>
+
     <style>
-        /* Серверные CSS переменные — применяются мгновенно */
         :root {
             --accent: {{ css_vars['--accent'] }} !important;
             --accent-dim: {{ css_vars['--accent-dim'] }} !important;
@@ -112,12 +84,12 @@
             --loader-color: {{ css_vars['--loader-color'] }} !important;
         }
     </style>
+
     <!-- Передаём настройки в JS через JSON-блок -->
     <script id="initial-state" type="application/json">
         {
             "colors": {{ colors|tojson }},
-            "effect": {{ effect|tojson }},
-            "config": {{ config|tojson }}
+            "effect": {{ effect|tojson }}
         }
     </script>
     <script>
@@ -127,20 +99,26 @@
             console.log('✅ Initial state loaded:', window.__INITIAL_STATE__);
         } catch (e) {
             console.error('❌ Failed to parse initial state:', e);
-            // Fallback
             window.__INITIAL_STATE__ = {
                 colors: { accent: '#7acc7a', glowIntensity: 50 },
-                effect: 'fadeBlurIn',
-                config: { app: { title: 'DayzM', logo: { text: 'Dayz', accent: 'M' } }, pages: [] }
+                effect: 'fade'
             };
         }
     </script>
-<!-- Swup -->
-<script src="{{ url_for('static', filename='js/loader.js') }}"></script>
-<script src="{{ url_for('static', filename='js/effects.js') }}"></script>
-<script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
-<script src="{{ url_for('static', filename='js/player.js') }}"></script>      <!-- ← player.js -->
-<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>         <!-- ← app.js ПОСЛЕ player.js -->
+
+    <!-- БИБЛИОТЕКИ -->
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+
+    <!-- APP -->
+    <script src="{{ url_for('static', filename='js/app/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app/init.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app/settings.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app/player.js') }}"></script>
+
 </body>
 </html>

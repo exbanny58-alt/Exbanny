@@ -242,66 +242,99 @@ const app = {
         this.loadSettingsContent(tabName);
     },
 
-    loadSettingsContent(tabName) {
-        const tab = tabName || this.currentSettingsTab;
-        
-        if (tab === 'general') {
-            document.getElementById('content').innerHTML = `
-                <div class='settings-page'>
-                    <div class='settings-header'>
-                        <div class='settings-icon'>
-                            <svg viewBox='0 0 24 24' fill='none' stroke='var(--accent)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
-                                <circle cx='12' cy='12' r='3'></circle>
-                                <path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'></path>
-                            </svg>
-                        </div>
-                        <h1>Общие настройки</h1>
+loadSettingsContent(tabName) {
+    const tab = tabName || this.currentSettingsTab;
+    
+    if (tab === 'general') {
+        document.getElementById('content').innerHTML = `
+            <div class='settings-page'>
+                <div class='settings-header'>
+                    <div class='settings-icon'>
+                        <svg viewBox='0 0 24 24' fill='none' stroke='var(--accent)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+                            <circle cx='12' cy='12' r='3'></circle>
+                            <path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'></path>
+                        </svg>
                     </div>
-                    <div class='settings-content'>
-                        <p>Здесь будут общие настройки приложения</p>
-                    </div>
-                </div>`;
-        } else if (tab === 'effects') {
-            const effects = EffectsManager.effects;
-            const currentEffect = EffectsManager.currentEffect;
-            let optionsHtml = '';
-            
-            Object.entries(effects).forEach(([id, effect]) => {
-                const isActive = currentEffect === id;
-                optionsHtml += `
-                    <div class="effect-option ${isActive ? 'active' : ''}" data-effect="${id}">
-                        <div class="effect-radio"></div>
-                        <div class="effect-info">
-                            <span class="effect-name">${effect.name}</span>
-                            <span class="effect-desc">${effect.description}</span>
+                    <h1>Общие настройки</h1>
+                </div>
+                <div class='settings-content'>
+                    <p>Здесь будут общие настройки приложения</p>
+                </div>
+            </div>`;
+            } else if (tab === 'effects') {
+                const effects = EffectsManager.effects;
+                const currentEffect = EffectsManager.currentEffect;
+                let optionsHtml = '';
+                
+                Object.entries(effects).forEach(([id, effect]) => {
+                    const isActive = currentEffect === id;
+                    optionsHtml += `
+                        <div class="effect-option ${isActive ? 'active' : ''}" data-effect="${id}">
+                            <div class="effect-radio"></div>
+                            <div class="effect-info">
+                                <span class="effect-name">${effect.name}</span>
+                                <span class="effect-desc">${effect.description}</span>
+                            </div>
+                        </div>`;
+                });
+
+                document.getElementById('content').innerHTML = `
+                    <div class='settings-page effects-page'>
+                        <div class='settings-content effects-content'>
+                            <p>Выберите анимацию переключения между страницами</p>
+                            <div class='effects-list'>
+                                ${optionsHtml}
+                            </div>
                         </div>
                     </div>`;
-            });
-
-            document.getElementById('content').innerHTML = `
-                <div class='settings-page effects-page'>
-                    <div class='settings-content effects-content'>
-                        <p>Выберите анимацию переключения между страницами</p>
-                        <div class='effects-list'>
-                            ${optionsHtml}
-                        </div>
-                    </div>
-                </div>`;
-
-            setTimeout(() => {
-                document.querySelectorAll('.effect-option').forEach(option => {
-                    option.addEventListener('click', () => {
-                        const effectId = option.dataset.effect;
-                        EffectsManager.setEffect(effectId);
-                        this.loadSettingsContent('effects');
+                    
+                setTimeout(() => {
+                    document.querySelectorAll('.effect-option').forEach(option => {
+                        option.addEventListener('click', () => {
+                            const effectId = option.dataset.effect;
+                            EffectsManager.setEffect(effectId);
+                            this.loadSettingsContent('effects');
+                        });
                     });
-                });
-            }, 0);
-        }
-        
-        setTimeout(() => EffectsManager.applyToContent(), 50);
-    },
-
+                }, 0);
+            } else if (tab === 'paths') {
+                // ═══════════════════════════════════════════════
+                // НОВАЯ ВКЛАДКА "ПУТИ" — В РАЗРАБОТКЕ
+                // ═══════════════════════════════════════════════
+                document.getElementById('content').innerHTML = `
+                    <div class='settings-page'>
+                        <div class='settings-header'>
+                            <div class='settings-icon'>
+                                <svg viewBox='0 0 24 24' fill='none' stroke='var(--accent)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+                                    <path d='M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z'/>
+                                    <path d='M3 9V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4'/>
+                                    <line x1='8' y1='3' x2='8' y2='9'/>
+                                    <line x1='16' y1='3' x2='16' y2='9'/>
+                                    <line x1='3' y1='15' x2='21' y2='15'/>
+                                </svg>
+                            </div>
+                            <h1>Пути к папкам</h1>
+                        </div>
+                        <div class='settings-content'>
+                            <p style='color: var(--text-secondary); font-size: 0.95rem; letter-spacing: 0.5px; margin-bottom: 24px;'>
+                                Настройка путей к системным директориям и ресурсам.
+                            </p>
+                            <div style='background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; text-align: center;'>
+                                <div style='font-size: 3rem; margin-bottom: 12px; opacity: 0.4;'>🚧</div>
+                                <h3 style='color: var(--text-heading); font-weight: 500; margin-bottom: 8px;'>В разработке</h3>
+                                <p style='color: var(--text-secondary); font-size: 0.85rem;'>
+                                    Раздел настройки путей будет доступен в следующих обновлениях.
+                                </p>
+                                <div style='margin-top: 20px; display: inline-block; padding: 6px 18px; border-radius: 20px; background: var(--accent-bg); border: 1px solid rgba(122,204,122,0.2); color: var(--accent); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.5px;'>
+                                    ⏳ Скоро
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            
+            setTimeout(() => EffectsManager.applyToContent(), 50);
+        },
     goHome() {
         this.showHome();
         ColorPicker.close();

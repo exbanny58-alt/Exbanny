@@ -1,10 +1,27 @@
 // player.js - Аудиоплеер с молниеносной реакцией на затухание
+// + IDLE-режим: пульсация и подпрыгивание для привлечения внимания
 const Player = {
     playlist: [],
     currentTrackIndex: -1,
     isPlaying: false,
     isOpen: false,
     audio: null,
+    
+    // ===== IDLE-режим (привлечение внимания) =====
+    idleMode: {
+        enabled: true,
+        idleStartTime: null,
+        pulseInterval: null,
+        bounceInterval: null,
+        isBouncing: false,
+        isPulsing: false,
+        idleThreshold: 20000, // 20 секунд бездействия → начинаем прыгать
+        pulseSpeed: 1200,     // скорость пульсации (мс)
+        bounceHeight: 12,     // высота подпрыгивания (px)
+        bounceDuration: 700,  // длительность одного прыжка
+        bounceIntervalTime: 5800, // интервал между прыжками
+        lastInteractionTime: 0,
+    },
     
     // AudioContext для анализа
     audioContext: null,
@@ -15,38 +32,25 @@ const Player = {
     
     // Настройки пульсации
     bassConfig: {
-        // bassRange: {          // ❌ ВЫРЕЗАНО
-        //     min: 20,
-        //     max: 150
-        // },
-        // subBassRange: {       // ❌ ЗАКОММЕНТИРОВАНО
-        //     min: 20,
-        //     max: 60
-        // },
-        kickRange: {             // ✅ АКТИВЕН
+        kickRange: {
             min: 80,
             max: 200
         },
         sensitivity: 0.2,
-        smoothing: 0.15,        // Меньше сглаживания = быстрее реакция
+        smoothing: 0.15,
         minThreshold: 0.05,
-        flashDuration: 80,      // Короткая вспышка
+        flashDuration: 80,
         intensityMultiplier: 2.0,
-        // Мгновенное затухание
-        decaySpeed: 0.92,       // Скорость затухания (0-1, выше = быстрее)
-        minDecay: 0.02          // Минимальный уровень перед полным сбросом
+        decaySpeed: 0.92,
+        minDecay: 0.02
     },
     
-    // Состояние пульсации
     bassState: {
         currentIntensity: 0,
         isFlashing: false,
         flashTimeout: null,
         lastFlashTime: 0,
-        // Для разных типов баса
-        // subBass: 0,          // ❌ ЗАКОММЕНТИРОВАНО
         kickBass: 0,
-        // midBass: 0           // ❌ ЗАКОММЕНТИРОВАНО
     },
     
     frequencyCache: null,
@@ -56,6 +60,7 @@ const Player = {
         this.createPlayer();
         this.bindEvents();
         this.loadPlaylist();
+        this.startIdleMode();
         console.log('🎵 Аудиоплеер DayzM инициализирован');
     },
     
@@ -72,6 +77,8 @@ const Player = {
                 <span class="pulse-ring"></span>
                 <span class="pulse-ring"></span>
                 <span class="bass-ring"></span>
+                <!-- IDLE-кольцо для привлечения внимания -->
+                <span class="idle-ring"></span>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M9 18V5l12-2v13"/>
                     <circle cx="6" cy="18" r="3"/>
@@ -168,11 +175,9 @@ const Player = {
                     <div class="playlist-list" id="playlistList">
                         <div class="playlist-empty">
                             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <!-- Ноты -->
                                 <path d="M9 18V5l12-2v13"/>
                                 <circle cx="6" cy="18" r="3"/>
                                 <circle cx="18" cy="16" r="3"/>
-                                <!-- Волны звука -->
                                 <path d="M3 12a5 5 0 0 1 0-8"/>
                                 <path d="M21 12a5 5 0 0 0 0-8"/>
                                 <path d="M6 15a3 3 0 0 1 0-6"/>
@@ -190,6 +195,112 @@ const Player = {
         this.elements = this.getElements();
         this.audio = new Audio();
         this.bindPlayerEvents();
+        
+        // Добавляем стили для IDLE-колец
+        this.injectIdleStyles();
+    },
+    
+    injectIdleStyles() {
+        const styleId = 'dayzm-idle-styles';
+        if (document.getElementById(styleId)) return;
+        
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+            /* ===== IDLE-кольцо — пульсация ===== */
+            .player-toggle .idle-ring {
+                position: absolute;
+                top: -6px;
+                left: -6px;
+                right: -6px;
+                bottom: -6px;
+                border: 2px solid var(--accent);
+                border-radius: 50%;
+                opacity: 0;
+                pointer-events: none;
+                transition: all 0.3s ease;
+                box-shadow: 0 0 20px var(--accent-glow);
+            }
+            
+            .player-toggle.idle-pulse .idle-ring {
+                animation: idlePulse 1.2s ease-in-out infinite;
+            }
+            
+            .player-toggle.idle-bounce {
+                animation: idleBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            
+            .player-toggle.idle-bounce .idle-ring {
+                animation: idlePulseStrong 0.6s ease-in-out;
+            }
+            
+            @keyframes idlePulse {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.6;
+                    box-shadow: 0 0 20px var(--accent-glow);
+                }
+                100% {
+                    transform: scale(1.5);
+                    opacity: 0;
+                    box-shadow: 0 0 40px var(--accent-glow-strong);
+                }
+            }
+            
+            @keyframes idlePulseStrong {
+                0% {
+                    transform: scale(1);
+                    opacity: 0.8;
+                    box-shadow: 0 0 30px var(--accent-glow-strong);
+                }
+                100% {
+                    transform: scale(1.8);
+                    opacity: 0;
+                    box-shadow: 0 0 60px var(--accent-glow-strong);
+                }
+            }
+            
+            @keyframes idleBounce {
+                0% {
+                    transform: translateY(0);
+                }
+                30% {
+                    transform: translateY(-12px);
+                }
+                50% {
+                    transform: translateY(-4px);
+                }
+                70% {
+                    transform: translateY(-8px);
+                }
+                100% {
+                    transform: translateY(0);
+                }
+            }
+            
+            /* Контейнер для бейджа — не мешаем анимации */
+            .player-toggle.idle-bounce .player-badge {
+                animation: idleBadgeBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            
+            @keyframes idleBadgeBounce {
+                0% { transform: scale(1); }
+                30% { transform: scale(1.3); }
+                70% { transform: scale(0.9); }
+                100% { transform: scale(1); }
+            }
+            
+            /* При проигрывании отключаем idle-эффекты */
+            .player-toggle.playing.idle-pulse .idle-ring {
+                animation: none;
+                opacity: 0;
+            }
+            
+            .player-toggle.playing.idle-bounce {
+                animation: none;
+            }
+        `;
+        document.head.appendChild(style);
     },
     
     getElements() {
@@ -218,14 +329,30 @@ const Player = {
     },
     
     bindEvents() {
-        this.elements.toggle.addEventListener('click', () => this.toggle());
-        this.elements.close.addEventListener('click', () => this.close());
+        this.elements.toggle.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.toggle();
+        });
+        this.elements.close.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.close();
+        });
         
-        this.elements.playBtn.addEventListener('click', () => this.togglePlay());
-        this.elements.prevBtn.addEventListener('click', () => this.prevTrack());
-        this.elements.nextBtn.addEventListener('click', () => this.nextTrack());
+        this.elements.playBtn.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.togglePlay();
+        });
+        this.elements.prevBtn.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.prevTrack();
+        });
+        this.elements.nextBtn.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.nextTrack();
+        });
         
         this.elements.progressSlider.addEventListener('input', () => {
+            this.resetIdleTimer();
             if (this.audio.duration) {
                 this.audio.currentTime = (this.elements.progressSlider.value / 100) * this.audio.duration;
             }
@@ -235,9 +362,16 @@ const Player = {
             this.audio.volume = this.elements.volumeSlider.value / 100;
         });
         
-        this.elements.playlistToggle.addEventListener('click', () => this.togglePlaylist());
-        this.elements.addTrack.addEventListener('click', () => this.elements.fileInput.click());
+        this.elements.playlistToggle.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.togglePlaylist();
+        });
+        this.elements.addTrack.addEventListener('click', () => {
+            this.resetIdleTimer();
+            this.elements.fileInput.click();
+        });
         this.elements.fileInput.addEventListener('change', (e) => {
+            this.resetIdleTimer();
             this.addTracks([...e.target.files]);
             e.target.value = '';
         });
@@ -246,14 +380,17 @@ const Player = {
             if (e.target.tagName === 'INPUT') return;
             if (e.code === 'Space' && this.isOpen) {
                 e.preventDefault();
+                this.resetIdleTimer();
                 this.togglePlay();
             }
             if (e.key === 'ArrowRight' && this.isOpen) {
                 e.preventDefault();
+                this.resetIdleTimer();
                 this.nextTrack();
             }
             if (e.key === 'ArrowLeft' && this.isOpen) {
                 e.preventDefault();
+                this.resetIdleTimer();
                 this.prevTrack();
             }
             if (e.key === 'Escape' && this.isOpen) {
@@ -265,9 +402,186 @@ const Player = {
         this.observeAccentColor();
     },
     
+    // ===== IDLE-РЕЖИМ =====
+    
+    startIdleMode() {
+        this.idleMode.lastInteractionTime = Date.now();
+        this.idleMode.idleStartTime = Date.now();
+        
+        // Запускаем пульсацию с задержкой
+        this.idleMode.pulseInterval = setInterval(() => {
+            this.updateIdleState();
+        }, this.idleMode.pulseSpeed);
+    },
+    
+    resetIdleTimer() {
+        this.idleMode.lastInteractionTime = Date.now();
+        this.idleMode.idleStartTime = Date.now();
+        
+        // Если играет музыка — отключаем idle-эффекты
+        if (this.isPlaying) {
+            this.disableIdleEffects();
+            return;
+        }
+        
+        // Если был режим прыжков — сбрасываем
+        if (this.idleMode.isBouncing) {
+            this.stopBouncing();
+        }
+        
+        // Возвращаем пульсацию
+        this.startPulsing();
+    },
+    
+    updateIdleState() {
+        // Если музыка играет — отключаем всё
+        if (this.isPlaying) {
+            this.disableIdleEffects();
+            return;
+        }
+        
+        // Если плеер открыт — не отвлекаем
+        if (this.isOpen) {
+            this.disableIdleEffects();
+            return;
+        }
+        
+        const now = Date.now();
+        const idleTime = now - this.idleMode.lastInteractionTime;
+        
+        // Если прошло меньше порога — пульсируем
+        if (idleTime < this.idleMode.idleThreshold) {
+            this.startPulsing();
+            // Если был прыжок — останавливаем
+            if (this.idleMode.isBouncing) {
+                this.stopBouncing();
+            }
+            return;
+        }
+        
+        // Если прошло больше порога — начинаем прыгать
+        if (!this.idleMode.isBouncing) {
+            this.startBouncing();
+        }
+    },
+    
+    startPulsing() {
+        const toggle = this.elements.toggle;
+        if (!toggle) return;
+        
+        if (this.idleMode.isPulsing) return;
+        if (this.isPlaying) return;
+        
+        this.idleMode.isPulsing = true;
+        toggle.classList.add('idle-pulse');
+        
+        // Обновляем цвет кольца
+        this.updateIdleRingColor();
+    },
+    
+    stopPulsing() {
+        const toggle = this.elements.toggle;
+        if (!toggle) return;
+        
+        this.idleMode.isPulsing = false;
+        toggle.classList.remove('idle-pulse');
+    },
+    
+    startBouncing() {
+        const toggle = this.elements.toggle;
+        if (!toggle) return;
+        
+        // Отключаем пульсацию
+        this.stopPulsing();
+        
+        this.idleMode.isBouncing = true;
+        
+        // Первый прыжок сразу
+        toggle.classList.add('idle-bounce');
+        
+        // Убираем класс после анимации
+        setTimeout(() => {
+            toggle.classList.remove('idle-bounce');
+        }, this.idleMode.bounceDuration);
+        
+        // Запускаем интервал для повторных прыжков
+        if (this.idleMode.bounceInterval) {
+            clearInterval(this.idleMode.bounceInterval);
+        }
+        
+        this.idleMode.bounceInterval = setInterval(() => {
+            // Проверяем, не включили ли музыку
+            if (this.isPlaying || this.isOpen) {
+                this.stopBouncing();
+                return;
+            }
+            
+            // Делаем прыжок
+            toggle.classList.add('idle-bounce');
+            setTimeout(() => {
+                toggle.classList.remove('idle-bounce');
+            }, this.idleMode.bounceDuration);
+            
+            // Обновляем цвет для разнообразия
+            this.updateIdleRingColor();
+            
+            // Иногда меняем интенсивность
+            const intensity = 0.5 + Math.random() * 0.5;
+            const ring = toggle.querySelector('.idle-ring');
+            if (ring) {
+                ring.style.boxShadow = `0 0 ${20 + intensity * 30}px var(--accent-glow)`;
+            }
+            
+        }, this.idleMode.bounceIntervalTime);
+    },
+    
+    stopBouncing() {
+        const toggle = this.elements.toggle;
+        if (!toggle) return;
+        
+        this.idleMode.isBouncing = false;
+        toggle.classList.remove('idle-bounce');
+        
+        if (this.idleMode.bounceInterval) {
+            clearInterval(this.idleMode.bounceInterval);
+            this.idleMode.bounceInterval = null;
+        }
+        
+        // Возвращаем пульсацию, если не играет музыка
+        if (!this.isPlaying && !this.isOpen) {
+            this.startPulsing();
+        }
+    },
+    
+    disableIdleEffects() {
+        this.stopPulsing();
+        this.stopBouncing();
+        
+        const toggle = this.elements.toggle;
+        if (toggle) {
+            toggle.classList.remove('idle-pulse', 'idle-bounce');
+        }
+    },
+    
+    updateIdleRingColor() {
+        const toggle = this.elements.toggle;
+        if (!toggle) return;
+        
+        const root = document.documentElement;
+        const accent = getComputedStyle(root).getPropertyValue('--accent').trim() || '#7acc7a';
+        const ring = toggle.querySelector('.idle-ring');
+        if (ring) {
+            ring.style.borderColor = accent;
+            ring.style.boxShadow = `0 0 20px ${accent}66`;
+        }
+    },
+    
+    // ===== ОСТАЛЬНАЯ ЛОГИКА =====
+    
     observeAccentColor() {
         const observer = new MutationObserver(() => {
             this.updateBassRingColor();
+            this.updateIdleRingColor();
         });
         observer.observe(document.documentElement, {
             attributes: true,
@@ -306,15 +620,22 @@ const Player = {
                 this.updatePlayButton();
                 this.updateToggleButton();
                 this.stopBassAnalysis();
+                // Включаем idle-режим
+                this.resetIdleTimer();
             }
         });
         
         this.audio.addEventListener('play', () => {
             this.startBassAnalysis();
+            this.disableIdleEffects();
         });
         
         this.audio.addEventListener('pause', () => {
             this.stopBassAnalysis();
+            // Если пауза и нет трека — включаем idle
+            if (!this.audio.src) {
+                this.resetIdleTimer();
+            }
         });
     },
     
@@ -335,6 +656,7 @@ const Player = {
             dragCounter = 0;
             const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('audio/'));
             if (files.length) {
+                this.resetIdleTimer();
                 this.addTracks(files);
                 if (!this.isOpen) this.open();
                 setTimeout(() => {
@@ -352,6 +674,8 @@ const Player = {
         this.isOpen = true;
         this.elements.body.classList.add('open');
         this.elements.toggle.classList.add('active');
+        // Отключаем idle при открытии плеера
+        this.disableIdleEffects();
     },
     
     close() {
@@ -359,6 +683,10 @@ const Player = {
         this.elements.body.classList.remove('open');
         this.elements.toggle.classList.remove('active');
         this.elements.playlistList.parentElement.classList.remove('open');
+        // Включаем idle обратно, если не играет музыка
+        if (!this.isPlaying) {
+            this.resetIdleTimer();
+        }
     },
     
     togglePlaylist() {
@@ -372,7 +700,7 @@ const Player = {
         return `${m}:${sec.toString().padStart(2, '0')}`;
     },
     
-    // ===== МОЛНИЕНОСНАЯ ПУЛЬСАЦИЯ =====
+    // ===== БАС-АНАЛИЗ =====
     
     startBassAnalysis() {
         if (this.bassInterval) return;
@@ -388,7 +716,7 @@ const Player = {
                 
                 this.analyser = this.audioContext.createAnalyser();
                 this.analyser.fftSize = 1024;
-                this.analyser.smoothingTimeConstant = 0.4; // Меньше сглаживания = быстрее реакция
+                this.analyser.smoothingTimeConstant = 0.4;
                 
                 this.sourceNode = this.audioContext.createMediaElementSource(this.audio);
                 this.sourceNode.connect(this.analyser);
@@ -409,10 +737,9 @@ const Player = {
                 this.bassState.flashTimeout = null;
             }
             
-            // Высокая частота обновления для быстрой реакции
             this.bassInterval = setInterval(() => {
                 this.analyzeFrequencies();
-            }, 20); // 50fps для максимальной скорости
+            }, 20);
             
         } catch (e) {
             console.warn('Анализ недоступен:', e);
@@ -427,15 +754,7 @@ const Player = {
         const getIndex = (freq) => Math.floor(freq / frequencyResolution);
         
         this.frequencyCache = {
-            // bass: {                // ❌ ВЫРЕЗАНО
-            //     start: getIndex(20),
-            //     end: getIndex(150)
-            // },
-            // subBass: {             // ❌ ЗАКОММЕНТИРОВАНО
-            //     start: getIndex(20),
-            //     end: getIndex(60)
-            // },
-            kick: {                  // ✅ ТОЛЬКО КИК АКТИВЕН
+            kick: {
                 start: getIndex(60),
                 end: getIndex(120)
             }
@@ -448,13 +767,10 @@ const Player = {
         try {
             this.analyser.getByteFrequencyData(this.dataArray);
             
-            // ✅ ТОЛЬКО кик-бас (60-120 Гц)
             const kickEnergy = this.getBandEnergy(this.frequencyCache.kick);
             
-            // Применяем чувствительность
             let intensity = kickEnergy * this.bassConfig.sensitivity;
             
-            // Порог
             const threshold = this.bassConfig.minThreshold;
             if (intensity < threshold) {
                 intensity = 0;
@@ -464,11 +780,9 @@ const Player = {
             
             intensity = Math.min(1, intensity * this.bassConfig.intensityMultiplier);
             
-            // Мгновенное обновление
             const oldIntensity = this.bassState.currentIntensity;
             this.bassState.currentIntensity = intensity;
             
-            // Резкое падение - мгновенный сброс
             if (oldIntensity - intensity > 0.15) {
                 this.instantDecay();
             }
@@ -480,7 +794,6 @@ const Player = {
                 return;
             }
             
-            // Триггер вспышки
             if (intensity > 0.04) {
                 this.triggerInstantFlash(intensity);
             }
@@ -503,7 +816,6 @@ const Player = {
         return sum / (count * 255);
     },
     
-    // Мгновенный сброс эффекта
     instantDecay() {
         this.bassState.currentIntensity = 0;
         
@@ -541,18 +853,15 @@ const Player = {
         const toggle = this.elements.toggle;
         const ring = toggle.querySelector('.bass-ring');
         
-        // Мгновенная реакция - без задержек
         const isStrong = intensity > 0.3;
         const isVeryStrong = intensity > 0.55;
         
-        // Масштаб с учетом силы
         const scale = 1 + intensity * 0.3;
         const glowIntensity = intensity * 60;
         
         const root = document.documentElement;
         const accent = getComputedStyle(root).getPropertyValue('--accent').trim() || '#7acc7a';
         
-        // Динамический цвет
         let color = accent;
         if (isVeryStrong) {
             color = '#973434';
@@ -560,7 +869,6 @@ const Player = {
             color = accent;
         }
         
-        // Применяем эффект мгновенно
         toggle.style.transition = 'none';
         toggle.style.transform = `scale(${scale})`;
         toggle.style.boxShadow = `0 0 ${20 + glowIntensity}px ${color}, 0 0 ${40 + glowIntensity * 2}px ${color}44`;
@@ -581,7 +889,6 @@ const Player = {
             toggle.classList.remove('bass-strong');
         }
         
-        // Возвращаем transition для плавного затухания
         requestAnimationFrame(() => {
             toggle.style.transition = '';
             if (ring) {
@@ -589,14 +896,12 @@ const Player = {
             }
         });
         
-        // Короткий таймер для сброса, если бас упадет
         if (this.bassState.flashTimeout) {
             clearTimeout(this.bassState.flashTimeout);
         }
         
         this.bassState.isFlashing = true;
         this.bassState.flashTimeout = setTimeout(() => {
-            // Если интенсивность упала - сбрасываем
             if (this.bassState.currentIntensity < 0.03) {
                 this.instantDecay();
             } else {
@@ -606,7 +911,7 @@ const Player = {
         }, this.bassConfig.flashDuration);
     },
     
-    // ===== ОСТАЛЬНАЯ ЛОГИКА =====
+    // ===== УПРАВЛЕНИЕ ПЛЕЙЛИСТОМ =====
     
     loadTrack(index) {
         if (index < 0 || index >= this.playlist.length) return;
@@ -630,6 +935,7 @@ const Player = {
             this.isPlaying = true;
             this.updatePlayButton();
             this.updateToggleButton();
+            this.disableIdleEffects();
         }, 150);
     },
     
@@ -664,6 +970,9 @@ const Player = {
         this.elements.playlistCount.textContent = this.playlist.length;
         this.updatePlaylistUI();
         this.savePlaylist();
+        
+        // Сбрасываем idle-таймер
+        this.resetIdleTimer();
     },
     
     updatePlaylistUI() {
@@ -708,6 +1017,7 @@ const Player = {
             el.addEventListener('click', (e) => {
                 if (e.target.closest('.track-remove')) return;
                 const index = parseInt(el.dataset.index);
+                this.resetIdleTimer();
                 this.loadTrack(index);
             });
         });
@@ -716,6 +1026,7 @@ const Player = {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const index = parseInt(btn.dataset.index);
+                this.resetIdleTimer();
                 this.removeTrack(index);
             });
         });
@@ -741,6 +1052,8 @@ const Player = {
                 this.elements.progressSlider.value = 0;
                 this.elements.currentTime.textContent = '0:00';
                 this.elements.totalTime.textContent = '0:00';
+                // Включаем idle
+                this.resetIdleTimer();
             }
         } else if (index < this.currentTrackIndex) {
             this.currentTrackIndex--;
@@ -763,10 +1076,13 @@ const Player = {
             this.audio.pause();
             this.isPlaying = false;
             this.stopBassAnalysis();
+            // Включаем idle при паузе
+            this.resetIdleTimer();
         } else {
             this.audio.play().catch(() => {});
             this.isPlaying = true;
             this.startBassAnalysis();
+            this.disableIdleEffects();
         }
         this.updatePlayButton();
         this.updateToggleButton();
@@ -804,9 +1120,12 @@ const Player = {
         const toggle = this.elements.toggle;
         if (this.isPlaying && this.playlist.length > 0) {
             toggle.classList.add('playing');
+            this.disableIdleEffects();
         } else {
             toggle.classList.remove('playing');
             this.instantDecay();
+            // Включаем idle
+            this.resetIdleTimer();
         }
     },
     

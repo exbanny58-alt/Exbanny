@@ -616,9 +616,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;  /* ← было center, стало flex-start */
     min-height: 100%;
+    padding-top: 20px;            /* ← добавил отступ сверху */
     animation: fadeIn 0.4s ease;
+}
+
+.settings-page .settings-content {
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
 }
 
 .settings-header {
@@ -2069,3 +2076,262 @@ body {
     .player-volume input[type="range"] { min-width: 30px; }
 }
 
+/* ============================================
+   БАЗА ДАННЫХ — полные стили
+   ============================================ */
+
+/* ---- Список таблиц слева ---- */
+.db-table-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+.db-table-item:hover {
+    background: var(--accent-bg);
+    color: var(--text-heading);
+}
+
+.db-table-item.active {
+    background: var(--accent-bg);
+    color: var(--accent);
+}
+
+/* ---- Контейнер с данными ---- */
+.db-data-wrapper {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 300px;
+}
+
+.db-data-wrapper .db-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.db-data-wrapper .db-empty .empty-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.db-data-wrapper .db-empty .empty-text {
+    font-size: 0.9rem;
+}
+
+/* ---- Статистика таблицы ---- */
+.db-table-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.db-table-stats .table-name {
+    color: var(--text-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.db-table-stats .table-name code {
+    background: var(--bg-primary);
+    padding: 2px 10px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-family: 'Courier New', monospace;
+}
+
+.db-table-stats .table-count {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.db-table-stats .table-count strong {
+    color: var(--text-heading);
+}
+
+/* ---- Кнопка очистки ---- */
+.db-clear-btn {
+    padding: 4px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 70, 70, 0.3);
+    background: rgba(255, 70, 70, 0.08);
+    color: #ff6b6b;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.db-clear-btn:hover {
+    background: rgba(255, 70, 70, 0.2) !important;
+    border-color: rgba(255, 70, 70, 0.5) !important;
+    box-shadow: 0 0 16px rgba(255, 70, 70, 0.15);
+}
+
+.db-clear-btn:active {
+    transform: scale(0.95);
+}
+
+/* ---- САМА ТАБЛИЦА ---- */
+.db-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Заголовки таблицы */
+.db-data-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.db-data-table thead tr {
+    background: var(--bg-primary);
+}
+
+.db-data-table th {
+    padding: 10px 14px;
+    text-align: left;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--accent-dim);
+    white-space: nowrap;
+    background: var(--bg-primary);
+}
+
+/* Ячейки таблицы */
+.db-data-table td {
+    padding: 8px 14px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.78rem;
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* Строки таблицы */
+.db-data-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.db-data-table tbody tr:hover td {
+    background: var(--accent-bg);
+}
+
+/* Четные строки */
+.db-data-table tbody tr:nth-child(even) td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.db-data-table tbody tr:nth-child(even):hover td {
+    background: var(--accent-bg);
+}
+
+/* NULL значения */
+.db-data-table .null-value {
+    color: var(--text-secondary);
+    opacity: 0.4;
+    font-style: italic;
+}
+
+/* Длинные тексты с подсказкой */
+.db-data-table .long-text {
+    cursor: pointer;
+    color: var(--accent);
+    text-decoration: underline dotted;
+    transition: color 0.2s ease;
+}
+
+.db-data-table .long-text:hover {
+    color: var(--accent-bright);
+}
+
+/* ---- Скролл для таблицы ---- */
+.db-table-scroll {
+    overflow: auto;
+    max-height: 450px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.db-table-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.db-table-scroll::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+    border-radius: 4px;
+}
+
+.db-table-scroll::-webkit-scrollbar-thumb {
+    background: var(--accent-dim);
+    border-radius: 4px;
+}
+
+.db-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+/* ---- Загрузчик ---- */
+.db-loader {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.db-loader .loader {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto;
+}
+
+.db-loader p {
+    color: var(--text-secondary);
+    margin-top: 12px;
+    font-size: 0.85rem;
+}
+
+/* --- Иконки в subnav --- */
+.subnav-tab svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke: currentColor;
+}
+
+.subnav-tab span {
+    flex-shrink: 0;
+}
+
+.subnav-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

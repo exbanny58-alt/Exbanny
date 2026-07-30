@@ -1,44 +1,35 @@
 from flask import Flask, render_template
-from routes.config_routes import config_bp
-from routes.settings_routes import settings_bp
+from routes import config_bp, settings_bp, paths_bp, misc_bp  # ← ДОБАВИЛИ misc_bp
+import database as db
 import json
 import os
 
 app = Flask(__name__)
 
-# Регистрируем蓝图
+# Регистрируем все роуты
 app.register_blueprint(config_bp)
 app.register_blueprint(settings_bp)
+app.register_blueprint(paths_bp)
+app.register_blueprint(misc_bp)  # ← НОВОЕ
 
-# Загружаем конфиги при старте сервера
-def load_json_file(filepath):
-    if os.path.exists(filepath):
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {}
+# Инициализируем БД при старте
+db.init_db()
+db.init_default_paths()
+db.init_default_pages()
 
-# Загружаем конфиги в глобальную переменную
-CONFIG = load_json_file('config/pages.json')
-SETTINGS = load_json_file('config/settings.json')
-
-# Извлекаем цвета и эффекты
-COLORS = SETTINGS.get('colors', {})
-EFFECT = SETTINGS.get('effect', 'fadeBlurIn')
-
-# Формируем CSS переменные для вставки в HTML
+# Формируем CSS переменные
 def get_css_variables():
-    accent = COLORS.get('accent', '#7acc7a')
-    glow_intensity = COLORS.get('glowIntensity', 50)
+    colors = db.get_colors()
+    accent = colors.get('accent', '#7acc7a')
+    glow_intensity = colors.get('glowIntensity', 50)
     intensity_float = glow_intensity / 100
     glow_size = glow_intensity * 1.5
     
-    # Вычисляем alpha для glow
     min_alpha = 5
     max_alpha = 51
     alpha = round(min_alpha + (max_alpha - min_alpha) * intensity_float)
     alpha_hex = hex(alpha)[2:].zfill(2)
     
-    # Исправлено: преобразуем в строку
     glow_size_str = str(max(glow_size, 2))
     
     return {
@@ -51,17 +42,20 @@ def get_css_variables():
         '--loader-color': accent
     }
 
-CSS_VARS = get_css_variables()
-
 @app.route('/')
 def index():
+    colors = db.get_colors()
+    effect = db.get_setting('effect', 'fade')
+    pages = db.get_all_pages()
+    home_page = db.get_home_page()
+    
     return render_template(
         'index.html',
-        colors=COLORS,
-        effect=EFFECT,
-        css_vars=CSS_VARS,
-        config=CONFIG,
-        settings=SETTINGS
+        colors=colors,
+        effect=effect,
+        css_vars=get_css_variables(),
+        pages=pages,
+        home_page=home_page
     )
 
 if __name__ == '__main__':

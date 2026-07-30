@@ -1,33 +1,38 @@
 from flask import Blueprint, jsonify, request
-import json
-import os
+import database as db
 
 settings_bp = Blueprint('settings', __name__)
 
-SETTINGS_FILE = 'config/settings.json'
-
-def load_json_file(filepath):
-    if os.path.exists(filepath):
-        with open(filepath, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {}
-
-def save_json_file(filepath, data):
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=4, ensure_ascii=False)
-
-@settings_bp.route('/api/settings/load')
+@settings_bp.route('/api/settings/load', methods=['GET'])
 def load_settings():
-    return jsonify(load_json_file(SETTINGS_FILE))
+    """Загрузить настройки"""
+    try:
+        colors = db.get_colors()
+        effect = db.get_setting('effect', 'fade')
+        return jsonify({
+            'success': True,
+            'colors': colors,
+            'effect': effect
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @settings_bp.route('/api/settings/save', methods=['POST'])
 def save_settings():
+    """Сохранить настройки"""
     data = request.get_json()
-    settings = load_json_file(SETTINGS_FILE)
     
-    if data:
-        settings.update(data)
-    
-    save_json_file(SETTINGS_FILE, settings)
-    return jsonify({'success': True, 'settings': settings})
+    try:
+        if 'colors' in data:
+            colors = data['colors']
+            db.save_colors(
+                colors.get('accent', '#7acc7a'), 
+                colors.get('glowIntensity', 50)
+            )
+        
+        if 'effect' in data:
+            db.set_setting('effect', data['effect'])
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

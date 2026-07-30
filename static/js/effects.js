@@ -1,8 +1,10 @@
-// Управление эффектами переходов со Swup
+// ============================================
+// УПРАВЛЕНИЕ ЭФФЕКТАМИ ПЕРЕХОДОВ (без Swup)
+// ============================================
+
 const EffectsManager = {
     currentEffect: 'fade',
     isLoaded: false,
-    swupInstance: null,
 
     effects: {
         fade: {
@@ -89,98 +91,13 @@ const EffectsManager = {
 
     init() {
         this.loadSettings();
-        this.initSwup();
-        console.log('✅ EffectsManager initialized with Swup');
-    },
-
-    initSwup() {
-        // Проверяем, загружен ли Swup
-        if (typeof Swup === 'undefined') {
-            console.warn('⚠️ Swup not loaded, waiting...');
-            setTimeout(() => this.initSwup(), 500);
-            return;
-        }
-
-        if (this.swupInstance) return;
-
-        try {
-            // Конфигурация Swup для SPA
-            this.swupInstance = new Swup({
-                containers: ['#content'],
-                cache: false,
-                animateHistoryBrowsing: true,
-                plugins: []
-            });
-
-            console.log('✅ Swup initialized');
-
-            // Подписываемся на события Swup
-            this.swupInstance.on('transitionStart', () => {
-                console.log('🔄 Transition start');
-            });
-
-            this.swupInstance.on('transitionEnd', () => {
-                console.log('✅ Transition end');
-                // Применяем эффект к новому контенту
-                this.applyToContent();
-            });
-
-            // Применяем текущий эффект
-            setTimeout(() => this.applyToContent(), 200);
-
-        } catch (e) {
-            console.error('❌ Swup init error:', e);
-            // Fallback на CSS
-            this.applyToContent();
-        }
+        // Применяем эффект после загрузки
+        setTimeout(() => this.applyToContent(), 200);
+        console.log('✅ EffectsManager initialized (без Swup)');
     },
 
     getAnimation() {
         return this.effects[this.currentEffect]?.animation || 'fade';
-    },
-
-    getDuration(effect) {
-        const durations = {
-            'fade': 500,
-            'slide': 500,
-            'slide-up': 500,
-            'slide-down': 500,
-            'explode': 700,
-            'dissolve': 600,
-            'shatter': 700,
-            'push': 500,
-            'pull': 500,
-            'flip': 600,
-            'glitch': 600,
-            'perspective': 600,
-            'swirl': 700,
-            'reveal': 600,
-            'fold': 600,
-            'zoom': 500
-        };
-        return durations[effect] || 500;
-    },
-
-    getLeaveAnimation(effect) {
-        const map = {
-            'fade': 'fadeOut 0.5s ease forwards',
-            'slide': 'slideOut 0.5s ease forwards',
-            'slide-up': 'slideUpOut 0.5s ease forwards',
-            'slide-down': 'slideDownOut 0.5s ease forwards',
-            'explode': 'explodeOut 0.7s ease forwards',
-            'dissolve': 'dissolveOut 0.6s ease forwards',
-            'shatter': 'shatterOut 0.7s ease forwards',
-            'push': 'pushOut 0.5s ease forwards',
-            'pull': 'pullOut 0.5s ease forwards',
-            'flip': 'flipOut 0.6s ease forwards',
-            'glitch': 'glitchOut 0.6s ease forwards',
-            'perspective': 'perspectiveOut 0.6s ease forwards',
-            'swirl': 'swirlOut 0.7s ease forwards',
-            'reveal': 'revealOut 0.6s ease forwards',
-            'fold': 'foldOut 0.6s ease forwards',
-            'zoom': 'zoomOut 0.5s ease forwards'
-        };
-        return map[effect] || 'fadeOut 0.5s ease forwards';
     },
 
     getEnterAnimation(effect) {
@@ -211,7 +128,6 @@ const EffectsManager = {
             this.currentEffect = effectId;
             this.saveSettings();
             
-            // Применяем эффект
             this.applyToContent();
             
             if (typeof Notifications !== 'undefined') {
@@ -226,9 +142,6 @@ const EffectsManager = {
         const content = document.getElementById('content');
         if (!content) return;
         
-        // Убираем старые классы анимации
-        content.classList.remove('is-leaving', 'is-enter');
-        
         // Сбрасываем стили
         content.style.animation = 'none';
         content.style.opacity = '0';
@@ -240,15 +153,6 @@ const EffectsManager = {
         const effect = this.getAnimation();
         content.style.animation = this.getEnterAnimation(effect);
         content.style.opacity = '1';
-    },
-
-    // Метод для Swup — вызывается перед переходом
-    beforeTransition() {
-        const content = document.getElementById('content');
-        if (!content) return;
-        
-        const effect = this.getAnimation();
-        content.style.animation = this.getLeaveAnimation(effect);
     },
 
     saveSettings() {
@@ -286,4 +190,3 @@ const EffectsManager = {
             });
     }
 };
-
