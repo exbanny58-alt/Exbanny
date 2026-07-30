@@ -8,10 +8,22 @@ const ColorPicker = {
         glowIntensity: 50
     },
 
-    async init() {
-        // Сначала загружаем цвета
-        await this.loadColors();
-        // Потом создаём попап
+    init() {
+        // Если есть начальное состояние — используем его
+        if (window.__INITIAL_STATE__ && window.__INITIAL_STATE__.colors) {
+            const serverColors = window.__INITIAL_STATE__.colors;
+            this.colors = {
+                accent: serverColors.accent || this.defaultColors.accent,
+                glowIntensity: serverColors.glowIntensity !== undefined 
+                    ? serverColors.glowIntensity 
+                    : this.defaultColors.glowIntensity
+            };
+        } else {
+            // Fallback — загружаем с сервера
+            this.loadColors();
+        }
+        
+        // Создаём попап
         this.createPopup();
         // Привязываем события
         this.bindEvents();
@@ -19,10 +31,11 @@ const ColorPicker = {
         this.applyColors();
         // Отмечаем, что загружено
         this.isLoaded = true;
-        console.log('🎨 Цвета загружены и применены:', this.colors);
+        console.log('🎨 ColorPicker инициализирован с цветами:', this.colors);
     },
 
     async loadColors() {
+        // Этот метод теперь используется только как fallback
         try {
             const response = await fetch('/api/settings/load');
             const data = await response.json();
@@ -35,21 +48,14 @@ const ColorPicker = {
                         : this.defaultColors.glowIntensity
                 };
             } else {
-                console.log('Цвета не найдены, сохраняем дефолтные...');
                 this.colors = { ...this.defaultColors };
                 await this.saveColorsToServer(this.colors);
             }
         } catch (error) {
             console.error('Ошибка загрузки цветов:', error);
             this.colors = { ...this.defaultColors };
-            try {
-                await this.saveColorsToServer(this.colors);
-            } catch (e) {
-                console.error('Не удалось сохранить дефолтные цвета:', e);
-            }
         }
     },
-
     async saveColorsToServer(colors) {
         try {
             const response = await fetch('/api/settings/save', {
@@ -280,6 +286,7 @@ const ColorPicker = {
         
         const newColors = {
             accent: colorInput ? colorInput.value : (this.colors.accent || this.defaultColors.accent),
+            accentSecondary: this.colors.accentSecondary || this.defaultColors.accentSecondary,
             glowIntensity: slider ? parseInt(slider.value) : (this.colors.glowIntensity || this.defaultColors.glowIntensity)
         };
         
@@ -289,10 +296,10 @@ const ColorPicker = {
         const success = await this.saveColorsToServer(newColors);
         
         if (success) {
-            this.showNotification('✅ Настройки сохранены!');
+            Notifications.success('✅ Стили темы Сохранены!');
             setTimeout(() => this.close(), 600);
         } else {
-            this.showNotification('❌ Ошибка сохранения');
+            Notifications.error('❌ Ошибка сохранения');
         }
     },
 
@@ -304,13 +311,13 @@ const ColorPicker = {
         const success = await this.saveColorsToServer(this.defaultColors);
         
         if (success) {
-            this.showNotification('↺ Настройки сброшены');
+            Notifications.success('↺ Стиль темы Сброшен');
             setTimeout(() => this.close(), 600);
         } else {
-            this.showNotification('❌ Ошибка сброса');
+            Notifications.error('❌ Ошибка сброса');
         }
     },
-
+    
     applyColors() {
         const root = document.documentElement;
         const accent = this.colors.accent || this.defaultColors.accent;
@@ -319,24 +326,20 @@ const ColorPicker = {
         const glowSize = intensity * 1.5;
         
         if (accent) {
-            root.style.setProperty('--accent', accent);
-            root.style.setProperty('--accent-dim', accent + 'cc');
-            root.style.setProperty('--accent-bg', accent + '0f');
-            root.style.setProperty('--loader-color', accent);
+            root.style.setProperty('--accent', accent, 'important');
+            root.style.setProperty('--accent-dim', accent + 'cc', 'important');
+            root.style.setProperty('--accent-bg', accent + '0f', 'important');
+            root.style.setProperty('--loader-color', accent, 'important');
             
             const minAlpha = 5;
             const maxAlpha = 51;
             const alpha = Math.round(minAlpha + (maxAlpha - minAlpha) * intensityFloat);
             const alphaHex = alpha.toString(16).padStart(2, '0');
             
-            root.style.setProperty('--accent-glow', accent + alphaHex);
-            root.style.setProperty('--accent-glow-strong', accent + alphaHex);
-            root.style.setProperty('--accent-glow-size', Math.max(glowSize, 2) + 'px');
+            root.style.setProperty('--accent-glow', accent + alphaHex, 'important');
+            root.style.setProperty('--accent-glow-strong', accent + alphaHex, 'important');
+            root.style.setProperty('--accent-glow-size', Math.max(glowSize, 2) + 'px', 'important');
             
-            // Обновляем цвета загрузчика
-            Loader.updateColors();
-            
-            // Обновляем цвета плеера
             this.updatePlayerColors(accent);
         }
     },
@@ -359,37 +362,6 @@ const ColorPicker = {
         if (bassRing) {
             bassRing.style.borderColor = accent;
         }
-    },
-
-    showNotification(message) {
-        const existing = document.querySelector('.color-notification');
-        if (existing) existing.remove();
-        
-        const notification = document.createElement('div');
-        notification.className = 'color-notification';
-        notification.style.cssText = `
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            background: var(--bg-card);
-            border: 1px solid var(--accent-dim);
-            border-radius: 12px;
-            padding: 14px 24px;
-            color: var(--text-primary);
-            font-family: 'Montserrat', sans-serif;
-            font-size: 0.9rem;
-            z-index: 1001;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 24px var(--accent-glow);
-            animation: slideBounceUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            max-width: 320px;
-        `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'popupClose 0.25s ease forwards';
-            setTimeout(() => notification.remove(), 300);
-        }, 2500);
     },
 
     toggle() {

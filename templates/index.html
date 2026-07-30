@@ -5,13 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DayzM</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/transitions.css') }}">
+    <style>
+        /* Серверные CSS переменные — применяются мгновенно */
+        :root {
+            --accent: {{ css_vars['--accent'] }};
+            --accent-dim: {{ css_vars['--accent-dim'] }};
+            --accent-bg: {{ css_vars['--accent-bg'] }};
+            --accent-glow: {{ css_vars['--accent-glow'] }};
+            --accent-glow-strong: {{ css_vars['--accent-glow-strong'] }};
+            --accent-glow-size: {{ css_vars['--accent-glow-size'] }};
+            --loader-color: {{ css_vars['--loader-color'] }};
+        }
+    </style>
 </head>
 <body>
+    <body>
+    <!-- ============================================ -->
+    <!-- SVG SPRITE ДЛЯ УВЕДОМЛЕНИЙ                   -->
+    <!-- ============================================ -->
+    <svg class="notifications-svg-sprite" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+        <defs>
+            <!-- Success -->
+            <symbol id="success" viewBox="0 0 32 32">
+                <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/>
+                <path d="M10 16 L14 20 L22 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- Error -->
+            <symbol id="error" viewBox="0 0 32 32">
+                <circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="10" y1="10" x2="22" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="22" y1="10" x2="10" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </symbol>
+            <!-- Warning -->
+            <symbol id="warning" viewBox="0 0 32 32">
+                <path d="M16 4 L2 28 L30 28 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <line x1="16" y1="18" x2="16" y2="12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="16" cy="24" r="1.5" fill="currentColor"/>
+            </symbol>
+            <!-- Info / Message -->
+            <symbol id="message" viewBox="0 0 32 32">
+                <path d="M16 4C8.5 4 2.5 9.5 2.5 16C2.5 20.5 5 24.5 9 27L8 30L12 27.5C13.5 28 15 28.5 16 28.5C23.5 28.5 29.5 23 29.5 16C29.5 9 23.5 4 16 4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="11" cy="16" r="1.5" fill="currentColor"/>
+                <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+                <circle cx="21" cy="16" r="1.5" fill="currentColor"/>
+            </symbol>
+        </defs>
+    </svg>
     <!-- Верхняя матовая панель -->
     <header class="top-panel">
         <div class="top-panel-left">
             <div class="logo">
-                <span class="dayz"></span><span class="m"></span>
+                <span class="dayz">{{ config.app.logo.text }}</span><span class="m">{{ config.app.logo.accent }}</span>
             </div>
 
             <nav class="settings-subnav" id="settingsSubnav">
@@ -30,7 +76,7 @@
                     <path d="M9 9l12-2"/>
                 </svg>
             </button>
-            <button class="settings-btn" title="Настройки"></button>
+            <button class="settings-btn" title="Настройки">{{ config.settings.icon|safe }}</button>
         </div>
     </header>
 
@@ -40,20 +86,61 @@
         <!-- Левая панель -->
         <aside class="side-panel">
             <nav class="side-tabs">
-                <!-- Вкладки генерируются через JS -->
+                {% for page in config.pages %}
+                <button class="side-tab" data-page-id="{{ page.id }}">
+                    <span class="tab-icon">{{ page.icon|safe }}</span>
+                    {{ page.name }}
+                </button>
+                {% endfor %}
             </nav>
         </aside>
 
         <!-- Контент -->
         <main class="content-area" id="content">
-            <!-- Контент подгружается через JS -->
+            {{ config.homePage.content|safe }}
         </main>
     </div>
-
-    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <style>
+        /* Серверные CSS переменные — применяются мгновенно */
+        :root {
+            --accent: {{ css_vars['--accent'] }} !important;
+            --accent-dim: {{ css_vars['--accent-dim'] }} !important;
+            --accent-bg: {{ css_vars['--accent-bg'] }} !important;
+            --accent-glow: {{ css_vars['--accent-glow'] }} !important;
+            --accent-glow-strong: {{ css_vars['--accent-glow-strong'] }} !important;
+            --accent-glow-size: {{ css_vars['--accent-glow-size'] }} !important;
+            --loader-color: {{ css_vars['--loader-color'] }} !important;
+        }
+    </style>
+    <!-- Передаём настройки в JS через JSON-блок -->
+    <script id="initial-state" type="application/json">
+        {
+            "colors": {{ colors|tojson }},
+            "effect": {{ effect|tojson }},
+            "config": {{ config|tojson }}
+        }
+    </script>
+    <script>
+        const stateScript = document.getElementById('initial-state');
+        try {
+            window.__INITIAL_STATE__ = JSON.parse(stateScript.textContent);
+            console.log('✅ Initial state loaded:', window.__INITIAL_STATE__);
+        } catch (e) {
+            console.error('❌ Failed to parse initial state:', e);
+            // Fallback
+            window.__INITIAL_STATE__ = {
+                colors: { accent: '#7acc7a', glowIntensity: 50 },
+                effect: 'fadeBlurIn',
+                config: { app: { title: 'DayzM', logo: { text: 'Dayz', accent: 'M' } }, pages: [] }
+            };
+        }
+    </script>
+<!-- Swup -->
+<script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/effects.js') }}"></script>
+<script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
+<script src="{{ url_for('static', filename='js/player.js') }}"></script>      <!-- ← player.js -->
+<script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>         <!-- ← app.js ПОСЛЕ player.js -->
 </body>
 </html>

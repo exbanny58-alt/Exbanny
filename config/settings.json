@@ -1,7 +1,7 @@
 {
-    "effect": "flipIn",
+    "effect": "shatter",
     "colors": {
-        "accent": "#00bfff",
-        "glowIntensity": 100
+        "accent": "#7acc7a",
+        "glowIntensity": 50
     }
 }

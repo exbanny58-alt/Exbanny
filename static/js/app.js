@@ -3,130 +3,221 @@ const app = {
     config: null,
     currentPage: null,
     currentSettingsTab: 'general',
+    isSettingsOpen: false,  // Добавляем флаг для отслеживания состояния настроек
 
     async init() {
-        try {
-            const response = await fetch('/api/config');
-            this.config = await response.json();
-            this.render();
-            EffectsManager.init();
-            ColorPicker.init();
-            this.initMusicButton();
-        } catch (error) {
-            console.error('Ошибка загрузки конфига:', error);
+        console.log('🚀 App initializing...');
+        
+        this.config = window.__INITIAL_STATE__.config;
+        console.log('✅ Config loaded:', this.config);
+        
+        const colors = window.__INITIAL_STATE__.colors;
+        if (colors) {
+            ColorPicker.colors = {
+                accent: colors.accent || '#7acc7a',
+                glowIntensity: colors.glowIntensity !== undefined ? colors.glowIntensity : 50
+            };
+            ColorPicker.applyColors();
+            console.log('✅ Colors applied:', ColorPicker.colors);
         }
+        
+        const effect = window.__INITIAL_STATE__.effect;
+        if (effect && EffectsManager.effects[effect]) {
+            EffectsManager.currentEffect = effect;
+            console.log('✅ Effect set:', effect);
+        }
+        
+        this.render();
+        
+        EffectsManager.init();
+        ColorPicker.init();
+        this.initMusicButton();
+        
+        setTimeout(() => EffectsManager.applyToContent(), 50);
+        
+        console.log('✅ App initialized successfully');
     },
 
     render() {
         this.renderLogo();
         this.renderSettingsButton();
         this.renderSettingsSubnav();
-        this.renderTabs();
-        this.showHome();
-        setTimeout(() => ColorPicker.applyColors(), 100);
+        this.updateActiveTab();
+        this.loadSettingsFromServer();
     },
 
     renderLogo() {
-        document.querySelector('.logo .dayz').textContent = this.config.app.logo.text;
-        document.querySelector('.logo .m').textContent = this.config.app.logo.accent;
-        document.title = this.config.app.title;
+        if (this.config && this.config.app) {
+            document.title = this.config.app.title;
+        }
     },
 
     renderSettingsButton() {
         const btn = document.querySelector('.settings-btn');
-        if (this.config.settings && this.config.settings.icon) {
-            btn.innerHTML = this.config.settings.icon;
+        if (btn) {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+            
+            newBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('⚙️ Settings button clicked');
+                this.togglePage('settings');
+            });
+            console.log('✅ Settings button initialized');
+        } else {
+            console.warn('⚠️ Settings button not found in DOM');
         }
-        btn.addEventListener('click', () => this.togglePage('settings'));
     },
 
     renderSettingsSubnav() {
         document.querySelectorAll('.subnav-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 const tabName = tab.dataset.settingsTab;
+                console.log('📑 Settings tab clicked:', tabName);
                 this.switchSettingsTab(tabName);
             });
         });
     },
 
-    renderTabs() {
-        const nav = document.querySelector('.side-tabs');
-        nav.innerHTML = '';
-
-        this.config.pages.forEach(page => {
-            const button = document.createElement('button');
-            button.className = 'side-tab';
-            button.dataset.pageId = page.id;
-            button.innerHTML = `
-                <span class="tab-icon">${page.icon}</span>
-                ${page.name}
-            `;
-            button.addEventListener('click', () => this.togglePage(page.id));
-            nav.appendChild(button);
+    updateActiveTab() {
+        document.querySelectorAll('.side-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const pageId = tab.dataset.pageId;
+                console.log('📄 Page clicked:', pageId);
+                this.togglePage(pageId);
+            });
         });
-
-        SideLoader.init();
     },
 
+    async loadSettingsFromServer() {
+        try {
+            const response = await fetch('/api/settings/load');
+            const data = await response.json();
+            
+            if (data.effect && EffectsManager.effects[data.effect]) {
+                EffectsManager.currentEffect = data.effect;
+            }
+            
+            if (data.colors) {
+                ColorPicker.colors = {
+                    accent: data.colors.accent || ColorPicker.colors.accent,
+                    accentSecondary: data.colors.accentSecondary || ColorPicker.colors.accentSecondary,
+                    glowIntensity: data.colors.glowIntensity !== undefined ? data.colors.glowIntensity : ColorPicker.colors.glowIntensity
+                };
+                ColorPicker.applyColors();
+            }
+        } catch (error) {
+            console.error('❌ Error loading settings:', error);
+            Notifications.error('Ошибка загрузки настроек');
+        }
+    },
     showHome() {
-        document.getElementById('content').innerHTML = this.config.homePage.content;
+        console.log('🏠 Showing home page');
         this.currentPage = 'home';
+        this.isSettingsOpen = false;
         this.hideSettingsSubnav();
         this.closeColorPickerIfOpen();
 
+        // Убираем активный класс со всех вкладок
         document.querySelectorAll('.side-tab').forEach(tab => {
             tab.classList.remove('active');
         });
 
-        document.querySelector('.settings-btn').classList.remove('active');
+        const settingsBtn = document.querySelector('.settings-btn');
+        if (settingsBtn) settingsBtn.classList.remove('active');
+        
+        // Возвращаем контент на главную
+        if (this.config && this.config.homePage) {
+            document.getElementById('content').innerHTML = this.config.homePage.content;
+        }
         
         setTimeout(() => EffectsManager.applyToContent(), 50);
     },
 
     togglePage(pageId) {
+        console.log('🔄 Toggle page:', pageId, 'current:', this.currentPage);
+        
+        // Если кликнули по настройкам
+        if (pageId === 'settings') {
+            // Если настройки уже открыты — сворачиваем на главную
+            if (this.currentPage === 'settings' || this.isSettingsOpen) {
+                this.showHome();
+                return;
+            }
+            // Иначе открываем настройки
+            this.openPage('settings');
+            return;
+        }
+        
+        // Если кликнули по home — показываем главную
+        if (pageId === 'home') {
+            this.showHome();
+            return;
+        }
+        
+        // Если кликнули по той же странице — сворачиваем на главную
         if (this.currentPage === pageId) {
             this.showHome();
-        } else {
-            this.openPage(pageId);
+            return;
         }
+        
+        // Открываем страницу
+        this.openPage(pageId);
     },
 
     openPage(pageId) {
-        document.querySelectorAll('.side-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.pageId === pageId);
-        });
-
+        console.log('📄 Opening page:', pageId);
+        
+        // Если открываем настройки
         if (pageId === 'settings') {
+            this.isSettingsOpen = true;
             this.showSettingsSubnav();
-            document.querySelector('.settings-btn').classList.add('active');
+            const settingsBtn = document.querySelector('.settings-btn');
+            if (settingsBtn) settingsBtn.classList.add('active');
+            
             document.querySelectorAll('.side-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
+            
             this.currentSettingsTab = 'general';
             document.querySelectorAll('.subnav-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.settingsTab === 'general');
             });
             this.loadSettingsContent('general');
-        } else {
-            this.hideSettingsSubnav();
-            this.closeColorPickerIfOpen();
-            document.querySelector('.settings-btn').classList.remove('active');
-            const page = this.config.pages.find(p => p.id === pageId);
-            if (page) {
-                document.getElementById('content').innerHTML = page.content;
-                setTimeout(() => EffectsManager.applyToContent(), 50);
-            }
+            this.currentPage = 'settings';
+            return;
+        }
+        
+        // Открываем обычную страницу
+        this.isSettingsOpen = false;
+        this.hideSettingsSubnav();
+        this.closeColorPickerIfOpen();
+        
+        const settingsBtn = document.querySelector('.settings-btn');
+        if (settingsBtn) settingsBtn.classList.remove('active');
+        
+        // Обновляем активную вкладку
+        document.querySelectorAll('.side-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.pageId === pageId);
+        });
+        
+        const page = this.config.pages.find(p => p.id === pageId);
+        if (page) {
+            document.getElementById('content').innerHTML = page.content;
+            setTimeout(() => EffectsManager.applyToContent(), 50);
         }
 
         this.currentPage = pageId;
     },
     
     showSettingsSubnav() {
-        document.getElementById('settingsSubnav').classList.add('visible');
+        const subnav = document.getElementById('settingsSubnav');
+        if (subnav) subnav.classList.add('visible');
     },
 
     hideSettingsSubnav() {
-        document.getElementById('settingsSubnav').classList.remove('visible');
+        const subnav = document.getElementById('settingsSubnav');
+        if (subnav) subnav.classList.remove('visible');
     },
 
     closeColorPickerIfOpen() {
@@ -159,7 +250,7 @@ const app = {
                 <div class='settings-page'>
                     <div class='settings-header'>
                         <div class='settings-icon'>
-                            <svg viewBox='0 0 24 24' fill='none' stroke='#7acc7a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
+                            <svg viewBox='0 0 24 24' fill='none' stroke='var(--accent)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'>
                                 <circle cx='12' cy='12' r='3'></circle>
                                 <path d='M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z'></path>
                             </svg>
@@ -222,27 +313,32 @@ const app = {
 
     initMusicButton() {
         const musicBtn = document.querySelector('.music-btn');
-        if (!musicBtn) return;
+        if (!musicBtn) {
+            console.warn('⚠️ Music button not found in DOM');
+            return;
+        }
 
-        // Находим контейнер плеера
         const player = document.getElementById('dayzmPlayer');
-        if (!player) return;
+        if (!player) {
+            console.warn('⚠️ Player container not found');
+            return;
+        }
 
-        // По умолчанию плавающая кнопка скрыта
         player.classList.add('hidden');
         player.style.display = 'none';
 
-        // Обработчик клика по кнопке в топ-панели - только показывает/скрывает плавающую кнопку
-        musicBtn.addEventListener('click', (e) => {
+        const newMusicBtn = musicBtn.cloneNode(true);
+        musicBtn.parentNode.replaceChild(newMusicBtn, musicBtn);
+
+        newMusicBtn.addEventListener('click', (e) => {
             e.stopPropagation();
+            console.log('🎵 Music button clicked');
             this.toggleFloatingButton();
         });
 
-        // Синхронизация с закрытием тела плеера через крестик
         const closeBtn = document.getElementById('playerClose');
         if (closeBtn) {
             closeBtn.addEventListener('click', () => {
-                // Закрываем только тело плеера, плавающая кнопка остаётся
                 if (typeof Player !== 'undefined' && Player.isOpen) {
                     Player.close();
                 }
@@ -250,9 +346,7 @@ const app = {
             });
         }
 
-        // Когда плавающая кнопка открывает плеер - синхронизируем состояние
         if (typeof Player !== 'undefined') {
-            // Перехватываем открытие плеера через плавающую кнопку
             const originalToggle = Player.toggle;
             Player.toggle = function() {
                 originalToggle.call(this);
@@ -268,13 +362,13 @@ const app = {
             const originalClose = Player.close;
             Player.close = function() {
                 originalClose.call(this);
-                // Плавающая кнопка остаётся видимой
                 app.updateMusicButtonState(true);
             };
         }
+        
+        console.log('✅ Music button initialized');
     },
 
-    // Показывает/скрывает ТОЛЬКО плавающую кнопку (не тело плеера)
     toggleFloatingButton() {
         const player = document.getElementById('dayzmPlayer');
         if (!player) return;
@@ -295,9 +389,6 @@ const app = {
         player.style.animation = 'fadeIn 0.3s ease forwards';
         
         this.updateMusicButtonState(true);
-        
-        // НЕ открываем плеер автоматически!
-        // Пользователь сам кликнет по плавающей кнопке когда захочет
     },
 
     hideFloatingButton() {
@@ -313,7 +404,6 @@ const app = {
         
         this.updateMusicButtonState(false);
         
-        // Если тело плеера открыто - закрываем его
         if (typeof Player !== 'undefined' && Player.isOpen) {
             Player.close();
         }
@@ -336,6 +426,11 @@ const app = {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('📄 DOM loaded, initializing app...');
     app.init();
-    document.querySelector('.logo').addEventListener('click', () => app.goHome());
+    
+    const logo = document.querySelector('.logo');
+    if (logo) {
+        logo.addEventListener('click', () => app.goHome());
+    }
 });
