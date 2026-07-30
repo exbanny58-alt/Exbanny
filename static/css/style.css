@@ -1483,10 +1483,18 @@ body {
 }
 
 /* ============================================
-   DAYZM AUDIO PLAYER
+   DAYZM AUDIO PLAYER — ОПТИМИЗИРОВАННЫЙ
    ============================================ */
 
-/* Кнопка-триггер плеера */
+/* ----- ОБЩИЕ ПЕРЕМЕННЫЕ ----- */
+:root {
+    --player-size: 48px;
+    --player-radius: 50%;
+    --transition-fast: 0.2s ease;
+    --transition-med: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ----- КНОПКА-ТРИГГЕР ----- */
 .dayzm-player {
     position: fixed;
     bottom: 30px;
@@ -1494,31 +1502,30 @@ body {
     z-index: 900;
 }
 
+/* Общий класс для круговых элементов */
+.player-toggle,
+.player-toggle .pulse-ring,
+.player-toggle .bass-ring {
+    border-radius: var(--player-radius);
+    position: relative;
+}
+
 .player-toggle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+    width: var(--player-size);
+    height: var(--player-size);
     background: var(--bg-card);
     border: 2px solid var(--accent);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all var(--transition-fast);
     box-shadow: 0 0 24px var(--accent-glow);
-    position: relative;
 }
 
 .player-toggle:hover {
     transform: scale(1.05);
     box-shadow: 0 0 32px var(--accent-glow-strong);
-}
-
-.player-toggle svg {
-    width: 22px;
-    height: 22px;
-    stroke: var(--accent);
-    transition: all 0.3s ease;
 }
 
 .player-toggle.active {
@@ -1527,48 +1534,81 @@ body {
     background: var(--accent-bg);
 }
 
-/* ===== БАС-МИГАНИЕ ТРИГГЕР-КНОПКИ ===== */
-.player-toggle.playing {
-    border-color: var(--accent-bright);
+.player-toggle svg {
+    width: 22px;
+    height: 22px;
+    stroke: var(--accent);
+    transition: stroke var(--transition-fast);
 }
 
-.player-toggle.playing svg {
-    stroke: var(--accent-bright);
-}
-
-.player-toggle.playing .player-badge {
-    animation: badgePulse 1.2s ease-in-out infinite;
-}
-
-/* Базовое свечение */
-.player-toggle.playing .bass-ring {
+/* ----- КОЛЬЦА ВОКРУГ КНОПКИ (общий стиль) ----- */
+.player-toggle .pulse-ring,
+.player-toggle .bass-ring {
     position: absolute;
     top: -4px;
     left: -4px;
     right: -4px;
     bottom: -4px;
-    border-radius: 50%;
     border: 2px solid var(--accent);
     opacity: 0;
     pointer-events: none;
 }
 
-/* Бас-мигание — будет управляться через JS */
+/* Пульсирующие кольца */
+.player-toggle.playing .pulse-ring {
+    animation: ringPulse 1.2s ease-in-out infinite;
+}
+.player-toggle.playing .pulse-ring:nth-child(2) { animation-delay: 0.4s; }
+.player-toggle.playing .pulse-ring:nth-child(3) { animation-delay: 0.8s; }
+
+@keyframes ringPulse {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Бас-кольцо — управляется JS */
+.player-toggle.playing .bass-ring {
+    opacity: 0;
+}
+
+/* ----- БАС-МИГАНИЕ ----- */
+.player-toggle.playing {
+    border-color: var(--accent-bright);
+}
+.player-toggle.playing svg { stroke: var(--accent-bright); }
+
+/* Басовые состояния — объединены с одним keyframe */
 .player-toggle.bass-active {
     animation: bassFlash 0.15s ease-out;
 }
-
 .player-toggle.bass-active .bass-ring {
     animation: bassRingFlash 0.15s ease-out;
 }
 
+.player-toggle.bass-strong {
+    animation: bassFlashStrong 0.12s ease-out;
+}
+
 @keyframes bassFlash {
-    0% {
+    0% { 
         transform: scale(1);
         box-shadow: 0 0 30px var(--accent-glow-strong), 0 0 60px rgba(122, 204, 122, 0.2);
         border-color: var(--accent-bright);
     }
-    100% {
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 0 24px var(--accent-glow);
+        border-color: var(--accent);
+    }
+}
+
+@keyframes bassFlashStrong {
+    0% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 50px var(--accent-glow-strong), 0 0 100px rgba(122, 204, 122, 0.3);
+        border-color: #fff;
+    }
+    100% { 
         transform: scale(1);
         box-shadow: 0 0 24px var(--accent-glow);
         border-color: var(--accent);
@@ -1576,81 +1616,11 @@ body {
 }
 
 @keyframes bassRingFlash {
-    0% {
-        transform: scale(1);
-        opacity: 0.8;
-        border-color: var(--accent-bright);
-    }
-    100% {
-        transform: scale(1.3);
-        opacity: 0;
-        border-color: var(--accent);
-    }
+    0% { transform: scale(1); opacity: 0.8; border-color: var(--accent-bright); }
+    100% { transform: scale(1.3); opacity: 0; border-color: var(--accent); }
 }
 
-/* Для более сильного эффекта */
-.player-toggle.bass-strong {
-    animation: bassFlashStrong 0.12s ease-out;
-}
-
-@keyframes bassFlashStrong {
-    0% {
-        transform: scale(1.1);
-        box-shadow: 0 0 50px var(--accent-glow-strong), 0 0 100px rgba(122, 204, 122, 0.3);
-        border-color: #fff;
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 24px var(--accent-glow);
-        border-color: var(--accent);
-    }
-}
-
-@keyframes badgePulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.15);
-    }
-}
-
-/* ===== ВОЛНЫ ВОКРУГ ТРИГГЕР-КНОПКИ (для красоты) ===== */
-.player-toggle .pulse-ring {
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
-    opacity: 0;
-    pointer-events: none;
-}
-
-.player-toggle.playing .pulse-ring {
-    animation: ringPulse 1.2s ease-in-out infinite;
-}
-
-.player-toggle.playing .pulse-ring:nth-child(2) {
-    animation-delay: 0.4s;
-}
-
-.player-toggle.playing .pulse-ring:nth-child(3) {
-    animation-delay: 0.8s;
-}
-
-@keyframes ringPulse {
-    0% {
-        transform: scale(1);
-        opacity: 0.6;
-    }
-    100% {
-        transform: scale(1.6);
-        opacity: 0;
-    }
-}
-
+/* Бейдж */
 .player-badge {
     position: absolute;
     top: -4px;
@@ -1661,15 +1631,25 @@ body {
     font-weight: 700;
     width: 20px;
     height: 20px;
-    border-radius: 50%;
+    border-radius: var(--player-radius);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Montserrat', sans-serif;
     z-index: 2;
+    transition: transform var(--transition-fast);
 }
 
-/* Тело плеера */
+.player-toggle.playing .player-badge {
+    animation: badgePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+/* ----- ТЕЛО ПЛЕЕРА ----- */
 .player-body {
     position: absolute;
     bottom: 60px;
@@ -1678,12 +1658,12 @@ body {
     background: var(--bg-card);
     border: 2px solid var(--accent);
     border-radius: 16px;
-    padding: 20px 22px 22px 22px;
+    padding: 20px 22px 22px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px var(--accent-glow);
     opacity: 0;
     transform: translateY(20px) scale(0.95);
     pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all var(--transition-med);
     transform-origin: bottom right;
 }
 
@@ -1693,7 +1673,7 @@ body {
     pointer-events: all;
 }
 
-/* Хедер плеера */
+/* ----- ХЕДЕР ----- */
 .player-header {
     display: flex;
     align-items: center;
@@ -1716,7 +1696,6 @@ body {
     align-items: center;
     justify-content: center;
 }
-
 .player-icon svg {
     width: 22px;
     height: 22px;
@@ -1736,39 +1715,35 @@ body {
     color: var(--text-secondary);
     font-size: 1.2rem;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all var(--transition-fast);
     padding: 0 4px;
 }
-
 .player-close:hover {
     color: var(--accent);
     transform: rotate(90deg);
 }
 
-/* Информация о треке */
-.player-track {
-    margin-bottom: 16px;
-}
+/* ----- ИНФО О ТРЕКЕ ----- */
+.player-track { margin-bottom: 16px; }
 
 .track-info .track-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-heading);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
-
 .track-info .track-artist {
     font-size: 0.8rem;
     color: var(--text-secondary);
+}
+.track-info .track-title,
+.track-info .track-artist {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* ===== КНОПКИ УПРАВЛЕНИЯ ===== */
+/* ----- КНОПКИ УПРАВЛЕНИЯ ----- */
 .player-controls {
     display: flex;
     align-items: center;
@@ -1783,54 +1758,30 @@ body {
     color: var(--text-secondary);
     cursor: pointer;
     padding: 6px;
-    border-radius: 50%;
-    transition: all 0.25s ease;
+    border-radius: var(--player-radius);
+    transition: all var(--transition-fast);
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
 }
-
 .ctrl-btn:hover {
     color: var(--text-heading);
     background: var(--accent-bg);
 }
-
 .ctrl-btn svg {
     width: 20px;
     height: 20px;
     stroke: currentColor;
 }
 
-/* ===== КНОПКА PLAY ===== */
-.play-btn {
-    width: 44px;
-    height: 44px;
-    background: var(--accent-bg) !important;
-    border: 2px solid var(--accent) !important;
-    color: var(--accent) !important;
-    box-shadow: 0 0 20px var(--accent-glow);
-    position: relative;
-}
-
-.play-btn:hover {
-    background: rgba(122, 204, 122, 0.15) !important;
-    box-shadow: 0 0 32px var(--accent-glow-strong);
-    transform: scale(1.05);
-}
-
-.play-btn svg {
-    width: 22px;
-    height: 22px;
-}
-
-/* Прогресс */
-.player-progress {
+/* ----- ПРОГРЕСС И ВОЛЮМ (общие стили для range) ----- */
+.player-progress,
+.player-volume {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 14px;
 }
 
 .player-progress .time {
@@ -1840,44 +1791,71 @@ body {
     min-width: 32px;
 }
 
-.player-progress input[type="range"] {
-    flex: 1;
+/* Общие стили для всех range */
+.player-progress input[type="range"],
+.player-volume input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
     background: var(--border-color);
-    height: 3px;
     border-radius: 2px;
     outline: none;
     cursor: pointer;
-    transition: height 0.2s;
+    transition: height var(--transition-fast);
 }
 
-.player-progress input[type="range"]:hover {
-    height: 5px;
+.player-progress input[type="range"] {
+    flex: 1;
+    height: 3px;
+}
+.player-progress input[type="range"]:hover { height: 5px; }
+
+.player-volume input[type="range"] {
+    flex: 1;
+    height: 2px;
+    min-width: 40px;
+}
+.player-volume input[type="range"]:hover { height: 4px; }
+
+/* Thumb для всех range */
+.player-progress input[type="range"]::-webkit-slider-thumb,
+.player-volume input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: var(--player-radius);
+    cursor: pointer;
 }
 
 .player-progress input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
     width: 12px;
     height: 12px;
-    border-radius: 50%;
     background: var(--accent);
-    cursor: pointer;
     box-shadow: 0 0 16px var(--accent-glow-strong);
 }
-
 .player-progress input[type="range"]::-moz-range-thumb {
     width: 12px;
     height: 12px;
-    border-radius: 50%;
+    border-radius: var(--player-radius);
     background: var(--accent);
     cursor: pointer;
     border: none;
     box-shadow: 0 0 16px var(--accent-glow-strong);
 }
 
-/* Нижняя панель */
+.player-volume input[type="range"]::-webkit-slider-thumb {
+    width: 10px;
+    height: 10px;
+    background: var(--text-secondary);
+}
+.player-volume input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--player-radius);
+    background: var(--text-secondary);
+    cursor: pointer;
+    border: none;
+}
+
+/* ----- НИЖНЯЯ ПАНЕЛЬ ----- */
 .player-bottom {
     display: flex;
     align-items: center;
@@ -1885,53 +1863,11 @@ body {
     gap: 12px;
 }
 
-.player-volume {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-}
-
 .player-volume svg {
     width: 16px;
     height: 16px;
     stroke: var(--text-secondary);
     flex-shrink: 0;
-}
-
-.player-volume input[type="range"] {
-    flex: 1;
-    -webkit-appearance: none;
-    appearance: none;
-    background: var(--border-color);
-    height: 2px;
-    border-radius: 1px;
-    outline: none;
-    cursor: pointer;
-    min-width: 40px;
-}
-
-.player-volume input[type="range"]:hover {
-    height: 4px;
-}
-
-.player-volume input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--text-secondary);
-    cursor: pointer;
-}
-
-.player-volume input[type="range"]::-moz-range-thumb {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--text-secondary);
-    cursor: pointer;
-    border: none;
 }
 
 .player-actions {
@@ -1949,20 +1885,18 @@ body {
     cursor: pointer;
     padding: 4px 6px;
     border-radius: 6px;
-    transition: all 0.25s ease;
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     gap: 4px;
     font-size: 0.75rem;
     font-family: 'Montserrat', sans-serif;
 }
-
 .playlist-toggle:hover,
 .add-track:hover {
     color: var(--text-heading);
     background: var(--accent-bg);
 }
-
 .playlist-toggle svg,
 .add-track svg {
     width: 16px;
@@ -1977,14 +1911,13 @@ body {
     text-align: center;
 }
 
-/* Плейлист */
+/* ----- ПЛЕЙЛИСТ ----- */
 .player-playlist {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, margin 0.3s ease;
+    transition: max-height var(--transition-med), margin var(--transition-med);
     margin-top: 0;
 }
-
 .player-playlist.open {
     max-height: 240px;
     margin-top: 14px;
@@ -2001,29 +1934,24 @@ body {
     letter-spacing: 0.3px;
     text-transform: uppercase;
 }
-
 .playlist-empty-msg {
     font-size: 0.7rem;
     color: var(--text-secondary);
     opacity: 0.5;
 }
 
+/* Список треков */
 .playlist-list {
     max-height: 180px;
     overflow-y: auto;
     margin: 0 -4px;
     padding-right: 4px;
 }
-
-.playlist-list::-webkit-scrollbar {
-    width: 3px;
-}
-
+.playlist-list::-webkit-scrollbar { width: 3px; }
 .playlist-list::-webkit-scrollbar-thumb {
     background: var(--border-color);
     border-radius: 2px;
 }
-
 .playlist-list::-webkit-scrollbar-thumb:hover {
     background: var(--accent-dim);
 }
@@ -2035,16 +1963,12 @@ body {
     padding: 20px 0;
     line-height: 1.8;
 }
-
 .playlist-empty span {
     font-size: 1.5rem;
     display: block;
     margin-bottom: 4px;
 }
-
-.playlist-empty strong {
-    color: var(--accent);
-}
+.playlist-empty strong { color: var(--accent); }
 
 .playlist-track {
     display: flex;
@@ -2053,17 +1977,14 @@ body {
     gap: 8px;
     cursor: pointer;
     border-radius: 6px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
-
-.playlist-track:hover {
-    background: var(--accent-bg);
-}
-
+.playlist-track:hover { background: var(--accent-bg); }
 .playlist-track.active {
     background: var(--accent-bg);
     border-left: 2px solid var(--accent);
 }
+.playlist-track.active .track-title { color: var(--accent); }
 
 .playlist-track .track-num {
     font-size: 0.7rem;
@@ -2072,28 +1993,21 @@ body {
     min-width: 20px;
     text-align: center;
 }
-
 .playlist-track .track-info {
     flex: 1;
     min-width: 0;
 }
-
 .playlist-track .track-title {
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
-
-.playlist-track.active .track-title {
-    color: var(--accent);
-}
-
 .playlist-track .track-artist {
     font-size: 0.7rem;
     color: var(--text-secondary);
+}
+.playlist-track .track-title,
+.playlist-track .track-artist {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2107,24 +2021,22 @@ body {
     cursor: pointer;
     padding: 2px;
     border-radius: 4px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .track-remove:hover {
     opacity: 1;
     color: #ff6b6b;
 }
-
 .track-remove svg {
     width: 14px;
     height: 14px;
     stroke: currentColor;
 }
 
-/* Мобильная адаптация */
+/* ----- МОБИЛЬНАЯ АДАПТАЦИЯ ----- */
 @media (max-width: 640px) {
     .dayzm-player {
         bottom: 16px;
@@ -2133,23 +2045,18 @@ body {
     
     .player-body {
         width: 300px;
-        right: 0;
-        padding: 16px 18px 18px 18px;
+        padding: 16px 18px 18px;
         bottom: 56px;
+        right: 0;
     }
     
     .player-toggle {
         width: 42px;
         height: 42px;
     }
-    
     .player-toggle svg {
         width: 18px;
         height: 18px;
-    }
-    
-    .player-controls {
-        gap: 8px;
     }
     
     .ctrl-btn {
@@ -2157,21 +2064,8 @@ body {
         height: 30px;
     }
     
-    .play-btn {
-        width: 38px;
-        height: 38px;
-    }
-    
-    .play-btn svg {
-        width: 18px;
-        height: 18px;
-    }
-    
-    .player-progress {
-        gap: 6px;
-    }
-    
-    .player-volume input[type="range"] {
-        min-width: 30px;
-    }
+    .player-controls { gap: 8px; }
+    .player-progress { gap: 6px; }
+    .player-volume input[type="range"] { min-width: 30px; }
 }
+

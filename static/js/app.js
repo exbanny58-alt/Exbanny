@@ -11,6 +11,7 @@ const app = {
             this.render();
             EffectsManager.init();
             ColorPicker.init();
+            this.initMusicButton();
         } catch (error) {
             console.error('Ошибка загрузки конфига:', error);
         }
@@ -101,7 +102,6 @@ const app = {
             document.querySelectorAll('.side-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            // По умолчанию показываем "Общие"
             this.currentSettingsTab = 'general';
             document.querySelectorAll('.subnav-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.settingsTab === 'general');
@@ -142,20 +142,16 @@ const app = {
             tab.classList.toggle('active', tab.dataset.settingsTab === tabName);
         });
 
-        // Если нажали на "Цвета" — открываем попап, страница не меняется
         if (tabName === 'colors') {
             ColorPicker.open();
-            // Контент не меняем, оставляем текущий
             return;
         }
 
-        // Для других вкладок закрываем попап и загружаем контент
         ColorPicker.close();
         this.loadSettingsContent(tabName);
     },
 
     loadSettingsContent(tabName) {
-        // Если tabName не передан, используем currentSettingsTab
         const tab = tabName || this.currentSettingsTab;
         
         if (tab === 'general') {
@@ -206,7 +202,6 @@ const app = {
                     option.addEventListener('click', () => {
                         const effectId = option.dataset.effect;
                         EffectsManager.setEffect(effectId);
-                        // Перезагружаем содержимое чтобы обновить активное состояние
                         this.loadSettingsContent('effects');
                     });
                 });
@@ -219,8 +214,126 @@ const app = {
     goHome() {
         this.showHome();
         ColorPicker.close();
+    },
+
+    // ============================================
+    // УПРАВЛЕНИЕ ПЛАВАЮЩИМ ПЛЕЕРОМ
+    // ============================================
+
+    initMusicButton() {
+        const musicBtn = document.querySelector('.music-btn');
+        if (!musicBtn) return;
+
+        // Находим контейнер плеера
+        const player = document.getElementById('dayzmPlayer');
+        if (!player) return;
+
+        // По умолчанию плавающая кнопка скрыта
+        player.classList.add('hidden');
+        player.style.display = 'none';
+
+        // Обработчик клика по кнопке в топ-панели - только показывает/скрывает плавающую кнопку
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleFloatingButton();
+        });
+
+        // Синхронизация с закрытием тела плеера через крестик
+        const closeBtn = document.getElementById('playerClose');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                // Закрываем только тело плеера, плавающая кнопка остаётся
+                if (typeof Player !== 'undefined' && Player.isOpen) {
+                    Player.close();
+                }
+                this.updateMusicButtonState(true);
+            });
+        }
+
+        // Когда плавающая кнопка открывает плеер - синхронизируем состояние
+        if (typeof Player !== 'undefined') {
+            // Перехватываем открытие плеера через плавающую кнопку
+            const originalToggle = Player.toggle;
+            Player.toggle = function() {
+                originalToggle.call(this);
+                app.updateMusicButtonState(true);
+            };
+
+            const originalOpen = Player.open;
+            Player.open = function() {
+                originalOpen.call(this);
+                app.updateMusicButtonState(true);
+            };
+
+            const originalClose = Player.close;
+            Player.close = function() {
+                originalClose.call(this);
+                // Плавающая кнопка остаётся видимой
+                app.updateMusicButtonState(true);
+            };
+        }
+    },
+
+    // Показывает/скрывает ТОЛЬКО плавающую кнопку (не тело плеера)
+    toggleFloatingButton() {
+        const player = document.getElementById('dayzmPlayer');
+        if (!player) return;
+        
+        if (player.classList.contains('hidden') || player.style.display === 'none') {
+            this.showFloatingButton();
+        } else {
+            this.hideFloatingButton();
+        }
+    },
+
+    showFloatingButton() {
+        const player = document.getElementById('dayzmPlayer');
+        if (!player) return;
+        
+        player.classList.remove('hidden');
+        player.style.display = 'block';
+        player.style.animation = 'fadeIn 0.3s ease forwards';
+        
+        this.updateMusicButtonState(true);
+        
+        // НЕ открываем плеер автоматически!
+        // Пользователь сам кликнет по плавающей кнопке когда захочет
+    },
+
+    hideFloatingButton() {
+        const player = document.getElementById('dayzmPlayer');
+        if (!player) return;
+        
+        player.style.animation = 'popupClose 0.25s ease forwards';
+        setTimeout(() => {
+            player.classList.add('hidden');
+            player.style.display = 'none';
+            player.style.animation = '';
+        }, 250);
+        
+        this.updateMusicButtonState(false);
+        
+        // Если тело плеера открыто - закрываем его
+        if (typeof Player !== 'undefined' && Player.isOpen) {
+            Player.close();
+        }
+    },
+
+    updateMusicButtonState(isVisible) {
+        const musicBtn = document.querySelector('.music-btn');
+        if (!musicBtn) return;
+        
+        if (isVisible) {
+            musicBtn.classList.add('active');
+        } else {
+            musicBtn.classList.remove('active');
+        }
     }
 };
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ
+// ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
     app.init();

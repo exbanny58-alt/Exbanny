@@ -2,28 +2,66 @@
 const ColorPicker = {
     colors: {},
     isOpen: false,
+    isLoaded: false,
     defaultColors: {
         accent: '#7acc7a',
         glowIntensity: 50
     },
 
-    init() {
-        this.loadColors();
+    async init() {
+        // Сначала загружаем цвета
+        await this.loadColors();
+        // Потом создаём попап
         this.createPopup();
+        // Привязываем события
         this.bindEvents();
+        // Применяем цвета к странице
+        this.applyColors();
+        // Отмечаем, что загружено
+        this.isLoaded = true;
+        console.log('🎨 Цвета загружены и применены:', this.colors);
     },
 
     async loadColors() {
         try {
             const response = await fetch('/api/settings/load');
             const data = await response.json();
-            this.colors = data.colors || { ...this.defaultColors };
-            if (this.colors.glowIntensity === undefined || this.colors.glowIntensity === null) {
-                this.colors.glowIntensity = 50;
+            
+            if (data && data.colors && typeof data.colors === 'object') {
+                this.colors = {
+                    accent: data.colors.accent || this.defaultColors.accent,
+                    glowIntensity: data.colors.glowIntensity !== undefined && data.colors.glowIntensity !== null 
+                        ? data.colors.glowIntensity 
+                        : this.defaultColors.glowIntensity
+                };
+            } else {
+                console.log('Цвета не найдены, сохраняем дефолтные...');
+                this.colors = { ...this.defaultColors };
+                await this.saveColorsToServer(this.colors);
             }
         } catch (error) {
             console.error('Ошибка загрузки цветов:', error);
             this.colors = { ...this.defaultColors };
+            try {
+                await this.saveColorsToServer(this.colors);
+            } catch (e) {
+                console.error('Не удалось сохранить дефолтные цвета:', e);
+            }
+        }
+    },
+
+    async saveColorsToServer(colors) {
+        try {
+            const response = await fetch('/api/settings/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ colors: colors })
+            });
+            const data = await response.json();
+            return data.success || false;
+        } catch (error) {
+            console.error('Ошибка сохранения цветов:', error);
+            return false;
         }
     },
 
@@ -164,11 +202,10 @@ const ColorPicker = {
     updateGlowPreview() {
         const glowPreview = document.getElementById('glowPreview');
         const colorInput = document.getElementById('colorAccent');
-        const slider = document.getElementById('glowSlider');
         
         if (!glowPreview) return;
         
-        const color = colorInput ? colorInput.value : this.colors.accent;
+        const color = colorInput ? colorInput.value : (this.colors.accent || this.defaultColors.accent);
         const intensity = this.colors.glowIntensity !== undefined ? this.colors.glowIntensity : 50;
         const intensityFloat = intensity / 100;
         const glowSize = intensity * 1.5;
@@ -225,91 +262,102 @@ const ColorPicker = {
         const slider = document.getElementById('glowSlider');
         const glowValue = document.getElementById('glowValue');
         
-        if (this.colors.glowIntensity === undefined || this.colors.glowIntensity === null) {
-            this.colors.glowIntensity = 50;
-        }
+        const accent = this.colors.accent || this.defaultColors.accent;
+        const intensity = this.colors.glowIntensity !== undefined ? this.colors.glowIntensity : this.defaultColors.glowIntensity;
         
-        if (colorInput) colorInput.value = this.colors.accent;
-        if (hexInput) hexInput.value = this.colors.accent;
-        if (preview) preview.style.background = this.colors.accent;
-        if (slider) slider.value = this.colors.glowIntensity;
-        if (glowValue) glowValue.textContent = this.colors.glowIntensity + '%';
+        if (colorInput) colorInput.value = accent;
+        if (hexInput) hexInput.value = accent;
+        if (preview) preview.style.background = accent;
+        if (slider) slider.value = intensity;
+        if (glowValue) glowValue.textContent = intensity + '%';
         
         this.updateGlowPreview();
     },
 
-    save() {
+    async save() {
         const colorInput = document.getElementById('colorAccent');
         const slider = document.getElementById('glowSlider');
         
         const newColors = {
-            accent: colorInput ? colorInput.value : this.colors.accent,
-            glowIntensity: slider ? parseInt(slider.value) : this.colors.glowIntensity
+            accent: colorInput ? colorInput.value : (this.colors.accent || this.defaultColors.accent),
+            glowIntensity: slider ? parseInt(slider.value) : (this.colors.glowIntensity || this.defaultColors.glowIntensity)
         };
         
         this.colors = newColors;
         this.applyColors();
         
-        fetch('/api/settings/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ colors: newColors })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                this.showNotification('✅ Настройки сохранены!');
-                setTimeout(() => this.close(), 600);
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка сохранения:', error);
+        const success = await this.saveColorsToServer(newColors);
+        
+        if (success) {
+            this.showNotification('✅ Настройки сохранены!');
+            setTimeout(() => this.close(), 600);
+        } else {
             this.showNotification('❌ Ошибка сохранения');
-        });
+        }
     },
 
-    reset() {
+    async reset() {
         this.colors = { ...this.defaultColors };
         this.updateValues();
         this.applyColors();
         
-        fetch('/api/settings/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ colors: this.defaultColors })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                this.showNotification('↺ Настройки сброшены');
-                setTimeout(() => this.close(), 600);
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка сброса:', error);
-        });
+        const success = await this.saveColorsToServer(this.defaultColors);
+        
+        if (success) {
+            this.showNotification('↺ Настройки сброшены');
+            setTimeout(() => this.close(), 600);
+        } else {
+            this.showNotification('❌ Ошибка сброса');
+        }
     },
 
     applyColors() {
         const root = document.documentElement;
-        const intensity = this.colors.glowIntensity !== undefined ? this.colors.glowIntensity : 50;
+        const accent = this.colors.accent || this.defaultColors.accent;
+        const intensity = this.colors.glowIntensity !== undefined ? this.colors.glowIntensity : this.defaultColors.glowIntensity;
         const intensityFloat = intensity / 100;
         const glowSize = intensity * 1.5;
         
-        if (this.colors.accent) {
-            root.style.setProperty('--accent', this.colors.accent);
-            root.style.setProperty('--accent-dim', this.colors.accent + 'cc');
-            root.style.setProperty('--accent-bg', this.colors.accent + '0f');
-            root.style.setProperty('--loader-color', this.colors.accent);
+        if (accent) {
+            root.style.setProperty('--accent', accent);
+            root.style.setProperty('--accent-dim', accent + 'cc');
+            root.style.setProperty('--accent-bg', accent + '0f');
+            root.style.setProperty('--loader-color', accent);
             
             const minAlpha = 5;
             const maxAlpha = 51;
             const alpha = Math.round(minAlpha + (maxAlpha - minAlpha) * intensityFloat);
             const alphaHex = alpha.toString(16).padStart(2, '0');
             
-            root.style.setProperty('--accent-glow', this.colors.accent + alphaHex);
-            root.style.setProperty('--accent-glow-strong', this.colors.accent + alphaHex);
+            root.style.setProperty('--accent-glow', accent + alphaHex);
+            root.style.setProperty('--accent-glow-strong', accent + alphaHex);
             root.style.setProperty('--accent-glow-size', Math.max(glowSize, 2) + 'px');
+            
+            // Обновляем цвета загрузчика
+            Loader.updateColors();
+            
+            // Обновляем цвета плеера
+            this.updatePlayerColors(accent);
+        }
+    },
+    updatePlayerColors(accent) {
+        // Обновляем цвет кнопки плеера
+        const toggle = document.getElementById('playerToggle');
+        if (toggle) {
+            toggle.style.borderColor = accent;
+            toggle.style.boxShadow = `0 0 24px ${accent}33`;
+        }
+        
+        // Обновляем бейдж
+        const badge = document.querySelector('.player-badge');
+        if (badge) {
+            badge.style.background = accent;
+        }
+        
+        // Обновляем bass-ring
+        const bassRing = document.querySelector('.bass-ring');
+        if (bassRing) {
+            bassRing.style.borderColor = accent;
         }
     },
 

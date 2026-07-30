@@ -1,0 +1,558 @@
+/* ============================================
+   PRELOADER - 3D ТЕКСТОВОЕ КОЛЬЦО
+   ============================================ */
+
+* {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --loader-font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320));
+    --loader-ring-radius: 7rem;
+    --loader-ring-sectors: 30;
+    --loader-anim-duration: 8s;
+    --loader-bg: #161916;
+    --loader-color: var(--accent, #7acc7a);
+    --loader-text-color: #d4d8d4;
+    --loader-outline-color: #d4d8d4;
+    --loader-outline-fade: #4e5559;
+}
+
+/* ============================================
+   ОСНОВНЫЕ СТИЛИ ЗАГРУЗЧИКА (без !important)
+   ============================================ */
+
+/* Overlay загрузчика - БАЗОВЫЕ СТИЛИ */
+#app-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--loader-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    cursor: pointer;
+    user-select: none;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+/* Скрытое состояние - ТОЛЬКО ТУТ transition */
+#app-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Кликабельный оверлей для продолжения */
+#app-loader .loader-click-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Montserrat', 'Dosis', sans-serif;
+    font-size: 0.7rem;
+    color: var(--loader-text-color);
+    opacity: 0.3;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    animation: fadeInOut 2s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.6; }
+}
+
+/* Контейнер прелоадера */
+.preloader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 17em;
+    height: 17em;
+    animation: tiltSpin var(--loader-anim-duration) linear infinite;
+    transform-style: preserve-3d;
+    perspective: 40em;
+    position: relative;
+}
+
+/* Кольца прелоадера */
+.preloader__ring {
+    font-size: 2em;
+    position: relative;
+    height: 3rem;
+    width: 1.5rem;
+    transform-style: preserve-3d;
+    animation: spin calc(var(--loader-anim-duration) / 2) linear infinite;
+}
+
+.preloader__ring:nth-child(even) {
+    animation-direction: reverse;
+}
+
+/* Сектора кольца */
+.preloader__sector {
+    font-weight: 600;
+    position: absolute;
+    top: 0;
+    left: 0;
+    text-align: center;
+    text-transform: uppercase;
+    transform: translateZ(var(--loader-ring-radius));
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    color: var(--loader-text-color);
+    font-family: 'Montserrat', 'Dosis', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-shadow: 0 0 20px rgba(122, 204, 122, 0.1);
+}
+
+/* Пустые сектора становятся полосками */
+.preloader__sector:empty::before {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        transparent 45%,
+        var(--loader-color) 45% 55%,
+        transparent 55%
+    );
+    opacity: 0.6;
+    box-shadow: 0 0 10px var(--loader-color);
+    transition: opacity 0.3s ease;
+}
+
+.preloader__sector:empty:hover::before {
+    opacity: 1;
+}
+
+/* Позиционирование секторов */
+.preloader__sector:nth-child(2) { transform: rotateY(12deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(3) { transform: rotateY(24deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(4) { transform: rotateY(36deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(5) { transform: rotateY(48deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(6) { transform: rotateY(60deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(7) { transform: rotateY(72deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(8) { transform: rotateY(84deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(9) { transform: rotateY(96deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(10) { transform: rotateY(108deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(11) { transform: rotateY(120deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(12) { transform: rotateY(132deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(13) { transform: rotateY(144deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(14) { transform: rotateY(156deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(15) { transform: rotateY(168deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(16) { transform: rotateY(180deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(17) { transform: rotateY(192deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(18) { transform: rotateY(204deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(19) { transform: rotateY(216deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(20) { transform: rotateY(228deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(21) { transform: rotateY(240deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(22) { transform: rotateY(252deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(23) { transform: rotateY(264deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(24) { transform: rotateY(276deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(25) { transform: rotateY(288deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(26) { transform: rotateY(300deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(27) { transform: rotateY(312deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(28) { transform: rotateY(324deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(29) { transform: rotateY(336deg) translateZ(var(--loader-ring-radius)); }
+.preloader__sector:nth-child(30) { transform: rotateY(348deg) translateZ(var(--loader-ring-radius)); }
+
+/* Текст "DayzM" в центре */
+.preloader__label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Montserrat', 'Dosis', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--loader-text-color);
+    letter-spacing: 4px;
+    text-shadow: 0 0 30px rgba(122, 204, 122, 0.15);
+    animation: labelPulse 2s ease-in-out infinite;
+    pointer-events: none;
+    user-select: none;
+}
+
+.preloader__label span {
+    color: var(--loader-color);
+    font-weight: 300;
+}
+
+/* Процент загрузки */
+.preloader__percent {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    color: var(--loader-text-color);
+    opacity: 0.4;
+    letter-spacing: 2px;
+    font-weight: 300;
+}
+
+/* ============================================
+   MOUSE SCROLL - АНИМИРОВАННАЯ МЫШКА
+   ============================================ */
+
+.loader-mouse-container {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    pointer-events: none;
+}
+
+.mouse {
+    position: relative;
+    width: 52px;
+    height: 88px;
+    border-radius: 100px;
+    background: var(--loader-outline-fade) linear-gradient(
+        transparent 0%,
+        transparent 50%,
+        var(--loader-outline-color) 50%,
+        var(--loader-outline-color) 100%
+    );
+    background-size: 100% 200%;
+    animation: 
+        colorSlide 5s linear infinite,
+        nudgeMouse 5s ease-out infinite;
+}
+
+.mouse:before,
+.mouse:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+}
+
+.mouse:before {
+    width: 40px;
+    height: 76px;
+    background-color: var(--loader-bg);
+    border-radius: 100px;
+}
+
+.mouse:after {
+    background-color: var(--loader-outline-color);
+    width: 10px;
+    height: 10px;
+    border-radius: 100%;
+    animation: trackBallSlide 5s linear infinite;
+}
+
+.mouse-text {
+    font-family: 'Montserrat', 'Cabin', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 12px;
+    text-indent: 12px;
+    color: var(--loader-outline-color);
+    text-transform: uppercase;
+    animation: 
+        colorText 5s ease-out infinite,
+        nudgeText 5s ease-out infinite;
+    opacity: 0.6;
+}
+
+/* Анимации мышки */
+@keyframes colorSlide { 
+    0% { background-position: 0% 100%; }
+    20% { background-position: 0% 0%; }
+    21% { background-color: var(--loader-outline-fade); }
+    29.99% { 
+        background-color: var(--loader-outline-color);
+        background-position: 0% 0%;
+    }
+    30% { 
+        background-color: var(--loader-outline-fade);
+        background-position: 0% 100%;
+    }
+    50% { background-position: 0% 0%; }
+    51% { background-color: var(--loader-outline-fade); }
+    59% { 
+        background-color: var(--loader-outline-color);
+        background-position: 0% 0%;
+    }
+    60% { 
+        background-color: var(--loader-outline-fade);
+        background-position: 0% 100%;
+    }
+    80% { background-position: 0% 0%; }
+    81% { background-color: var(--loader-outline-fade); }
+    90%, 100% { background-color: var(--loader-outline-color); }
+}
+
+@keyframes trackBallSlide {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(-20px);
+    }
+    6% { 
+        opacity: 1;
+        transform: scale(0.9) translateY(5px);
+    }
+    14% {
+        opacity: 0;
+        transform: scale(0.4) translateY(40px);
+    }
+    15%, 19% {
+        opacity: 0;
+        transform: scale(0.4) translateY(-20px);
+    }
+    28%, 29.99% {
+        opacity: 1;
+        transform: scale(1) translateY(-20px);
+    }
+    30% {
+        opacity: 1;
+        transform: scale(1) translateY(-20px);
+    }
+    36% { 
+        opacity: 1;
+        transform: scale(0.9) translateY(5px);
+    }
+    44% {
+        opacity: 0;
+        transform: scale(0.4) translateY(40px);
+    }
+    45%, 49% {
+        opacity: 0;
+        transform: scale(0.4) translateY(-20px);
+    }
+    58%, 59.99% {
+        opacity: 1;
+        transform: scale(1) translateY(-20px);
+    }
+    60% {
+        opacity: 1;
+        transform: scale(1) translateY(-20px);
+    }
+    66% { 
+        opacity: 1;
+        transform: scale(0.9) translateY(5px);
+    }
+    74% {
+        opacity: 0;
+        transform: scale(0.4) translateY(40px);
+    }
+    75%, 79% {
+        opacity: 0;
+        transform: scale(0.4) translateY(-20px);
+    }
+    88%, 100% {
+        opacity: 1;
+        transform: scale(1) translateY(-20px);
+    }
+}
+
+@keyframes nudgeMouse {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(8px); }
+    30% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+    60% { transform: translateY(0); }
+    80% { transform: translateY(8px); }
+    90% { transform: translateY(0); }
+}
+
+@keyframes nudgeText {
+    0% { transform: translateY(0); }
+    20% { transform: translateY(2px); }
+    30% { transform: translateY(0); }
+    50% { transform: translateY(2px); }
+    60% { transform: translateY(0); }
+    80% { transform: translateY(2px); }
+    90% { transform: translateY(0); }
+}
+
+@keyframes colorText { 
+    21% { color: var(--loader-outline-fade); }
+    30% { color: var(--loader-outline-color); }
+    51% { color: var(--loader-outline-fade); }
+    60% { color: var(--loader-outline-color); }
+    81% { color: var(--loader-outline-fade); }
+    90% { color: var(--loader-outline-color); }
+}
+
+/* ============================================
+   АНИМАЦИИ
+   ============================================ */
+
+@keyframes tiltSpin {
+    from { transform: rotateY(0) rotateX(30deg); }
+    to { transform: rotateY(1turn) rotateX(30deg); }
+}
+
+@keyframes spin {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(1turn); }
+}
+
+@keyframes labelPulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+}
+
+/* ============================================
+   АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ
+   ============================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --loader-ring-radius: 4.5rem;
+    }
+    
+    .preloader {
+        width: 12em;
+        height: 12em;
+    }
+    
+    .preloader__ring {
+        font-size: 1.4em;
+        height: 2.2rem;
+        width: 1.1rem;
+    }
+    
+    .preloader__sector {
+        font-size: 0.6rem;
+    }
+    
+    .preloader__label {
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+    
+    .mouse {
+        width: 40px;
+        height: 68px;
+    }
+    
+    .mouse:before {
+        width: 30px;
+        height: 58px;
+    }
+    
+    .mouse:after {
+        width: 8px;
+        height: 8px;
+    }
+    
+    .mouse-text {
+        font-size: 0.6rem;
+        letter-spacing: 8px;
+        text-indent: 8px;
+    }
+    
+    .loader-mouse-container {
+        bottom: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --loader-ring-radius: 3.5rem;
+    }
+    
+    .preloader {
+        width: 9em;
+        height: 9em;
+    }
+    
+    .preloader__ring {
+        font-size: 1.1em;
+        height: 1.8rem;
+        width: 0.9rem;
+    }
+    
+    .preloader__sector {
+        font-size: 0.5rem;
+    }
+    
+    .preloader__label {
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+    
+    .mouse {
+        width: 32px;
+        height: 54px;
+    }
+    
+    .mouse:before {
+        width: 24px;
+        height: 46px;
+    }
+    
+    .mouse:after {
+        width: 6px;
+        height: 6px;
+    }
+    
+    .mouse-text {
+        font-size: 0.5rem;
+        letter-spacing: 6px;
+        text-indent: 6px;
+    }
+    
+    .loader-mouse-container {
+        bottom: 40px;
+    }
+}
+
+/* ============================================
+   ЗАЩИТА ОТ АВТОМАТИЧЕСКОГО СКРЫТИЯ
+   ============================================ */
+
+/* Эти стили гарантируют, что загрузчик виден до клика */
+#app-loader:not(.hidden) {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: all !important;
+}
+
+/* Скрываем только когда есть класс .hidden */
+#app-loader.hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: opacity 0.6s ease, visibility 0.6s ease !important;
+}
+
+/* Защита от display:none из других стилей */
+#app-loader[style*="display: none"]:not(.hidden) {
+    display: flex !important;
+}

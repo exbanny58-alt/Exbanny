@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DayzM</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/loaders.css') }}">
 </head>
 <body>
-
     <!-- Верхняя матовая панель -->
     <header class="top-panel">
         <div class="top-panel-left">
@@ -15,7 +15,6 @@
                 <span class="dayz"></span><span class="m"></span>
             </div>
 
-            <!-- Подменю настроек -->
             <nav class="settings-subnav" id="settingsSubnav">
                 <button class="subnav-tab active" data-settings-tab="general">Общие</button>
                 <button class="subnav-tab" data-settings-tab="colors">Цвета</button>
@@ -36,10 +35,10 @@
         </div>
     </header>
 
-    <!-- Основной контейнер: левая панель + контент -->
+    <!-- Основной контейнер -->
     <div class="main-container">
 
-        <!-- Левая матовая панель -->
+        <!-- Левая панель -->
         <aside class="side-panel">
             <nav class="side-tabs">
                 <!-- Вкладки генерируются через JS -->
@@ -52,10 +51,11 @@
         </main>
     </div>
 
-<script src="{{ url_for('static', filename='js/effects.js') }}"></script>
-<script src="{{ url_for('static', filename='js/loader.js') }}"></script>
-<script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
-<script src="{{ url_for('static', filename='js/player.js') }}"></script>
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loaders.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/loader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/effects.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/color-picker.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/player.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

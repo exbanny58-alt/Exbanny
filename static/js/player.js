@@ -1,16 +1,55 @@
-// player.js - Аудиоплеер в стиле DayzM с бас-миганием
+// player.js - Аудиоплеер с молниеносной реакцией на затухание
 const Player = {
     playlist: [],
     currentTrackIndex: -1,
     isPlaying: false,
     isOpen: false,
     audio: null,
+    
+    // AudioContext для анализа
     audioContext: null,
     analyser: null,
     dataArray: null,
+    sourceNode: null,
     bassInterval: null,
-    bassSensitivity: 80, // Чувствительность баса (0-100)
     
+    // Настройки пульсации
+    bassConfig: {
+        // bassRange: {          // ❌ ВЫРЕЗАНО
+        //     min: 20,
+        //     max: 150
+        // },
+        // subBassRange: {       // ❌ ЗАКОММЕНТИРОВАНО
+        //     min: 20,
+        //     max: 60
+        // },
+        kickRange: {             // ✅ АКТИВЕН
+            min: 80,
+            max: 200
+        },
+        sensitivity: 0.2,
+        smoothing: 0.15,        // Меньше сглаживания = быстрее реакция
+        minThreshold: 0.05,
+        flashDuration: 80,      // Короткая вспышка
+        intensityMultiplier: 2.0,
+        // Мгновенное затухание
+        decaySpeed: 0.92,       // Скорость затухания (0-1, выше = быстрее)
+        minDecay: 0.02          // Минимальный уровень перед полным сбросом
+    },
+    
+    // Состояние пульсации
+    bassState: {
+        currentIntensity: 0,
+        isFlashing: false,
+        flashTimeout: null,
+        lastFlashTime: 0,
+        // Для разных типов баса
+        // subBass: 0,          // ❌ ЗАКОММЕНТИРОВАНО
+        kickBass: 0,
+        // midBass: 0           // ❌ ЗАКОММЕНТИРОВАНО
+    },
+    
+    frequencyCache: null,
     elements: {},
     
     init() {
@@ -123,17 +162,26 @@ const Player = {
                 
                 <div class="player-playlist" id="playerPlaylist">
                     <div class="playlist-header">
-                        <span>🎵 Плейлист</span>
+                        <span>Плейлист</span>
                         <span class="playlist-empty-msg" id="emptyMsg">Нет треков</span>
                     </div>
                     <div class="playlist-list" id="playlistList">
                         <div class="playlist-empty">
-                            <span>📂</span>
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <!-- Ноты -->
+                                <path d="M9 18V5l12-2v13"/>
+                                <circle cx="6" cy="18" r="3"/>
+                                <circle cx="18" cy="16" r="3"/>
+                                <!-- Волны звука -->
+                                <path d="M3 12a5 5 0 0 1 0-8"/>
+                                <path d="M21 12a5 5 0 0 0 0-8"/>
+                                <path d="M6 15a3 3 0 0 1 0-6"/>
+                                <path d="M18 15a3 3 0 0 0 0-6"/>
+                            </svg>
                             <p>Перетащите аудиофайлы сюда<br>или нажмите <strong>+</strong></p>
                         </div>
                     </div>
-                </div>
-                
+                </div>                
                 <input type="file" id="fileInput" accept="audio/*" multiple style="display:none">
             </div>
         `;
@@ -214,6 +262,26 @@ const Player = {
         });
         
         this.setupDragDrop();
+        this.observeAccentColor();
+    },
+    
+    observeAccentColor() {
+        const observer = new MutationObserver(() => {
+            this.updateBassRingColor();
+        });
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+    },
+    
+    updateBassRingColor() {
+        const root = document.documentElement;
+        const accent = getComputedStyle(root).getPropertyValue('--accent').trim();
+        const ring = this.elements.toggle?.querySelector('.bass-ring');
+        if (ring && accent) {
+            ring.style.borderColor = accent;
+        }
     },
     
     bindPlayerEvents() {
@@ -241,7 +309,6 @@ const Player = {
             }
         });
         
-        // При воспроизведении запускаем анализ баса
         this.audio.addEventListener('play', () => {
             this.startBassAnalysis();
         });
@@ -305,48 +372,160 @@ const Player = {
         return `${m}:${sec.toString().padStart(2, '0')}`;
     },
     
-    // ===== БАС-АНАЛИЗ =====
+    // ===== МОЛНИЕНОСНАЯ ПУЛЬСАЦИЯ =====
+    
     startBassAnalysis() {
         if (this.bassInterval) return;
+        if (!this.audio.src) return;
         
         try {
-            // Создаем AudioContext если его нет
             if (!this.audioContext) {
                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+                
                 this.analyser = this.audioContext.createAnalyser();
-                this.analyser.fftSize = 256;
-                const source = this.audioContext.createMediaElementSource(this.audio);
-                source.connect(this.analyser);
+                this.analyser.fftSize = 1024;
+                this.analyser.smoothingTimeConstant = 0.4; // Меньше сглаживания = быстрее реакция
+                
+                this.sourceNode = this.audioContext.createMediaElementSource(this.audio);
+                this.sourceNode.connect(this.analyser);
                 this.analyser.connect(this.audioContext.destination);
+                
                 this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                this.calculateFrequencyRanges();
             }
             
+            if (this.audioContext.state === 'suspended') {
+                this.audioContext.resume();
+            }
+            
+            this.bassState.currentIntensity = 0;
+            this.bassState.isFlashing = false;
+            if (this.bassState.flashTimeout) {
+                clearTimeout(this.bassState.flashTimeout);
+                this.bassState.flashTimeout = null;
+            }
+            
+            // Высокая частота обновления для быстрой реакции
             this.bassInterval = setInterval(() => {
-                if (!this.analyser || !this.isPlaying) return;
-                
-                this.analyser.getByteFrequencyData(this.dataArray);
-                
-                // Берем только низкие частоты (бас) - первые 20-30 значений
-                let bassSum = 0;
-                const bassCount = Math.min(25, this.dataArray.length);
-                for (let i = 0; i < bassCount; i++) {
-                    bassSum += this.dataArray[i];
-                }
-                const bassAvg = bassSum / bassCount;
-                
-                // Нормализуем (0-255 -> 0-1)
-                const normalized = Math.min(1, bassAvg / 128);
-                
-                // Применяем чувствительность
-                const threshold = this.bassSensitivity / 100;
-                if (normalized > threshold) {
-                    const intensity = (normalized - threshold) / (1 - threshold);
-                    this.triggerBassFlash(intensity);
-                }
-            }, 100); // Проверяем каждые 100мс
+                this.analyzeFrequencies();
+            }, 20); // 50fps для максимальной скорости
+            
         } catch (e) {
-            console.warn('Бас-анализ недоступен:', e);
+            console.warn('Анализ недоступен:', e);
         }
+    },
+    
+    calculateFrequencyRanges() {
+        const sampleRate = this.audioContext.sampleRate;
+        const fftSize = this.analyser.fftSize;
+        const frequencyResolution = sampleRate / fftSize;
+        
+        const getIndex = (freq) => Math.floor(freq / frequencyResolution);
+        
+        this.frequencyCache = {
+            // bass: {                // ❌ ВЫРЕЗАНО
+            //     start: getIndex(20),
+            //     end: getIndex(150)
+            // },
+            // subBass: {             // ❌ ЗАКОММЕНТИРОВАНО
+            //     start: getIndex(20),
+            //     end: getIndex(60)
+            // },
+            kick: {                  // ✅ ТОЛЬКО КИК АКТИВЕН
+                start: getIndex(60),
+                end: getIndex(120)
+            }
+        };
+    },
+    
+    analyzeFrequencies() {
+        if (!this.analyser || !this.isPlaying) return;
+        
+        try {
+            this.analyser.getByteFrequencyData(this.dataArray);
+            
+            // ✅ ТОЛЬКО кик-бас (60-120 Гц)
+            const kickEnergy = this.getBandEnergy(this.frequencyCache.kick);
+            
+            // Применяем чувствительность
+            let intensity = kickEnergy * this.bassConfig.sensitivity;
+            
+            // Порог
+            const threshold = this.bassConfig.minThreshold;
+            if (intensity < threshold) {
+                intensity = 0;
+            } else {
+                intensity = Math.min(1, (intensity - threshold) / (1 - threshold));
+            }
+            
+            intensity = Math.min(1, intensity * this.bassConfig.intensityMultiplier);
+            
+            // Мгновенное обновление
+            const oldIntensity = this.bassState.currentIntensity;
+            this.bassState.currentIntensity = intensity;
+            
+            // Резкое падение - мгновенный сброс
+            if (oldIntensity - intensity > 0.15) {
+                this.instantDecay();
+            }
+            
+            if (intensity < this.bassConfig.minDecay) {
+                if (this.bassState.currentIntensity > 0) {
+                    this.instantDecay();
+                }
+                return;
+            }
+            
+            // Триггер вспышки
+            if (intensity > 0.04) {
+                this.triggerInstantFlash(intensity);
+            }
+            
+        } catch (e) {
+            // Игнорируем ошибки
+        }
+    },
+    
+    getBandEnergy(range) {
+        let sum = 0;
+        const count = range.end - range.start;
+        
+        if (count <= 0) return 0;
+        
+        for (let i = range.start; i < range.end && i < this.dataArray.length; i++) {
+            sum += this.dataArray[i];
+        }
+        
+        return sum / (count * 255);
+    },
+    
+    // Мгновенный сброс эффекта
+    instantDecay() {
+        this.bassState.currentIntensity = 0;
+        
+        const toggle = this.elements.toggle;
+        toggle.style.transform = '';
+        toggle.style.boxShadow = '';
+        toggle.style.borderColor = '';
+        toggle.classList.remove('bass-active', 'bass-strong');
+        
+        const ring = toggle.querySelector('.bass-ring');
+        if (ring) {
+            ring.style.transform = '';
+            ring.style.opacity = '';
+            ring.style.borderColor = '';
+        }
+        
+        if (this.bassState.flashTimeout) {
+            clearTimeout(this.bassState.flashTimeout);
+            this.bassState.flashTimeout = null;
+        }
+        
+        this.bassState.isFlashing = false;
     },
     
     stopBassAnalysis() {
@@ -354,33 +533,77 @@ const Player = {
             clearInterval(this.bassInterval);
             this.bassInterval = null;
         }
-        // Убираем классы баса
-        this.elements.toggle.classList.remove('bass-active', 'bass-strong');
+        
+        this.instantDecay();
     },
     
-    triggerBassFlash(intensity) {
+    triggerInstantFlash(intensity) {
         const toggle = this.elements.toggle;
+        const ring = toggle.querySelector('.bass-ring');
         
-        // Сбрасываем анимацию
-        toggle.classList.remove('bass-active', 'bass-strong');
+        // Мгновенная реакция - без задержек
+        const isStrong = intensity > 0.3;
+        const isVeryStrong = intensity > 0.55;
         
-        // Принудительный reflow
-        void toggle.offsetHeight;
+        // Масштаб с учетом силы
+        const scale = 1 + intensity * 0.3;
+        const glowIntensity = intensity * 60;
         
-        if (intensity > 0.6) {
-            toggle.classList.add('bass-strong');
-        } else {
-            toggle.classList.add('bass-active');
+        const root = document.documentElement;
+        const accent = getComputedStyle(root).getPropertyValue('--accent').trim() || '#7acc7a';
+        
+        // Динамический цвет
+        let color = accent;
+        if (isVeryStrong) {
+            color = '#973434';
+        } else if (isStrong) {
+            color = accent;
         }
         
-        // Убираем класс через 200мс
-        setTimeout(() => {
-            toggle.classList.remove('bass-active', 'bass-strong');
-        }, 200);
-    },
-    
-    setBassSensitivity(value) {
-        this.bassSensitivity = Math.max(0, Math.min(100, value));
+        // Применяем эффект мгновенно
+        toggle.style.transition = 'none';
+        toggle.style.transform = `scale(${scale})`;
+        toggle.style.boxShadow = `0 0 ${20 + glowIntensity}px ${color}, 0 0 ${40 + glowIntensity * 2}px ${color}44`;
+        toggle.style.borderColor = isVeryStrong ? '#ffffff' : (isStrong ? accent : color);
+        
+        if (ring) {
+            ring.style.transition = 'none';
+            const ringScale = 1 + intensity * 1.0;
+            ring.style.transform = `scale(${ringScale})`;
+            ring.style.opacity = Math.min(1, intensity * 2.0);
+            ring.style.borderColor = isVeryStrong ? '#ffffff' : color;
+        }
+        
+        toggle.classList.add('bass-active');
+        if (isStrong) {
+            toggle.classList.add('bass-strong');
+        } else {
+            toggle.classList.remove('bass-strong');
+        }
+        
+        // Возвращаем transition для плавного затухания
+        requestAnimationFrame(() => {
+            toggle.style.transition = '';
+            if (ring) {
+                ring.style.transition = '';
+            }
+        });
+        
+        // Короткий таймер для сброса, если бас упадет
+        if (this.bassState.flashTimeout) {
+            clearTimeout(this.bassState.flashTimeout);
+        }
+        
+        this.bassState.isFlashing = true;
+        this.bassState.flashTimeout = setTimeout(() => {
+            // Если интенсивность упала - сбрасываем
+            if (this.bassState.currentIntensity < 0.03) {
+                this.instantDecay();
+            } else {
+                this.bassState.isFlashing = false;
+            }
+            this.bassState.flashTimeout = null;
+        }, this.bassConfig.flashDuration);
     },
     
     // ===== ОСТАЛЬНАЯ ЛОГИКА =====
@@ -390,7 +613,6 @@ const Player = {
         this.currentTrackIndex = index;
         const track = this.playlist[index];
         
-        // Останавливаем старый анализ
         this.stopBassAnalysis();
         
         this.audio.src = track.url;
@@ -584,7 +806,7 @@ const Player = {
             toggle.classList.add('playing');
         } else {
             toggle.classList.remove('playing');
-            toggle.classList.remove('bass-active', 'bass-strong');
+            this.instantDecay();
         }
     },
     
